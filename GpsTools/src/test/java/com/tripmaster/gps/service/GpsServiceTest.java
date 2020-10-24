@@ -1,4 +1,4 @@
-package com.tripmaster.gps;
+package com.tripmaster.gps.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,6 +31,10 @@ public class GpsServiceTest {
         UUID userId = UUID.randomUUID();
         // WHEN
         VisitedLocation visitedLocation = gpsService.getUserLocation(userId);
+        System.out.println(visitedLocation.timeVisited);
+        System.out.println(visitedLocation.location.latitude);
+        System.out.println(visitedLocation.location.longitude);
+        System.out.println(visitedLocation.userId);
         // THEN
         assertThat(visitedLocation).isNotNull();
     }

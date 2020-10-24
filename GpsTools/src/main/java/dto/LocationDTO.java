@@ -1,4 +1,4 @@
-package com.tripmaster.gps.DTO;
+package dto;
 
 /**
  * DTO used to transfer the data of gpsUtil Location class.

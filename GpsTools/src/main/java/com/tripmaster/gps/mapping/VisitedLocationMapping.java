@@ -1,8 +1,7 @@
 package com.tripmaster.gps.mapping;
 
-import com.tripmaster.gps.DTO.LocationDTO;
-import com.tripmaster.gps.DTO.VisitedLocationDTO;
-
+import dto.LocationDTO;
+import dto.VisitedLocationDTO;
 import gpsUtil.location.VisitedLocation;
 
 public class VisitedLocationMapping {

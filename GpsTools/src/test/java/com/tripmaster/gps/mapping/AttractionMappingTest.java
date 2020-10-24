@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.tripmaster.gps.DTO.AttractionDTO;
-
+import dto.AttractionDTO;
 import gpsUtil.location.Attraction;
 
 @SpringJUnitConfig(value = AttractionMapping.class)

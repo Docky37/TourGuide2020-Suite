@@ -3,8 +3,8 @@ package com.tripmaster.gps.service;
 import java.util.List;
 import java.util.UUID;
 
-import gpsUtil.location.Attraction;
-import gpsUtil.location.VisitedLocation;
+import dto.AttractionDTO;
+import dto.VisitedLocationDTO;
 
 /**
  * This interface provides 2 methods to deal with the gpsUtil.jar library.
@@ -21,7 +21,7 @@ public interface IGpsService {
      * @param uuid
      * @return a VisitedLocation
      */
-    VisitedLocation getUserLocation(UUID uuid);
+    VisitedLocationDTO getUserLocation(UUID uuid);
 
     /**
      * Method that calls the gpsUti.jar library to get the List of all
@@ -29,6 +29,6 @@ public interface IGpsService {
      *
      * @return an Attraction list
      */
-    List<Attraction> getAttractions();
+    List<AttractionDTO> getAttractions();
 
 }

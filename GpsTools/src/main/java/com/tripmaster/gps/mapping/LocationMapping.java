@@ -1,8 +1,11 @@
 package com.tripmaster.gps.mapping;
 
+import org.springframework.stereotype.Component;
+
 import dto.LocationDTO;
 import gpsUtil.location.Location;
 
+@Component
 public class LocationMapping {
 
     public LocationDTO mapToDTO(final Location location) {

@@ -49,6 +49,16 @@ public class GpsService implements IGpsService {
     }
 
     /**
+     * Class constructor used to inject Mock beans for tests.
+     */
+    public GpsService(VisitedLocationMapping visitedLocationMapping,
+            AttractionMapping attractionMapping)
+    {
+        this.visitedLocationMapping = visitedLocationMapping;
+        this.attractionMapping = attractionMapping;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -67,7 +77,7 @@ public class GpsService implements IGpsService {
     public List<AttractionDTO> getAttractions() {
         List<Attraction> attractions = gpsUtil.getAttractions();
         List<AttractionDTO> attractionsDTO = new ArrayList<>();
-        attractions.forEach(a->{
+        attractions.forEach(a -> {
             attractionsDTO.add(attractionMapping.mapToDTO(a));
         });
         logger.debug(attractionsDTO.toString());

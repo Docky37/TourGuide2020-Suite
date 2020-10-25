@@ -1,4 +1,4 @@
-package dto;
+package com.tripmaster.gps.dto;
 
 import java.util.Date;
 

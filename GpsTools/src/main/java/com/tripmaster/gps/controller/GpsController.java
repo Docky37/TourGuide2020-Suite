@@ -10,10 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tripmaster.gps.dto.AttractionDTO;
+import com.tripmaster.gps.dto.VisitedLocationDTO;
 import com.tripmaster.gps.service.GpsService;
-
-import dto.AttractionDTO;
-import dto.VisitedLocationDTO;
 
 @RestController
 public class GpsController {

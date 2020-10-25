@@ -3,8 +3,8 @@ package com.tripmaster.gps.service;
 import java.util.List;
 import java.util.UUID;
 
-import dto.AttractionDTO;
-import dto.VisitedLocationDTO;
+import com.tripmaster.gps.dto.AttractionDTO;
+import com.tripmaster.gps.dto.VisitedLocationDTO;
 
 /**
  * This interface provides 2 methods to deal with the gpsUtil.jar library.

@@ -2,7 +2,8 @@ package com.tripmaster.gps.mapping;
 
 import org.springframework.stereotype.Component;
 
-import dto.LocationDTO;
+import com.tripmaster.gps.dto.LocationDTO;
+
 import gpsUtil.location.Location;
 
 @Component

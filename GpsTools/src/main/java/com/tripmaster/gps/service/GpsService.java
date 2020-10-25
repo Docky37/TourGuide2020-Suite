@@ -9,11 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.tripmaster.gps.dto.AttractionDTO;
+import com.tripmaster.gps.dto.VisitedLocationDTO;
 import com.tripmaster.gps.mapping.AttractionMapping;
 import com.tripmaster.gps.mapping.VisitedLocationMapping;
 
-import dto.AttractionDTO;
-import dto.VisitedLocationDTO;
 import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 

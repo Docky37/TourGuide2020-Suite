@@ -9,7 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import dto.VisitedLocationDTO;
+import com.tripmaster.gps.dto.VisitedLocationDTO;
+
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 

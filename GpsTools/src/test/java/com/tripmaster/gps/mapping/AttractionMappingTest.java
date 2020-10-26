@@ -25,11 +25,13 @@ public class AttractionMappingTest {
     @Test
     public void givenAnAttraction_whenMapToDTO_thenReturnAnAttractionDTO() {
         // GIVEN
-        Attraction attraction = new Attraction("Tour Eiffel", "Paris",
-                "France", 48.858482d, 2.294426d);
+        Attraction attraction = new Attraction("Tour Eiffel",
+                "Paris", "France", 48.858482d, 2.294426d);
         // WHEN
         AttractionDTO mappedAttraction = attractionMapping.mapToDTO(attraction);
         // THEN
+        assertThat(mappedAttraction.getAttractionId())
+                .isNotNull();
         assertThat(mappedAttraction.getAttractionName())
                 .isEqualTo(attraction.attractionName);
         assertThat(mappedAttraction.getCity()).isEqualTo(attraction.city);

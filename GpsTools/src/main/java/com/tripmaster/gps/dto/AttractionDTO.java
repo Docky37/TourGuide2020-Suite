@@ -1,5 +1,7 @@
 package com.tripmaster.gps.dto;
 
+import java.util.UUID;
+
 /**
  * DTO used to transfer the data of gpsUtil Attraction class.
  *
@@ -8,6 +10,10 @@ package com.tripmaster.gps.dto;
  * @since October 2020
  */
 public class AttractionDTO {
+    /**
+     * The id of this attraction with UUID type.
+     */
+    private UUID attractionId;
 
     /**
      * The name of this attraction.
@@ -44,10 +50,11 @@ public class AttractionDTO {
      * @param pLongitude
      * @param pState
      */
-    public AttractionDTO(final String pAttractionName,
+    public AttractionDTO(final UUID pAttractionId, final String pAttractionName,
             final String pCity, final String pState,
             final double pLatitude, final double pLongitude)
     {
+        attractionId = pAttractionId;
         attractionName = pAttractionName;
         city = pCity;
         state = pState;
@@ -59,6 +66,15 @@ public class AttractionDTO {
      * No argument and protected empty class constructor.
      */
     protected AttractionDTO() {
+    }
+
+    /**
+     * Getter of the attractionId attribute.
+     *
+     * @return an UUID
+     */
+    public UUID getAttractionId() {
+        return attractionId;
     }
 
     /**
@@ -111,7 +127,8 @@ public class AttractionDTO {
      */
     @Override
     public String toString() {
-        return "AttractionDTO [attractionName=" + attractionName + ", city="
+        return "AttractionDTO [attractionId=" + attractionId
+                + ", attractionName=" + attractionName + ", city="
                 + city + ", state=" + state + ", latitude=" + latitude
                 + ", longitude=" + longitude + "]";
     }

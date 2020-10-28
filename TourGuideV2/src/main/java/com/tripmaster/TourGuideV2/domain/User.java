@@ -21,7 +21,7 @@ public class User {
     private String emailAddress;
     private Date latestLocationTimestamp;
     private List<VisitedLocation> visitedLocations = new ArrayList<>();
-    //private List<UserReward> userRewards = new ArrayList<>();
+    private List<UserReward> userRewards = new ArrayList<>();
     private UserPreferences userPreferences = new UserPreferences();
     //private List<Provider> tripDeals = new ArrayList<>();
 
@@ -144,18 +144,18 @@ public class User {
      *
      * @param userReward
      */
-    /*public void addUserReward(UserReward userReward) {
+    public void addUserReward(UserReward userReward) {
         userRewards.add(userReward);
-    }*/
+    }
 
     /**
      * Getter of the userRewards List.
      *
      * @return a List<UserReward>
      */
-    /*public List<UserReward> getUserRewards() {
+    public List<UserReward> getUserRewards() {
         return userRewards;
-    }*/
+    }
 
     /**
      * Getter of userPreferences.

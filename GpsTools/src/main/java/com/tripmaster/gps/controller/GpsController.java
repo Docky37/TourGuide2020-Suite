@@ -40,7 +40,7 @@ public class GpsController {
     
     @GetMapping("/getAllAttractions")
     public List<AttractionDTO> getAllAttractions(){
-        logger.info("New HTML GET Request: /getLocation");
+        logger.info("New HTML GET Request: /getAllAttractions");
         List<AttractionDTO> attractions = gpsService.getAttractions();
         attractions.stream().forEach(a->logger.info(a.toString()));
         return attractions;

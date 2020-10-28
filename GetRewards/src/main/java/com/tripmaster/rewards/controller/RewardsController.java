@@ -27,10 +27,10 @@ public class RewardsController {
      *
      * @return an int
      */
-    @GetMapping("/getRewards")
+    @GetMapping("/getReward")
     public int getUserRewards(@RequestParam UUID attractionId,
             @RequestParam UUID userId) {
-        logger.info("HTML GET Request on localhost:8080");
+        logger.info("HTML GET Request on localhost:8787");
         int rewardPoints = rewardsService.getRewardPoints(attractionId, userId);
         logger.info(" -> User reward = ? points", rewardPoints);
         return rewardPoints;

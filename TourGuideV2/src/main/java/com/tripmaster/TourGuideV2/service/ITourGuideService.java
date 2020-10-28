@@ -9,7 +9,7 @@ import com.tripmaster.TourGuideV2.domain.Attraction;
 import com.tripmaster.TourGuideV2.domain.User;
 import com.tripmaster.TourGuideV2.domain.UserReward;
 import com.tripmaster.TourGuideV2.domain.VisitedLocation;
-import com.tripmaster.TourGuideV2.domain.Location;
+import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
 import com.tripmaster.TourGuideV2.dto.LocationDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 
@@ -85,7 +85,7 @@ public interface ITourGuideService {
      *         a Map with attractionName as String key and a NearbyAttractionDTO
      *         as value.
      */
-    //AttractionsSuggestionDTO getAttractionsSuggestion(User user);
+    AttractionsSuggestionDTO getAttractionsSuggestion(User user);
 
     /**
      * Get the list of the n closest attractions. The number n is defined by the

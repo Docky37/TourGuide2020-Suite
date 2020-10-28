@@ -3,12 +3,15 @@ package com.tripmaster.TourGuideV2.service;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -24,8 +27,9 @@ import com.tripmaster.TourGuideV2.domain.User;
 import com.tripmaster.TourGuideV2.domain.UserReward;
 import com.tripmaster.TourGuideV2.domain.VisitedLocation;
 import com.tripmaster.TourGuideV2.domain.Location;
-import com.tripmaster.TourGuideV2.dto.AttractionDTO;
+import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
 import com.tripmaster.TourGuideV2.dto.LocationDTO;
+import com.tripmaster.TourGuideV2.dto.NearbyAttractionDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 import com.tripmaster.TourGuideV2.helper.InternalTestHelper;
 import com.tripmaster.TourGuideV2.tracker.Tracker;
@@ -41,13 +45,17 @@ import reactor.core.publisher.Flux;
  */
 @Service
 public class TourGuideService implements ITourGuideService {
+
+    @Autowired
+    IRewardsService rewardsService;
+    
+    public final Tracker tracker;
+
     /**
      * Create a SLF4J/LOG4J LOGGER instance.
      */
     private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
 
-    @Autowired
-    public final Tracker tracker;
 
     /**
      * Create a testMode boolean instance initialized at true.
@@ -60,8 +68,9 @@ public class TourGuideService implements ITourGuideService {
      * @param gpsUtil
      * @param rewardsService
      */
-
-    public TourGuideService() {
+    @Autowired
+    public TourGuideService(IRewardsService pRewardsService) {
+        rewardsService = pRewardsService;
         if (testMode) {
             logger.info("TestMode enabled");
             logger.debug("Initializing users");
@@ -77,7 +86,7 @@ public class TourGuideService implements ITourGuideService {
      */
     @Override
     public List<UserReward> getUserRewards(User user) {
-        return null; // user.getUserRewards();
+        return user.getUserRewards(); // user.getUserRewards();
     }
 
     /**
@@ -106,7 +115,7 @@ public class TourGuideService implements ITourGuideService {
                             visitedLocationDTO.getLocation().getLongitude()),
                     visitedLocationDTO.getTimeVisited());
             user.addToVisitedLocations(visitedLocation);
-            // rewardsService.calculateRewards(user);
+            rewardsService.calculateRewards(user, getAllAttractions());
         }
 
         return visitedLocationDTO;
@@ -175,19 +184,19 @@ public class TourGuideService implements ITourGuideService {
     @Override
     public List<Attraction> getNearByAttractions(
             VisitedLocation visitedLocation) {
-        final String attractionUri = "/getAllAttractions";
-        WebClient webClient = WebClient.create("http://localhost:8889");
-
-        Flux<AttractionDTO> attractionsFlux = webClient.get()
-                .uri(attractionUri)
-                .retrieve()
-                .bodyToFlux(AttractionDTO.class);
-        List<AttractionDTO> listOfAttractionDTO = (List<AttractionDTO>) attractionsFlux
-                .collectList();
+        List<Attraction> listOfAttraction = getAllAttractions();
 
         List<Attraction> nearbyFiveAttractions = new ArrayList<>();
 
-        listOfAttractionDTO.forEach(
+        nearbyFiveAttractions = listOfAttraction.stream()
+                .sorted(Comparator.comparingDouble(a -> rewardsService
+                        .getDistance(a, visitedLocation.getLocation())))
+                .limit(SIZE_OF_NEARBY_ATTRACTIONS_LIST)
+                .collect(Collectors.toList());
+        nearbyFiveAttractions.forEach(a -> logger
+                .debug("getNearByAttractions:" + a.getAttractionName()));
+        
+        /*listOfAttraction.forEach(
                 a -> {
                     nearbyFiveAttractions.add(
                             new Attraction(a.getAttractionName(), a.getCity(),
@@ -195,17 +204,25 @@ public class TourGuideService implements ITourGuideService {
                                     a.getLongitude()));
                 }
 
-        );
+        );*/
 
-        /*
-         * nearbyFiveAttractions = attractions.stream()
-         * .sorted(Comparator.comparingDouble(a -> rewardsService
-         * .getDistance(visitedLocation.location, a)))
-         * .limit(SIZE_OF_NEARBY_ATTRACTIONS_LIST)
-         * .collect(Collectors.toList()); nearbyFiveAttractions.forEach( a ->
-         * logger.debug("getNearByAttractions:" + a.attractionName));
-         */
+
         return nearbyFiveAttractions;
+    }
+
+    public List<Attraction> getAllAttractions() {
+        final String attractionUri = "/getAllAttractions";
+        WebClient webClient = WebClient.create("http://localhost:8889");
+
+        Flux<Attraction> attractionsFlux = webClient.get()
+                .uri(attractionUri)
+                .retrieve()
+                .bodyToFlux(Attraction.class);
+        
+        List<Attraction> listOfAttraction = attractionsFlux.collectList()
+                .block();
+
+        return listOfAttraction;
     }
 
     /**
@@ -225,27 +242,39 @@ public class TourGuideService implements ITourGuideService {
      * @see NearbyAttractionDTO
      * @see getNearByAttractions(VisitedLocation visitedLocation)
      */
-    /*
-     * @Override public AttractionsSuggestionDTO getAttractionsSuggestion(User
-     * user) { AttractionsSuggestionDTO suggestion = new
-     * AttractionsSuggestionDTO();
-     * suggestion.setUserLocation(user.getLastVisitedLocation().location);
-     * TreeMap<String, NearbyAttractionDTO> suggestedAttractions = new
-     * TreeMap<>(); List<Attraction> attractionsList = getNearByAttractions(
-     * user.getLastVisitedLocation()); final AtomicInteger indexHolder = new
-     * AtomicInteger(1); attractionsList.stream()
-     * .sorted(Comparator.comparingDouble(a -> rewardsService
-     * .getDistance(user.getLastVisitedLocation().location, a))) .forEach(a -> {
-     * final int index = indexHolder.getAndIncrement();
-     * suggestedAttractions.put( index + ". " + a.attractionName, new
-     * NearbyAttractionDTO( new Location(a.latitude, a.longitude),
-     * rewardsService.getDistance(a, user.getLastVisitedLocation().location),
-     * rewardsService.getRewardPoints(a, user))); });
-     * 
-     * suggestion.setSuggestedAttractions(suggestedAttractions);
-     * 
-     * return suggestion; }
-     */
+    @Override
+    public AttractionsSuggestionDTO getAttractionsSuggestion(User user) {
+
+        AttractionsSuggestionDTO suggestion = new AttractionsSuggestionDTO();
+        suggestion.setUserLocation(new LocationDTO(
+                user.getLastVisitedLocation().getLocation().getLatitude(),
+                user.getLastVisitedLocation().getLocation().getLatitude()));
+
+        TreeMap<String, NearbyAttractionDTO> suggestedAttractions = new TreeMap<>();
+        List<Attraction> attractionsList = getNearByAttractions(
+                user.getLastVisitedLocation());
+        final AtomicInteger indexHolder = new AtomicInteger(1);
+        attractionsList.stream()
+                .sorted(Comparator.comparingDouble(a -> rewardsService
+                        .getDistance(a,
+                                user.getLastVisitedLocation().getLocation())))
+                .forEach(a -> {
+                    final int index = indexHolder.getAndIncrement();
+                    suggestedAttractions.put(
+                            index + ". " + a.getAttractionName(),
+                            new NearbyAttractionDTO(
+                                    new LocationDTO(a.getLatitude(),
+                                            a.getLongitude()),
+                                    rewardsService.getDistance(a,
+                                            user.getLastVisitedLocation()
+                                                    .getLocation()),
+                                    rewardsService.getRewardPoints(a, user)));
+                });
+
+        suggestion.setSuggestedAttractions(suggestedAttractions);
+
+        return suggestion;
+    }
 
     /**
      * {@inheritDoc}
@@ -288,6 +317,7 @@ public class TourGuideService implements ITourGuideService {
      * This method creates users for tests.
      */
     private void initializeInternalUsers() {
+        List<Attraction> attractions = getAllAttractions();
         IntStream.range(0, InternalTestHelper.getInternalUserNumber())
                 .forEach(i -> {
                     String userName = "internalUser" + i;
@@ -295,7 +325,7 @@ public class TourGuideService implements ITourGuideService {
                     String email = userName + "@tourGuide.com";
                     User user = new User(UUID.randomUUID(), userName, phone,
                             email);
-                    generateUserLocationHistory(user);
+                    generateUserLocationHistory(user, attractions);
                     logger.debug("user = " + user.toString());
                     internalUserMap.put(userName, user);
                 });
@@ -309,7 +339,7 @@ public class TourGuideService implements ITourGuideService {
      *
      * @param user
      */
-    private void generateUserLocationHistory(User user) {
+    private void generateUserLocationHistory(User user, List<Attraction> attractions) {
         IntStream.range(0, 3).forEach(i -> {
             user.addToVisitedLocations(
                     new VisitedLocation(user.getUserId(),
@@ -317,6 +347,8 @@ public class TourGuideService implements ITourGuideService {
                                     generateRandomLongitude()),
                             getRandomTime()));
         });
+        rewardsService.calculateRewards(user, attractions);
+        
     }
 
     /**

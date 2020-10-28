@@ -14,7 +14,6 @@ import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 import com.tripmaster.TourGuideV2.service.ITourGuideService;
 import com.tripmaster.TourGuideV2.service.TourGuideService;
 
-
 @RestController
 public class TourGuideController {
 
@@ -49,10 +48,10 @@ public class TourGuideController {
      */
     @GetMapping("/getLocation")
     public String getLocation(@RequestParam String userName) {
-        logger.info("New HTML Request on /getLocation");
+        logger.info("New HTML Request on /getLocation for ?", userName);
         VisitedLocationDTO visitedLocationDTO = tourGuideService
                 .getUserLocation(getUser(userName));
-        logger.info(visitedLocationDTO.toString());
+        logger.info(visitedLocationDTO.toString() + "\n");
         return JsonStream.serialize(visitedLocationDTO.getLocation());
     }
 
@@ -74,11 +73,15 @@ public class TourGuideController {
      * @see AttractionsSuggestionDTO
      * @see NearbyAttractionDTO
      */
-    /*@GetMapping("/getNearbyAttractions")
+    @GetMapping("/getNearbyAttractions")
     public AttractionsSuggestionDTO getNearbyAttractions(
             @RequestParam String userName) {
-        return tourGuideService.getAttractionsSuggestion(getUser(userName));
-    }*/
+        logger.info("New HTML Request on /getNearbyAttractions for ?",
+                userName);
+        AttractionsSuggestionDTO suggestion = tourGuideService.getAttractionsSuggestion(getUser(userName));
+        logger.info(suggestion.toString() + "\n");
+        return suggestion;
+    }
 
     /**
      * HTML GET request that returns a List of UserRewwards of the user who
@@ -87,11 +90,12 @@ public class TourGuideController {
      * @param userName
      * @return a String the serialized List of UserRewwards
      */
-    /*@GetMapping("/getRewards")
+    @GetMapping("/getRewards")
     public String getRewards(@RequestParam String userName) {
+        logger.info("New HTML Request on /getRewards for ?", userName);
         return JsonStream
                 .serialize(tourGuideService.getUserRewards(getUser(userName)));
-    }*/
+    }
 
     /**
      * HTML GET request that returns a List of every user's most recent location
@@ -113,12 +117,12 @@ public class TourGuideController {
      * @param userName
      * @return a String
      */
-    /*@GetMapping("/getTripDeals")
-    public String getTripDeals(@RequestParam String userName) {
-        List<Provider> providers = tourGuideService
-                .getTripDeals(getUser(userName));
-        return JsonStream.serialize(providers);
-    }*/
+    /*
+     * @GetMapping("/getTripDeals") public String getTripDeals(@RequestParam
+     * String userName) { List<Provider> providers = tourGuideService
+     * .getTripDeals(getUser(userName)); return JsonStream.serialize(providers);
+     * }
+     */
 
     /**
      * Returns the User who responds to the given userName parameter. used by

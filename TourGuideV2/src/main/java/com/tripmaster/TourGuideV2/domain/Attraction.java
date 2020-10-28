@@ -1,5 +1,7 @@
 package com.tripmaster.TourGuideV2.domain;
 
+import java.util.UUID;
+
 /**
  * DTO used to transfer the data of gpsUtil Attraction class.
  *
@@ -9,6 +11,7 @@ package com.tripmaster.TourGuideV2.domain;
  */
 public class Attraction {
 
+    UUID attractionId;
     /**
      * The name of this attraction.
      */
@@ -44,10 +47,11 @@ public class Attraction {
      * @param pLongitude
      * @param pState
      */
-    public Attraction(final String pAttractionName,
+    public Attraction(final UUID pAttractionId, final String pAttractionName,
             final String pCity, final String pState,
             final double pLatitude, final double pLongitude)
     {
+        attractionId = pAttractionId;
         attractionName = pAttractionName;
         city = pCity;
         state = pState;
@@ -59,6 +63,15 @@ public class Attraction {
      * No argument and protected empty class constructor.
      */
     protected Attraction() {
+    }
+
+    /**
+     * Getter of the attractionId attribute.
+     *
+     * @return a String
+     */
+    public UUID getAttractionId() {
+        return attractionId;
     }
 
     /**

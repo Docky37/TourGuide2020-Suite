@@ -87,6 +87,7 @@ public interface ITourGuideService {
      */
     AttractionsSuggestionDTO getAttractionsSuggestion(User user);
 
+    List<Attraction> getAllAttractions();
     /**
      * Get the list of the n closest attractions. The number n is defined by the
      * SIZE_OF_NEARBY_ATTRACTIONS_LIST constant.

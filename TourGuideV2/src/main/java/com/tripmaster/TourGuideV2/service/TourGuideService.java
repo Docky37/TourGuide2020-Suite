@@ -86,7 +86,7 @@ public class TourGuideService implements ITourGuideService {
      */
     @Override
     public List<UserReward> getUserRewards(User user) {
-        return user.getUserRewards(); // user.getUserRewards();
+        return user.getUserRewards();
     }
 
     /**
@@ -209,7 +209,7 @@ public class TourGuideService implements ITourGuideService {
 
         return nearbyFiveAttractions;
     }
-
+    @Override
     public List<Attraction> getAllAttractions() {
         final String attractionUri = "/getAllAttractions";
         WebClient webClient = WebClient.create("http://localhost:8889");

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jsoniter.output.JsonStream;
 import com.tripmaster.TourGuideV2.domain.User;
 import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
+import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 import com.tripmaster.TourGuideV2.service.ITourGuideService;
 import com.tripmaster.TourGuideV2.service.TourGuideService;
@@ -91,10 +92,9 @@ public class TourGuideController {
      * @return a String the serialized List of UserRewwards
      */
     @GetMapping("/getRewards")
-    public String getRewards(@RequestParam String userName) {
+    public UserRewardsDTO getRewards(@RequestParam String userName) {
         logger.info("New HTML Request on /getRewards for ?", userName);
-        return JsonStream
-                .serialize(tourGuideService.getUserRewards(getUser(userName)));
+        return tourGuideService.getUserRewards(getUser(userName));
     }
 
     /**

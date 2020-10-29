@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -92,10 +91,10 @@ public class RewardsService implements IRewardsService {
     @Override
     public void calculateRewards(User user, List<Attraction> attractions) {
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(() -> user.getVisitedLocations().forEach(vl -> {
-            attractions.stream()
-                    .filter(a -> nearAttraction(vl, a))
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        user.getVisitedLocations().forEach(vl -> { 
+            executor.submit(() -> attractions.stream()
+                    // .filter(a -> nearAttraction(vl, a))
                     .forEach(a -> {
                         if (user.getUserRewards().stream()
                                 .noneMatch(r -> r.attraction.getAttractionName()
@@ -103,12 +102,13 @@ public class RewardsService implements IRewardsService {
                             user.addUserReward(new UserReward(vl, a,
                                     getRewardPoints(a, user)));
                         }
-                    });
-        }));
+                    }));
+        });
 
         executor.shutdown();
         try {
-            if (!executor.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
+            if (!executor.awaitTermination(50,
+                    TimeUnit.MILLISECONDS)) {
                 executor.shutdownNow();
             }
         } catch (InterruptedException e) {
@@ -145,8 +145,8 @@ public class RewardsService implements IRewardsService {
      */
     private boolean nearAttraction(VisitedLocation visitedLocation,
             Attraction attraction) {
-        // logger.debug("nearAttraction - distance = "
-        // + getDistance(attraction, visitedLocation.location));
+        logger.debug("nearAttraction - distance = "
+                + getDistance(attraction, visitedLocation.getLocation()));
 
         return !(getDistance(attraction,
                 visitedLocation.getLocation()) > proximityBuffer);

@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -318,8 +321,9 @@ public class TourGuideService implements ITourGuideService {
      */
     private void initializeInternalUsers() {
         List<Attraction> attractions = getAllAttractions();
+        ExecutorService executor = Executors.newFixedThreadPool(100);
         IntStream.range(0, InternalTestHelper.getInternalUserNumber())
-                .forEach(i -> {
+                .forEach(i -> executor.submit(() ->{ 
                     String userName = "internalUser" + i;
                     String phone = "000";
                     String email = userName + "@tourGuide.com";
@@ -328,7 +332,17 @@ public class TourGuideService implements ITourGuideService {
                     generateUserLocationHistory(user, attractions);
                     logger.debug("user = " + user.toString());
                     internalUserMap.put(userName, user);
-                });
+                }));
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(2000,
+                    TimeUnit.MILLISECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+        }
+        
         logger.debug("Created " + InternalTestHelper.getInternalUserNumber()
                 + " internal test users.");
     }

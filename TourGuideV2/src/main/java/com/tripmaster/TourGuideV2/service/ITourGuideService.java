@@ -11,6 +11,7 @@ import com.tripmaster.TourGuideV2.domain.UserReward;
 import com.tripmaster.TourGuideV2.domain.VisitedLocation;
 import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
 import com.tripmaster.TourGuideV2.dto.LocationDTO;
+import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 
 @Service
@@ -24,7 +25,7 @@ public interface ITourGuideService {
      * @param user
      * @return a List<UserReward>
      */
-    List<UserReward> getUserRewards(User user);
+    UserRewardsDTO getUserRewards(User user);
 
     /**
      * This method get the user Location.

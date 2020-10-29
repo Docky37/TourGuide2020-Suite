@@ -33,6 +33,8 @@ import com.tripmaster.TourGuideV2.domain.Location;
 import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
 import com.tripmaster.TourGuideV2.dto.LocationDTO;
 import com.tripmaster.TourGuideV2.dto.NearbyAttractionDTO;
+import com.tripmaster.TourGuideV2.dto.UserRewardDTO;
+import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 import com.tripmaster.TourGuideV2.helper.InternalTestHelper;
 import com.tripmaster.TourGuideV2.tracker.Tracker;
@@ -51,14 +53,13 @@ public class TourGuideService implements ITourGuideService {
 
     @Autowired
     IRewardsService rewardsService;
-    
+
     public final Tracker tracker;
 
     /**
      * Create a SLF4J/LOG4J LOGGER instance.
      */
     private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
-
 
     /**
      * Create a testMode boolean instance initialized at true.
@@ -88,8 +89,16 @@ public class TourGuideService implements ITourGuideService {
      * {@inheritDoc}
      */
     @Override
-    public List<UserReward> getUserRewards(User user) {
-        return user.getUserRewards();
+    public UserRewardsDTO getUserRewards(User user) {
+        List<UserReward> userRewards = user.getUserRewards();
+        UserRewardsDTO userRewardsDTO = new UserRewardsDTO();
+        userRewardsDTO.setUserName(user.getUserName());
+        userRewards.forEach(uR -> userRewardsDTO
+                .addUserRewardDTO(new UserRewardDTO(
+                        uR.visitedLocation,
+                        uR.attraction,
+                        uR.getRewardPoints())));
+        return userRewardsDTO;
     }
 
     /**
@@ -198,20 +207,18 @@ public class TourGuideService implements ITourGuideService {
                 .collect(Collectors.toList());
         nearbyFiveAttractions.forEach(a -> logger
                 .debug("getNearByAttractions:" + a.getAttractionName()));
-        
-        /*listOfAttraction.forEach(
-                a -> {
-                    nearbyFiveAttractions.add(
-                            new Attraction(a.getAttractionName(), a.getCity(),
-                                    a.getState(), a.getLatitude(),
-                                    a.getLongitude()));
-                }
 
-        );*/
-
+        /*
+         * listOfAttraction.forEach( a -> { nearbyFiveAttractions.add( new
+         * Attraction(a.getAttractionName(), a.getCity(), a.getState(),
+         * a.getLatitude(), a.getLongitude())); }
+         * 
+         * );
+         */
 
         return nearbyFiveAttractions;
     }
+
     @Override
     public List<Attraction> getAllAttractions() {
         final String attractionUri = "/getAllAttractions";
@@ -221,7 +228,7 @@ public class TourGuideService implements ITourGuideService {
                 .uri(attractionUri)
                 .retrieve()
                 .bodyToFlux(Attraction.class);
-        
+
         List<Attraction> listOfAttraction = attractionsFlux.collectList()
                 .block();
 
@@ -323,7 +330,7 @@ public class TourGuideService implements ITourGuideService {
         List<Attraction> attractions = getAllAttractions();
         ExecutorService executor = Executors.newFixedThreadPool(100);
         IntStream.range(0, InternalTestHelper.getInternalUserNumber())
-                .forEach(i -> executor.submit(() ->{ 
+                .forEach(i -> executor.submit(() -> {
                     String userName = "internalUser" + i;
                     String phone = "000";
                     String email = userName + "@tourGuide.com";
@@ -342,7 +349,7 @@ public class TourGuideService implements ITourGuideService {
         } catch (InterruptedException e) {
             executor.shutdownNow();
         }
-        
+
         logger.debug("Created " + InternalTestHelper.getInternalUserNumber()
                 + " internal test users.");
     }
@@ -353,7 +360,8 @@ public class TourGuideService implements ITourGuideService {
      *
      * @param user
      */
-    private void generateUserLocationHistory(User user, List<Attraction> attractions) {
+    private void generateUserLocationHistory(User user,
+            List<Attraction> attractions) {
         IntStream.range(0, 3).forEach(i -> {
             user.addToVisitedLocations(
                     new VisitedLocation(user.getUserId(),
@@ -362,7 +370,7 @@ public class TourGuideService implements ITourGuideService {
                             getRandomTime()));
         });
         rewardsService.calculateRewards(user, attractions);
-        
+
     }
 
     /**
@@ -371,8 +379,8 @@ public class TourGuideService implements ITourGuideService {
      * @return a double
      */
     private double generateRandomLongitude() {
-        double leftLimit = -180;
-        double rightLimit = 180;
+        double leftLimit = -125;//-180;
+        double rightLimit = -66;//180;
         return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
     }
 
@@ -382,8 +390,8 @@ public class TourGuideService implements ITourGuideService {
      * @return a double
      */
     private double generateRandomLatitude() {
-        double leftLimit = -85.05112878;
-        double rightLimit = 85.05112878;
+        double leftLimit = 28.0;//-85.05112878;
+        double rightLimit = 42.0;//85.05112878;
         return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
     }
 

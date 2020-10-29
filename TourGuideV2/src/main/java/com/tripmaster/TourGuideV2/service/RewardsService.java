@@ -1,6 +1,8 @@
 package com.tripmaster.TourGuideV2.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +40,7 @@ public class RewardsService implements IRewardsService {
     /**
      * Proximity buffer default value in miles.
      */
-    private int defaultProximityBuffer = 10;
+    private int defaultProximityBuffer = 300;//10;
     /**
      * Current value of proximity buffer.
      */
@@ -89,31 +91,36 @@ public class RewardsService implements IRewardsService {
      * @return a CompletableFuture<?>
      */
     @Override
-    public void calculateRewards(User user, List<Attraction> attractions) {
+    public CompletableFuture<?> calculateRewards(User user, List<Attraction> attractions) {
 
-        ExecutorService executor = Executors.newFixedThreadPool(10);
+        List<CompletableFuture<?>> futures = new ArrayList<>();
+        futures.add(CompletableFuture.runAsync(() ->
         user.getVisitedLocations().forEach(vl -> { 
-            executor.submit(() -> attractions.stream()
-                    // .filter(a -> nearAttraction(vl, a))
+            //System.out.println("1. Method calculateRewards");
+            attractions.stream()
+                    .filter(a -> nearAttraction(vl, a))
                     .forEach(a -> {
                         if (user.getUserRewards().stream()
                                 .noneMatch(r -> r.attraction.getAttractionName()
                                         .equals(a.getAttractionName()))) {
+                            //System.out.println("2. True");
                             user.addUserReward(new UserReward(vl, a,
                                     getRewardPoints(a, user)));
                         }
-                    }));
-        });
+                    });
+        })));
 
-        executor.shutdown();
+        /*executor.shutdown();
         try {
-            if (!executor.awaitTermination(50,
+            if (!executor.awaitTermination(5000,
                     TimeUnit.MILLISECONDS)) {
                 executor.shutdownNow();
             }
         } catch (InterruptedException e) {
             executor.shutdownNow();
-        }
+        }*/
+        
+        return CompletableFuture.allOf(futures.stream().toArray(CompletableFuture[]::new));
 
     }
 

@@ -1,6 +1,7 @@
 package com.tripmaster.TourGuideV2.service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import com.tripmaster.TourGuideV2.domain.Attraction;
 import com.tripmaster.TourGuideV2.domain.Location;
@@ -26,7 +27,7 @@ public interface IRewardsService {
      * @param user
      * @return a CompletableFuture<?>
      */
-    void calculateRewards(User user, List<Attraction> attractions);
+    CompletableFuture<?> calculateRewards(User user, List<Attraction> attractions);
 
     /**
      * This method checks if the distance between location and attraction and

@@ -1,5 +1,7 @@
 package com.tripmaster.TourGuideV2.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jsoniter.output.JsonStream;
 import com.tripmaster.TourGuideV2.domain.User;
 import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
+import com.tripmaster.TourGuideV2.dto.ProviderDTO;
 import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 import com.tripmaster.TourGuideV2.service.ITourGuideService;
@@ -79,7 +82,8 @@ public class TourGuideController {
             @RequestParam String userName) {
         logger.info("New HTML Request on /getNearbyAttractions for ?",
                 userName);
-        AttractionsSuggestionDTO suggestion = tourGuideService.getAttractionsSuggestion(getUser(userName));
+        AttractionsSuggestionDTO suggestion = tourGuideService
+                .getAttractionsSuggestion(getUser(userName));
         logger.info(suggestion.toString() + "\n");
         return suggestion;
     }
@@ -117,15 +121,15 @@ public class TourGuideController {
      * @param userName
      * @return a String
      */
-    /*
-     * @GetMapping("/getTripDeals") public String getTripDeals(@RequestParam
-     * String userName) { List<Provider> providers = tourGuideService
-     * .getTripDeals(getUser(userName)); return JsonStream.serialize(providers);
-     * }
-     */
+    @GetMapping("/getTripDeals")
+    public List<ProviderDTO> getTripDeals(@RequestParam String userName) {
+        List<ProviderDTO> providers = tourGuideService
+                .getTripDeals(getUser(userName));
+        return providers;//JsonStream.serialize(providers);
+    }
 
     /**
-     * Returns the User who responds to the given userName parameter. used by
+     * Returns the User who responds to the given userName parameter. Used by
      * previous HTML request. This private sub method is used by pevious html
      * requests.
      *

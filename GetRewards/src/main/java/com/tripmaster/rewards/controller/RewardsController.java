@@ -23,7 +23,8 @@ public class RewardsController {
     RewardsService rewardsService;
 
     /**
-     * HTML GET request used to get reward points from RewardsCentral jar library.
+     * HTML GET request used to get reward points from RewardsCentral jar
+     * library.
      *
      * @return an int
      */
@@ -35,4 +36,5 @@ public class RewardsController {
         logger.info(" -> User reward = ? points", rewardPoints);
         return rewardPoints;
     }
+
 }

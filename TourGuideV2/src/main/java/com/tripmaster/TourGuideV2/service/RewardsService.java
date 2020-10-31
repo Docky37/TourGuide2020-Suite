@@ -3,12 +3,11 @@ package com.tripmaster.TourGuideV2.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -25,7 +24,6 @@ import com.tripmaster.TourGuideV2.domain.VisitedLocation;
  * @author TripMaster
  * @author Thierry Schreiner
  */
-
 @Service
 public class RewardsService implements IRewardsService {
     /**
@@ -40,7 +38,7 @@ public class RewardsService implements IRewardsService {
     /**
      * Proximity buffer default value in miles.
      */
-    private int defaultProximityBuffer = 300;//10;
+    private int defaultProximityBuffer = 300;// 10;
     /**
      * Current value of proximity buffer.
      */
@@ -50,21 +48,30 @@ public class RewardsService implements IRewardsService {
      */
     private int attractionProximityRange = 200;
 
-    WebClient webClient = WebClient.create("http://localhost:8787");
+    /**
+     * A Rewards Webclient declaration. The bean is injected by Spring with the
+     * class constructor @Autowired annotation.
+     */
+    WebClient webClientReward;
 
     /**
-     * Class constructor.
-     * 
+     * This class constructor allows Spring to inject one WebClient bean,
+     * specified by the @Qualifier annotation (because there are 3 qualified
+     * beans known by Spring context.
+     *
      * @param gpsUtil
      * @param rewardCentral
      */
-    public RewardsService() {
+    @Autowired
+    public RewardsService(
+            @Qualifier("getWebClientReward") final WebClient pWebClientReward)
+    {
+        webClientReward = pWebClientReward;
     }
 
-    /*
-     * @Autowired public RewardsService(WebClient pWebClient) { webClient =
-     * pWebClient; }
-     */
+    public RewardsService() {
+
+    }
 
     /**
      * Setter of proximityBuffer.
@@ -91,36 +98,32 @@ public class RewardsService implements IRewardsService {
      * @return a CompletableFuture<?>
      */
     @Override
-    public CompletableFuture<?> calculateRewards(User user, List<Attraction> attractions) {
+    public CompletableFuture<?> calculateRewards(User user,
+            List<Attraction> attractions) {
 
         List<CompletableFuture<?>> futures = new ArrayList<>();
-        futures.add(CompletableFuture.runAsync(() ->
-        user.getVisitedLocations().forEach(vl -> { 
-            //System.out.println("1. Method calculateRewards");
-            attractions.stream()
-                    .filter(a -> nearAttraction(vl, a))
-                    .forEach(a -> {
-                        if (user.getUserRewards().stream()
-                                .noneMatch(r -> r.attraction.getAttractionName()
-                                        .equals(a.getAttractionName()))) {
-                            //System.out.println("2. True");
-                            user.addUserReward(new UserReward(vl, a,
-                                    getRewardPoints(a, user)));
-                        }
-                    });
-        })));
+        futures.add(CompletableFuture.runAsync(() -> user.getVisitedLocations()
+                .forEach(vl -> {
+                    System.out.println("1. Method calculateRewards");
+                    attractions.stream()
+                            .filter(a -> nearAttraction(vl, a))
+                            .forEach(a -> {
+                                if (user.getUserRewards().stream()
+                                        .noneMatch(r -> r.attraction
+                                                .getAttractionName()
+                                                .equals(a
+                                                        .getAttractionName()))) {
+                                    System.out.println("2. True");
+                                    System.out.println(getRewardPoints(a, user));
+                                    user.addUserReward(new UserReward(vl, a,
+                                            getRewardPoints(a, user)));
+                                    
+                                }
+                            });
+                })));
 
-        /*executor.shutdown();
-        try {
-            if (!executor.awaitTermination(5000,
-                    TimeUnit.MILLISECONDS)) {
-                executor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
-        }*/
-        
-        return CompletableFuture.allOf(futures.stream().toArray(CompletableFuture[]::new));
+        return CompletableFuture
+                .allOf(futures.stream().toArray(CompletableFuture[]::new));
 
     }
 
@@ -166,16 +169,15 @@ public class RewardsService implements IRewardsService {
     }
 
     /**
-     * This method calls send an HTTP request on localhost:8787/getReward in
-     * order to get the attraction reward points for the given user.
+     * This method builds and sends an HTTP request on localhost:8787/getReward
+     * in order to get the attraction reward points for the given user.
      *
      * @param attraction
      * @param user
      * @return an int: the count of reward points
      */
-    public int getRewardPoints(Attraction attraction, User user) {
-        // WebClient webClient = WebClient.create("http://localhost:8787");
-        return webClient.get()
+    public int getRewardPoints(final Attraction attraction, final User user) {
+        return webClientReward.get()
                 .uri("/getReward?attractionId=" + attraction.getAttractionId()
                         + "&userId=" + user.getUserId())
                 .retrieve()
@@ -190,7 +192,7 @@ public class RewardsService implements IRewardsService {
      * @return a double: the distance in statute miles
      */
     @Override
-    public double getDistance(Location loc1, Location loc2) {
+    public double getDistance(final Location loc1, final Location loc2) {
         double lat1 = Math.toRadians(loc1.getLatitude());
         double lon1 = Math.toRadians(loc1.getLongitude());
         double lat2 = Math.toRadians(loc2.getLatitude());

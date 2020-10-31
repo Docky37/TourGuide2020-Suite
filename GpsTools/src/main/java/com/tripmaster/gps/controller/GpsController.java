@@ -14,6 +14,13 @@ import com.tripmaster.gps.dto.AttractionDTO;
 import com.tripmaster.gps.dto.VisitedLocationDTO;
 import com.tripmaster.gps.service.GpsService;
 
+/**
+ * This GpsController class exposes two end-points. The first one is used to get
+ * userLocation by his userId, the second provides the list of all attractions.
+ *
+ * @author TripMaster
+ * @author Thierry Schreiner
+ */
 @RestController
 public class GpsController {
 
@@ -21,28 +28,37 @@ public class GpsController {
      * Create a SLF4J/LOG4J LOGGER instance.
      */
     private Logger logger = LoggerFactory.getLogger(GpsController.class);
-    
+
     @Autowired
     GpsService gpsService;
-    
+
     /**
      * HTML GET request used to get the location of the user by his userId.
+     *
      * @param userId
-     * @return a VisitedLocationDTO
+     * @return a VisitedLocationDTO (with timeVisited an locationDTO attributes)
+     * @see LocationDTO
      */
     @GetMapping("/getLocation")
-    public VisitedLocationDTO getUserLocation(@RequestParam UUID userId) {
-        logger.info("New HTML GET Request: /getLocation?userId=?",userId);
+    public VisitedLocationDTO getUserLocation(@RequestParam final UUID userId) {
+        logger.info("New HTML GET Request: /getLocation?userId=?", userId);
         VisitedLocationDTO visitedLocation = gpsService.getUserLocation(userId);
         logger.info(visitedLocation.toString());
         return visitedLocation;
     }
-    
+
+    /**
+     * HTML GET request used to get the list of all attractions referenced by
+     * the GpsUtil application.
+     *
+     * @return a List<AttractionDTO>
+     * @see AttractionDTO
+     */
     @GetMapping("/getAllAttractions")
-    public List<AttractionDTO> getAllAttractions(){
+    public List<AttractionDTO> getAllAttractions() {
         logger.info("New HTML GET Request: /getAllAttractions");
         List<AttractionDTO> attractions = gpsService.getAttractions();
-        attractions.stream().forEach(a->logger.info(a.toString()));
+        attractions.stream().forEach(a -> logger.info(a.toString()));
         return attractions;
     }
 }

@@ -20,6 +20,8 @@ public class VisitedLocationDTO {
 
     /**
      * The location(latitude and longitude) of the VisitedLocation.
+     *
+     * @see LocationDTO
      */
     private LocationDTO location;
 

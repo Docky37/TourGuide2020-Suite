@@ -7,7 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class TourGuideV2Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TourGuideV2Application.class, args);
+	    System.setProperty("spring.devtools.restart.enabled", "false");
+	    SpringApplication.run(TourGuideV2Application.class, args);
 	}
 
 }

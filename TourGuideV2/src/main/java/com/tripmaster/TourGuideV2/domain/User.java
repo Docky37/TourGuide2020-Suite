@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.tripmaster.TourGuideV2.dto.ProviderDTO;
+
 //import gpsUtil.location.VisitedLocation;
 //import tripPricer.Provider;
 
@@ -23,7 +25,7 @@ public class User {
     private List<VisitedLocation> visitedLocations = new ArrayList<>();
     private List<UserReward> userRewards = new ArrayList<>();
     private UserPreferences userPreferences = new UserPreferences();
-    //private List<Provider> tripDeals = new ArrayList<>();
+    private List<ProviderDTO> tripDeals = new ArrayList<>();
 
     /**
      * Class constructor.
@@ -189,9 +191,9 @@ public class User {
      *
      * @param tripDeals
      */
-    /*public void setTripDeals(List<Provider> tripDeals) {
+    public void setTripDeals(List<ProviderDTO> tripDeals) {
         this.tripDeals = tripDeals;
-    }*/
+    }
 
     /**
      * Getter of the tripDeals list.
@@ -206,12 +208,12 @@ public class User {
      * Used by the following toString method for the concatenation of the
      * visitedLocations List.
      */
-    //private String serializedVisitedLocations = "";
+    private String serializedVisitedLocations = "";
 
     /**
      * Serialization method.
      */
-    /*@Override
+    @Override
     public String toString() {
         visitedLocations
                 .forEach(l -> this.serializedVisitedLocations += " {lat="
@@ -228,6 +230,6 @@ public class User {
                 + userRewards.toString()
                 + ", userPreferences=" + userPreferences.toString()
                 + ", tripDeals=" + tripDeals + "]";
-    }*/
+    }
 
 }

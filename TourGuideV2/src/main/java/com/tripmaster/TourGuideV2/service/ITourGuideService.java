@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 
 import com.tripmaster.TourGuideV2.domain.Attraction;
 import com.tripmaster.TourGuideV2.domain.User;
-import com.tripmaster.TourGuideV2.domain.UserReward;
 import com.tripmaster.TourGuideV2.domain.VisitedLocation;
 import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
 import com.tripmaster.TourGuideV2.dto.LocationDTO;
+import com.tripmaster.TourGuideV2.dto.ProviderDTO;
 import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 
@@ -65,7 +65,7 @@ public interface ITourGuideService {
      * @param user
      * @return a List<Provider>
      */
-    //List<Provider> getTripDeals(User user);
+    List<ProviderDTO> getTripDeals(User user);
 
     /**
      * Generates a new VisitedLocation (based on User location) and calculates a

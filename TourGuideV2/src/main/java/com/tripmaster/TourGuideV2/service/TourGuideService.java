@@ -21,6 +21,7 @@ import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -33,6 +34,7 @@ import com.tripmaster.TourGuideV2.domain.Location;
 import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
 import com.tripmaster.TourGuideV2.dto.LocationDTO;
 import com.tripmaster.TourGuideV2.dto.NearbyAttractionDTO;
+import com.tripmaster.TourGuideV2.dto.ProviderDTO;
 import com.tripmaster.TourGuideV2.dto.UserRewardDTO;
 import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
@@ -51,15 +53,33 @@ import reactor.core.publisher.Flux;
 @Service
 public class TourGuideService implements ITourGuideService {
 
-    @Autowired
-    IRewardsService rewardsService;
-
-    public final Tracker tracker;
-
     /**
      * Create a SLF4J/LOG4J LOGGER instance.
      */
     private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
+
+    /**
+     * RewardService declaration, the bean is injected by Spring with the class
+     * constructor @Autowired annotation.
+     */
+    IRewardsService rewardsService;
+
+    /**
+     * A TripDeals Webclient declaration. The bean is injected by Spring with
+     * the class constructor @Autowired annotation.
+     */
+    WebClient webClientTripDeals;
+
+    /**
+     * A GpsTools Webclient declaration. The bean is injected by Spring with the
+     * class constructor @Autowired annotation.
+     */
+    WebClient webClientGps;
+
+    /**
+     * 
+     */
+    public final Tracker tracker;
 
     /**
      * Create a testMode boolean instance initialized at true.
@@ -67,14 +87,22 @@ public class TourGuideService implements ITourGuideService {
     boolean testMode = true;
 
     /**
-     * Class constructor
+     * This class constructor allows Spring to inject 3 beans, RewardsService
+     * and 2 WebClient beans discriminated against by the @Qualifier annotation.
      *
-     * @param gpsUtil
-     * @param rewardsService
+     * @param pRewardsService
+     * @param pWebClientTripDeals
+     * @param pWebClientGps
      */
     @Autowired
-    public TourGuideService(IRewardsService pRewardsService) {
+    public TourGuideService(final IRewardsService pRewardsService,
+            @Qualifier("getWebClientTripDeals") final WebClient pWebClientTripDeals,
+            @Qualifier("getWebClientGps") final WebClient pWebClientGps)
+    {
         rewardsService = pRewardsService;
+        webClientGps = pWebClientGps;
+        webClientTripDeals = pWebClientTripDeals;
+
         if (testMode) {
             logger.info("TestMode enabled");
             logger.debug("Initializing users");
@@ -162,16 +190,30 @@ public class TourGuideService implements ITourGuideService {
     /**
      * {@inheritDoc}
      */
-    /*
-     * @Override public List<Provider> getTripDeals(User user) { int
-     * cumulatativeRewardPoints = user.getUserRewards().stream() .mapToInt(i ->
-     * i.getRewardPoints()).sum(); List<Provider> providers =
-     * tripPricer.getPrice(tripPricerApiKey, user.getUserId(),
-     * user.getUserPreferences().getNumberOfAdults(),
-     * user.getUserPreferences().getNumberOfChildren(),
-     * user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
-     * user.setTripDeals(providers); return providers; }
-     */
+    // @Override
+    public List<ProviderDTO> getTripDeals(User user) {
+        int cumulatativeRewardPoints = user.getUserRewards().stream()
+                .mapToInt(i -> i.getRewardPoints()).sum();
+
+        Flux<ProviderDTO> flux = webClientTripDeals.get()
+                .uri("/getTripDeals?tripPricerApiKey=" + tripPricerApiKey
+                        + "&userId=" + user.getUserId()
+                        + "&numberOfAdults=" + user.getUserPreferences()
+                                .getNumberOfAdults()
+                        + "&numberOfChildren=" + user.getUserPreferences()
+                                .getNumberOfChildren()
+                        + "&tripDuration=" + user.getUserPreferences()
+                                .getTripDuration()
+                        + "&cumulatativeRewardPoints="
+                        + cumulatativeRewardPoints)
+                .retrieve()
+                .bodyToFlux(ProviderDTO.class);
+System.out.println(flux.toString());
+        List<ProviderDTO> providers = flux.collectList().block();
+
+        user.setTripDeals(providers);
+        return providers;
+    }
 
     /**
      * {@inheritDoc}
@@ -208,23 +250,14 @@ public class TourGuideService implements ITourGuideService {
         nearbyFiveAttractions.forEach(a -> logger
                 .debug("getNearByAttractions:" + a.getAttractionName()));
 
-        /*
-         * listOfAttraction.forEach( a -> { nearbyFiveAttractions.add( new
-         * Attraction(a.getAttractionName(), a.getCity(), a.getState(),
-         * a.getLatitude(), a.getLongitude())); }
-         * 
-         * );
-         */
-
         return nearbyFiveAttractions;
     }
 
     @Override
     public List<Attraction> getAllAttractions() {
         final String attractionUri = "/getAllAttractions";
-        WebClient webClient = WebClient.create("http://localhost:8889");
 
-        Flux<Attraction> attractionsFlux = webClient.get()
+        Flux<Attraction> attractionsFlux = webClientGps.get()
                 .uri(attractionUri)
                 .retrieve()
                 .bodyToFlux(Attraction.class);
@@ -379,8 +412,8 @@ public class TourGuideService implements ITourGuideService {
      * @return a double
      */
     private double generateRandomLongitude() {
-        double leftLimit = -125;//-180;
-        double rightLimit = -66;//180;
+        double leftLimit = -125;// -180;
+        double rightLimit = -66;// 180;
         return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
     }
 
@@ -390,8 +423,8 @@ public class TourGuideService implements ITourGuideService {
      * @return a double
      */
     private double generateRandomLatitude() {
-        double leftLimit = 28.0;//-85.05112878;
-        double rightLimit = 42.0;//85.05112878;
+        double leftLimit = 28.0;// -85.05112878;
+        double rightLimit = 42.0;// 85.05112878;
         return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
     }
 

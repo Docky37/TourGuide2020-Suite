@@ -1,6 +1,5 @@
 package com.tripmaster.TourGuideV2.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -101,30 +100,27 @@ public class RewardsService implements IRewardsService {
     public CompletableFuture<?> calculateRewards(User user,
             List<Attraction> attractions) {
 
-        List<CompletableFuture<?>> futures = new ArrayList<>();
-        futures.add(CompletableFuture.runAsync(() -> user.getVisitedLocations()
-                .forEach(vl -> {
-                    System.out.println("1. Method calculateRewards");
-                    attractions.stream()
-                            .filter(a -> nearAttraction(vl, a))
-                            .forEach(a -> {
-                                if (user.getUserRewards().stream()
-                                        .noneMatch(r -> r.attraction
-                                                .getAttractionName()
-                                                .equals(a
-                                                        .getAttractionName()))) {
-                                    System.out.println("2. True");
-                                    System.out.println(getRewardPoints(a, user));
-                                    user.addUserReward(new UserReward(vl, a,
-                                            getRewardPoints(a, user)));
-                                    
-                                }
-                            });
-                })));
+        return CompletableFuture.supplyAsync(() -> {
+            user.getVisitedLocations().forEach(vl -> {
+                // System.out.println("1. Method calculateRewards");
+                attractions.stream()
+                        .filter(a -> nearAttraction(vl, a))
+                        .forEach(a -> {
+                            if (user.getUserRewards().stream()
+                                    .noneMatch(r -> r.attraction
+                                            .getAttractionName()
+                                            .equals(a.getAttractionName()))) {
+ //                               System.out.println("2. True");
+ //                               System.out.println(getRewardPoints(a, user));
+                                user.addUserReward(new UserReward(vl, a,
+                                        getRewardPoints(a, user)));
+                            }
+                        });
 
-        return CompletableFuture
-                .allOf(futures.stream().toArray(CompletableFuture[]::new));
+            });
 
+            return user;
+        });
     }
 
     /**

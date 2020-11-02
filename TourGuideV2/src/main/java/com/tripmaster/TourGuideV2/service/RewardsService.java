@@ -37,7 +37,7 @@ public class RewardsService implements IRewardsService {
     /**
      * Proximity buffer default value in miles.
      */
-    private int defaultProximityBuffer = 300;// 10;
+    private int defaultProximityBuffer = 10;
     /**
      * Current value of proximity buffer.
      */
@@ -68,8 +68,21 @@ public class RewardsService implements IRewardsService {
         webClientReward = pWebClientReward;
     }
 
-    public RewardsService() {
+    /**
+     * No parameters empty constructor.
+     */
+    RewardsService() {
+    }
 
+    /**
+     * Special class constructor for unit test with a Spring injection of a
+     * MockWebServer bean to mock the WebClient.
+     *
+     * @param testMode
+     * @param pWebClientReward
+     */
+    public RewardsService(String testMode, WebClient pWebClientReward) {
+        webClientReward = pWebClientReward;
     }
 
     /**
@@ -110,8 +123,8 @@ public class RewardsService implements IRewardsService {
                                     .noneMatch(r -> r.attraction
                                             .getAttractionName()
                                             .equals(a.getAttractionName()))) {
- //                               System.out.println("2. True");
- //                               System.out.println(getRewardPoints(a, user));
+                                // System.out.println("2. True");
+                                // System.out.println(getRewardPoints(a, user));
                                 user.addUserReward(new UserReward(vl, a,
                                         getRewardPoints(a, user)));
                             }

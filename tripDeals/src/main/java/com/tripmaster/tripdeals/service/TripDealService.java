@@ -21,7 +21,7 @@ public class TripDealService implements ITripDealService {
      */
     private Logger logger = LoggerFactory.getLogger(TripDealService.class);
 
-    TripPricer tripPricer;
+    TripPricer tripPricer = new TripPricer();
 
     @Override
     public List<ProviderDTO> getTripDeals(final String tripPricerApiKey,
@@ -29,6 +29,7 @@ public class TripDealService implements ITripDealService {
             final int numberOfChildren, final int tripDuration,
             final int cumulatativeRewardPoints) {
         logger.debug(" -> getTripDeals");
+
         List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, userId,
                 NumberOfAdult, numberOfChildren, tripDuration,
                 cumulatativeRewardPoints);

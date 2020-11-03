@@ -14,9 +14,10 @@ import java.util.UUID;
 public class VisitedLocation {
 
     /**
-     * 
+     * The id attribute of the user.
      */
     UUID userId;
+
     /**
      * This attribute tells us when this visitedLocation has been collected by
      * gpsUtil.
@@ -34,8 +35,7 @@ public class VisitedLocation {
      * @param pTimeVisited
      * @param pLocation
      */
-    public VisitedLocation(final Location pLocation, final Date pTimeVisited)
-    {
+    public VisitedLocation(final Location pLocation, final Date pTimeVisited) {
         userId = UUID.randomUUID();
         timeVisited = pTimeVisited;
         location = pLocation;
@@ -54,10 +54,21 @@ public class VisitedLocation {
      * @param pLocation
      * @param pTimeVisited
      */
-    public VisitedLocation(UUID pUserId, Location pLocation, Date pTimeVisited) {
+    public VisitedLocation(UUID pUserId, Location pLocation,
+            Date pTimeVisited)
+    {
         userId = pUserId;
         timeVisited = pTimeVisited;
         location = pLocation;
+    }
+
+    /**
+     * Getter of userId
+     *
+     * @return an UUID
+     */
+    public UUID getUserId() {
+        return userId;
     }
 
     /**

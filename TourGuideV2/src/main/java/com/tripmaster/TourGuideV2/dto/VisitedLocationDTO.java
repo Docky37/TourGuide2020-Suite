@@ -1,6 +1,7 @@
 package com.tripmaster.TourGuideV2.dto;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * DTO used to transfer the data of a gpsUtil VisitedLocation class, witch is
@@ -11,6 +12,11 @@ import java.util.Date;
  * @since October 2020
  */
 public class VisitedLocationDTO {
+
+    /**
+     * The id of the owner of this visitedLocation.
+     */
+    UUID userId;
 
     /**
      * This attribute tells us when this visitedLocation has been collected by
@@ -26,20 +32,30 @@ public class VisitedLocationDTO {
     /**
      * Full parameters class constructor.
      *
+     * @param pUserId
      * @param pTimeVisited
      * @param pLocation
      */
     public VisitedLocationDTO(final LocationDTO pLocation,
-            final Date pTimeVisited)
-    {
+            final Date pTimeVisited, UUID pUserId){
         timeVisited = pTimeVisited;
         location = pLocation;
+        userId = pUserId;
     }
 
     /**
      * No argument and protected empty class constructor.
      */
     protected VisitedLocationDTO() {
+    }
+
+    /**
+     * The getter of the userId.
+     *
+     * @return an UUID
+     */
+    public UUID getUserId() {
+        return userId;
     }
 
     /**

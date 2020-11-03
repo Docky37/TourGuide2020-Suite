@@ -115,16 +115,13 @@ public class RewardsService implements IRewardsService {
 
         return CompletableFuture.supplyAsync(() -> {
             user.getVisitedLocations().forEach(vl -> {
-                // System.out.println("1. Method calculateRewards");
                 attractions.stream()
-                        .filter(a -> nearAttraction(vl, a))
+                        //.filter(a -> nearAttraction(vl, a))
                         .forEach(a -> {
                             if (user.getUserRewards().stream()
                                     .noneMatch(r -> r.attraction
                                             .getAttractionName()
                                             .equals(a.getAttractionName()))) {
-                                // System.out.println("2. True");
-                                // System.out.println(getRewardPoints(a, user));
                                 user.addUserReward(new UserReward(vl, a,
                                         getRewardPoints(a, user)));
                             }

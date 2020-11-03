@@ -13,7 +13,7 @@ public class InternalTestHelper {
      * The number of internal users to create for tests.
      * (Set this default up to 100,000 for testing)
      */
-    private static int internalUserNumber = 100;
+    private static int internalUserNumber = 10;
 
     /**
      * Setter of internalUserNumber.

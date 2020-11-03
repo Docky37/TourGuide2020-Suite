@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.tripmaster.TourGuideV2.domain.Attraction;
@@ -239,7 +238,7 @@ public class TourGuideService implements ITourGuideService {
                         + cumulatativeRewardPoints)
                 .retrieve()
                 .bodyToFlux(ProviderDTO.class);
-        System.out.println(flux.toString());
+
         List<ProviderDTO> providers = flux.collectList().block();
 
         user.setTripDeals(providers);
@@ -325,7 +324,7 @@ public class TourGuideService implements ITourGuideService {
         AttractionsSuggestionDTO suggestion = new AttractionsSuggestionDTO();
         suggestion.setUserLocation(new LocationDTO(
                 user.getLastVisitedLocation().getLocation().getLatitude(),
-                user.getLastVisitedLocation().getLocation().getLatitude()));
+                user.getLastVisitedLocation().getLocation().getLongitude()));
 
         TreeMap<String, NearbyAttractionDTO> suggestedAttractions = new TreeMap<>();
         List<Attraction> attractionsList = getNearByAttractions(
@@ -436,7 +435,7 @@ public class TourGuideService implements ITourGuideService {
                                     generateRandomLongitude()),
                             getRandomTime()));
         });
-        //rewardsService.calculateRewards(user, attractions);
+        rewardsService.calculateRewards(user, attractions);
 
     }
 

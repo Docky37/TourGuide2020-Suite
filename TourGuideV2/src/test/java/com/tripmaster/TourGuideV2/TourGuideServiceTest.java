@@ -10,7 +10,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +25,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.tripmaster.TourGuideV2.domain.Attraction;
 import com.tripmaster.TourGuideV2.domain.Location;
 import com.tripmaster.TourGuideV2.domain.User;
-import com.tripmaster.TourGuideV2.domain.UserReward;
 import com.tripmaster.TourGuideV2.domain.VisitedLocation;
 import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
 import com.tripmaster.TourGuideV2.dto.LocationDTO;
@@ -35,20 +33,12 @@ import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 import com.tripmaster.TourGuideV2.helper.InternalTestHelper;
 import com.tripmaster.TourGuideV2.service.IRewardsService;
 import com.tripmaster.TourGuideV2.service.ITourGuideService;
-import com.tripmaster.TourGuideV2.service.RewardsService;
 import com.tripmaster.TourGuideV2.service.TourGuideService;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import reactor.core.publisher.Mono;
-import reactor.io.Buffer;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-
-import com.tripmaster.TourGuideV2.domain.Attraction;
-import com.tripmaster.TourGuideV2.service.IRewardsService;
 
 @ExtendWith(SpringExtension.class)
 public class TourGuideServiceTest {
@@ -177,10 +167,10 @@ public class TourGuideServiceTest {
     }
 
     @Test
-    @DisplayName("Given few users, when call addUser method then return User List")
+    @DisplayName("Given few users, when call getAllUsers method then return User List")
     void givenFewUsers_whenGetAllUsers_thenReturnsAllUsersList() {
         System.out.println(
-                "\n *** givenFewUsers_whenGetAllUsers_thenReturnsAllUsersList ***");
+                "\n *** Given few users, when call getAllUsers method then return User List ***");
         // GIVEN
         User user = new User(UUID.randomUUID(), "John DOE", "01.02.03.04.05",
                 "john.doe@tourGuide.com");
@@ -272,8 +262,8 @@ public class TourGuideServiceTest {
         do {
             attractions.remove(attractions.get(attractions.size() - 1));
         } while (attractions.size() > 4);
-             
-   System.out.println(attractions.toString());
+
+        System.out.println(attractions.toString());
     }
 
     @Test
@@ -281,29 +271,77 @@ public class TourGuideServiceTest {
     public void givenAUser_whenGetSuggestions_thenReturnSuggestions() {
         System.out.println(
                 "\n*** Given a user when Get Suggestions thenReturnSuggestions ***");
+        // GIVEN
+        attractions.add(new Attraction(UUID.randomUUID(), "Clos Lucé",
+                "Amboise", "France", 47.410445, 0.991830));
+        attractions.add(
+                new Attraction(UUID.randomUUID(), "Eglise Saint-Jean-Baptiste",
+                        "Saint-Jean-de-Luz", "France", 43.386897, -1.661847));
+        attractions.add(new Attraction(UUID.randomUUID(), "La Rhune",
+                "Ascain", "France", 43.309685, -1.635410));
+        attractions.add(new Attraction(UUID.randomUUID(), "Grand place",
+                "Arras", "France",
+                50.292564, 2.781040));
+
+        jsonResult = "[";
+        attractions.forEach(
+                a -> jsonResult = jsonResult.concat(a.toString() + ","));
+        jsonResult = jsonResult.substring(0,
+                jsonResult.length() - 1);
+        jsonResult = jsonResult.concat("]");
+        System.out.println(jsonResult);
+
+        mockWebServerGps.enqueue(
+                new MockResponse()
+                        .setResponseCode(200)
+                        .setHeader(HttpHeaders.CONTENT_TYPE,
+                                MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(jsonResult));
 
         UUID userId = UUID.randomUUID();
         User user = new User(userId, "John DOE", "01.02.03.04.05",
                 "john.doe@tourGuide.com");
-        tourGuideService.trackUserLocation(user);
+        user.addToVisitedLocations(new VisitedLocation(user.getUserId(),
+                new Location(45d, 1d), new Date()));
+
+        
         // WHEN
         AttractionsSuggestionDTO suggestion = tourGuideService
                 .getAttractionsSuggestion(user);
 
-        // tourGuideService.tracker.stopTracking();
         // THEN
-        assertThat(suggestion.getUserLocation())
-                .isEqualTo(user.getLastVisitedLocation().getLocation());
+        assertThat(suggestion.getUserLocation().getLatitude())
+                .isEqualTo(user.getLastVisitedLocation().getLocation().getLatitude());
+        assertThat(suggestion.getUserLocation().getLongitude())
+                .isEqualTo(user.getLastVisitedLocation().getLocation().getLongitude());
         assertThat(suggestion.getSuggestedAttraction().size())
                 .isEqualTo(ITourGuideService.SIZE_OF_NEARBY_ATTRACTIONS_LIST);
     }
 
-    @Ignore
     @Test
+    @DisplayName("Given a user, when getTripDeals then returns a list of five providers")
     public void givenAUser_whenGetTripDeals_thenReturnsAFiveProviderList() {
         System.out.println(
-                "\n *** givenAUser_whenGetTripDeals_thenReturnsAFiveProviderList ***");
+                "\n *** Given a user, when getTripDeals then returns a list of five providers ***");
         // GIVEN
+        jsonResult = "["
+                + "{\"tripId\":\"f815142d-5f6d-4568-8ff9-d573bfe5532d\","
+                + "\"name\":\"Enterprize Ventures Limited\",\"price\":0.9899999999999949},"
+                + "{\"tripId\":\"f815142d-5f6d-4568-8ff9-d573bfe5532d\",\"name\":\"Live Free\","
+                + "\"price\":445.99},{\"tripId\":\"f815142d-5f6d-4568-8ff9-d573bfe5532d\","
+                + "\"name\":\"United Partners Vacations\",\"price\":266.99},"
+                + "{\"tripId\":\"f815142d-5f6d-4568-8ff9-d573bfe5532d\","
+                + "\"name\":\"AdventureCo\",\"price\":258.99},"
+                + "{\"tripId\":\"f815142d-5f6d-4568-8ff9-d573bfe5532d\","
+                + "\"name\":\"Dream Trips\",\"price\":430.99}]";
+        System.out.println(jsonResult);
+
+        mockWebServerTripDeals.enqueue(
+                new MockResponse()
+                        .setResponseCode(200)
+                        .setHeader(HttpHeaders.CONTENT_TYPE,
+                                MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(jsonResult));
 
         User user = new User(UUID.randomUUID(), "jon", "000",
                 "jon@tourGuide.com");
@@ -314,13 +352,12 @@ public class TourGuideServiceTest {
         assertThat(providers.size()).isEqualTo(5);
     }
 
-    @Ignore
     @Test
+    @DisplayName("Given users, when call getAllUsersLocation then returns users location list")
     public void givenUsers_whenGetAllUsersLocation_thenReturnsUsersLocationList() {
         System.out.println(
-                "\n*** givenUsers_whenGetAllUsersLocation_thenReturnsUsersLocationList ***");
+                "\n*** Given users, when call getAllUsersLocation then returns users location list ***");
         // GIVEN
-        // tourGuideService.tracker.stopTracking();
 
         // WHEN
         Map<String, LocationDTO> locations = tourGuideService

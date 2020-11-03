@@ -111,9 +111,8 @@ public class AttractionDTO {
      */
     @Override
     public String toString() {
-        return "AttractionDTO [attractionName=" + attractionName + ", city="
-                + city + ", state=" + state + ", latitude=" + latitude
-                + ", longitude=" + longitude + "]";
+        return "{\"attractionName\":" + attractionName + "\", \"city\":"
+                + city + "\", \"state\":" + state + "\", \"latitude\":" + latitude
+                + ", \"longitude\":" + longitude + "}";
     }
-
-}
+ }

@@ -124,9 +124,9 @@ public class Attraction {
      */
     @Override
     public String toString() {
-        return "Attraction [attractionName=" + attractionName + ", city="
-                + city + ", state=" + state + ", latitude=" + latitude
-                + ", longitude=" + longitude + "]";
+        return "{\"attractionName\":\"" + attractionName + "\",\"city\":\""
+                + city + "\", \"state\":\"" + state + "\", \"latitude\":"
+                + latitude + ", \"longitude\":" + longitude + "}";
     }
 
 }

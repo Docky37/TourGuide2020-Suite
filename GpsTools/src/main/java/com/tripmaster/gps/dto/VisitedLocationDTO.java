@@ -1,6 +1,7 @@
 package com.tripmaster.gps.dto;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * DTO used to transfer the data of a gpsUtil VisitedLocation class, witch is
@@ -11,6 +12,11 @@ import java.util.Date;
  * @since October 2020
  */
 public class VisitedLocationDTO {
+
+    /**
+     * The id of the owner of this visitedLocation.
+     */
+    UUID userId;
 
     /**
      * This attribute tells us when this visitedLocation has been collected by
@@ -30,18 +36,38 @@ public class VisitedLocationDTO {
      *
      * @param pTimeVisited
      * @param pLocation
+     * @param pUserId
      */
     public VisitedLocationDTO(final LocationDTO pLocation,
-            final Date pTimeVisited)
+            final Date pTimeVisited, UUID pUserId)
     {
         timeVisited = pTimeVisited;
         location = pLocation;
+        userId = pUserId;
     }
 
     /**
      * No argument and protected empty class constructor.
      */
     protected VisitedLocationDTO() {
+    }
+
+    /**
+     * The getter of the userId.
+     *
+     * @return an UUID
+     */
+    public UUID getUserId() {
+        return userId;
+    }
+
+    /**
+     * The setter of the userId.
+     *
+     * @param pUserId
+     */
+    public void setUserId(UUID pUserId) {
+        this.userId = pUserId;
     }
 
     /**
@@ -67,8 +93,8 @@ public class VisitedLocationDTO {
      */
     @Override
     public String toString() {
-        return "VisitedLocationDTO [location=" + location.toString()
-                + ", timeVisited=" + timeVisited + "]";
+        return "{location:" + location.toString()
+                + ", timeVisited=" + timeVisited + ", userId:" + userId + "}";
     }
 
 }

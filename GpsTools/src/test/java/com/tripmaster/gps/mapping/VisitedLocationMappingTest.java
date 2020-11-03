@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 import java.util.Locale;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +28,17 @@ public class VisitedLocationMappingTest {
     @Test
     public void givenAVisitedLocation_whenMapToDTO_thenReturnAVisitedLocationDTO() {
         // GIVEN
+        UUID userId = UUID.randomUUID();
         VisitedLocation visitedLocation = new VisitedLocation(
                 null, new Location(48.858482d, 2.294426d),
                 new Date());
         ;
         // WHEN
         VisitedLocationDTO mappedVisitedLocation = visitedLocationMapping
-                .mapToDTO(visitedLocation);
+                .mapToDTO(visitedLocation, userId);
         // THEN
+        assertThat(mappedVisitedLocation.getUserId())
+                .isEqualTo(userId);
         assertThat(mappedVisitedLocation.getLocation().getLatitude())
                 .isEqualTo(visitedLocation.location.latitude);
         assertThat(mappedVisitedLocation.getLocation().getLongitude())

@@ -102,13 +102,43 @@ public class TourGuideService implements ITourGuideService {
         rewardsService = pRewardsService;
         webClientGps = pWebClientGps;
         webClientTripDeals = pWebClientTripDeals;
+        classInitialization();
+        tracker = new Tracker(this);
+        addShutDownHook();
+    }
 
+    /**
+     * This method is used in test mode to initialize service calling a method
+     * that creates random data.
+     */
+    private void classInitialization() {
         if (testMode) {
             logger.info("TestMode enabled");
             logger.debug("Initializing users");
             initializeInternalUsers();
             logger.debug("Finished initializing users");
         }
+    }
+
+    /**
+     * Specific class constructor for unit tests, thats allows Spring to inject
+     * mocks.
+     *
+     * @param test
+     * @param pRewardsService
+     * @param pWebClientTripDeals
+     * @param pWebClientGps
+     */
+    public TourGuideService(final String test,
+            final IRewardsService pRewardsService,
+            final WebClient pWebClientTripDeals, final WebClient pWebClientGps)
+    {
+        rewardsService = pRewardsService;
+        rewardsService = pRewardsService;
+        webClientTripDeals = pWebClientTripDeals;
+        webClientGps = pWebClientGps;
+
+        classInitialization();
         tracker = new Tracker(this);
         addShutDownHook();
     }
@@ -146,7 +176,8 @@ public class TourGuideService implements ITourGuideService {
             visitedLocationDTO = new VisitedLocationDTO(
                     new LocationDTO(visitedLocation.getLocation().getLatitude(),
                             visitedLocation.getLocation().getLongitude()),
-                    visitedLocation.getTimeVisited());
+                    visitedLocation.getTimeVisited(),
+                    visitedLocation.getUserId());
 
         } else {
             visitedLocationDTO = trackUserLocation(user);
@@ -208,7 +239,7 @@ public class TourGuideService implements ITourGuideService {
                         + cumulatativeRewardPoints)
                 .retrieve()
                 .bodyToFlux(ProviderDTO.class);
-System.out.println(flux.toString());
+        System.out.println(flux.toString());
         List<ProviderDTO> providers = flux.collectList().block();
 
         user.setTripDeals(providers);
@@ -220,11 +251,14 @@ System.out.println(flux.toString());
      */
     @Override
     public VisitedLocationDTO trackUserLocation(User user) {
-        final String uri = "http://localhost:8889//getLocation?userId="
+        final String getLocationUri = "/getLocation?userId=\"\r\n" 
                 + user.getUserId();
-        RestTemplate restTemplate = new RestTemplate();
-        VisitedLocationDTO visitedLocationDTO = restTemplate.getForObject(uri,
-                VisitedLocationDTO.class);
+
+        VisitedLocationDTO visitedLocationDTO = webClientGps.get()
+                .uri(getLocationUri)
+                .retrieve()
+                .bodyToMono(VisitedLocationDTO.class).block();
+
         return visitedLocationDTO;
     }
 
@@ -402,7 +436,7 @@ System.out.println(flux.toString());
                                     generateRandomLongitude()),
                             getRandomTime()));
         });
-        rewardsService.calculateRewards(user, attractions);
+        //rewardsService.calculateRewards(user, attractions);
 
     }
 

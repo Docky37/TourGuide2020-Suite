@@ -65,7 +65,7 @@ public class GpsService implements IGpsService {
     public VisitedLocationDTO getUserLocation(UUID userId) {
 
         VisitedLocationDTO visitedLocationDTO = visitedLocationMapping
-                .mapToDTO(gpsUtil.getUserLocation(userId));
+                .mapToDTO(gpsUtil.getUserLocation(userId), userId);
         logger.debug(visitedLocationDTO.toString());
         return visitedLocationDTO;
     }

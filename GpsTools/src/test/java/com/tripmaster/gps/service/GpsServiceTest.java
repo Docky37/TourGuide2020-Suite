@@ -47,9 +47,9 @@ public class GpsServiceTest {
         UUID userId = UUID.randomUUID();
         VisitedLocationDTO visitedLocationDTO = new VisitedLocationDTO(
                 new LocationDTO(48.858482d, 2.294426d),
-                new Date());
-        given(visitedLocationMapping.mapToDTO(any(VisitedLocation.class)))
-                .willReturn(visitedLocationDTO);
+                new Date(), userId);
+        given(visitedLocationMapping.mapToDTO(any(VisitedLocation.class),
+                any(UUID.class))).willReturn(visitedLocationDTO);
         // WHEN
         VisitedLocationDTO visitedLocation = gpsService.getUserLocation(userId);
         System.out.println(visitedLocation.getTimeVisited());

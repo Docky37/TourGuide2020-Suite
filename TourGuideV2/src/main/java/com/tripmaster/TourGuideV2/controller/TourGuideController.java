@@ -1,6 +1,7 @@
 package com.tripmaster.TourGuideV2.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,9 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jsoniter.output.JsonStream;
 import com.tripmaster.TourGuideV2.domain.User;
 import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
+import com.tripmaster.TourGuideV2.dto.LocationDTO;
 import com.tripmaster.TourGuideV2.dto.ProviderDTO;
 import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
@@ -40,6 +41,7 @@ public class TourGuideController {
      */
     @GetMapping("/")
     public String index() {
+        logger.info("New HTML Request on /");
         return "Greetings from TourGuide!";
     }
 
@@ -51,12 +53,12 @@ public class TourGuideController {
      * @return a String
      */
     @GetMapping("/getLocation")
-    public String getLocation(@RequestParam String userName) {
-        logger.info("New HTML Request on /getLocation for ?", userName);
+    public LocationDTO getLocation(@RequestParam String userName) {
+        logger.info("New HTML Request on /getLocation for {}", userName);
         VisitedLocationDTO visitedLocationDTO = tourGuideService
                 .getUserLocation(getUser(userName));
         logger.info(visitedLocationDTO.toString() + "\n");
-        return JsonStream.serialize(visitedLocationDTO.getLocation());
+        return visitedLocationDTO.getLocation();
     }
 
     /**
@@ -80,7 +82,7 @@ public class TourGuideController {
     @GetMapping("/getNearbyAttractions")
     public AttractionsSuggestionDTO getNearbyAttractions(
             @RequestParam String userName) {
-        logger.info("New HTML Request on /getNearbyAttractions for ?",
+        logger.info("New HTML Request on /getNearbyAttractions for {}",
                 userName);
         AttractionsSuggestionDTO suggestion = tourGuideService
                 .getAttractionsSuggestion(getUser(userName));
@@ -97,7 +99,7 @@ public class TourGuideController {
      */
     @GetMapping("/getRewards")
     public UserRewardsDTO getRewards(@RequestParam String userName) {
-        logger.info("New HTML Request on /getRewards for ?", userName);
+        logger.info("New HTML Request on /getRewards for {}", userName);
         return tourGuideService.getUserRewards(getUser(userName));
     }
 
@@ -110,8 +112,9 @@ public class TourGuideController {
      *         {"longitude":-48.188821,"latitude":74.84371} ... }
      */
     @GetMapping("/getAllCurrentLocations")
-    public String getAllCurrentLocations() {
-        return JsonStream.serialize(tourGuideService.getAllUsersLocation());
+    public Map<String, LocationDTO> getAllCurrentLocations() {
+        logger.info("New HTML Request on /getAllCurrentLocations");
+        return tourGuideService.getAllUsersLocation();
     }
 
     /**
@@ -123,9 +126,10 @@ public class TourGuideController {
      */
     @GetMapping("/getTripDeals")
     public List<ProviderDTO> getTripDeals(@RequestParam String userName) {
+        logger.info("New HTML Request on /getRewards for {}", userName);
         List<ProviderDTO> providers = tourGuideService
                 .getTripDeals(getUser(userName));
-        return providers;//JsonStream.serialize(providers);
+        return providers;
     }
 
     /**

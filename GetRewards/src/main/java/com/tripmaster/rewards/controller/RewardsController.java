@@ -13,7 +13,7 @@ import com.tripmaster.rewards.service.RewardsService;
 
 @RestController
 public class RewardsController {
-
+    int i = 1;
     /**
      * Create a SLF4J/LOG4J LOGGER instance.
      */
@@ -33,7 +33,9 @@ public class RewardsController {
             @RequestParam UUID userId) {
         logger.info("HTML GET Request on localhost:8787");
         int rewardPoints = rewardsService.getRewardPoints(attractionId, userId);
-        logger.info(" -> User reward = ? points", rewardPoints);
+        logger.info(" {} -> User {} reward = {} points", i, userId,
+                rewardPoints);
+        i++;
         return rewardPoints;
     }
 

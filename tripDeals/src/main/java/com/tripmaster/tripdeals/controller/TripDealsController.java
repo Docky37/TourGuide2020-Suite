@@ -58,7 +58,9 @@ public class TripDealsController {
         List<ProviderDTO> providerDTOList = tripDealService.getTripDeals(
                 tripPricerApiKey, userId, numberOfAdult, numberOfChildren,
                 tripDuration, cumulatativeRewardPoints);
-
+        if (providerDTOList.isEmpty()) {
+            logger.info("Sorry we don't find any trip deal!");
+        }
         return providerDTOList;
     }
 

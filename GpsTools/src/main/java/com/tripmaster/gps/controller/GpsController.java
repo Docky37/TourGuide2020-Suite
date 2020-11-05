@@ -41,9 +41,9 @@ public class GpsController {
      */
     @GetMapping("/getLocation")
     public VisitedLocationDTO getUserLocation(@RequestParam final UUID userId) {
-        logger.info("New HTML GET Request: /getLocation?userId=?", userId);
+        logger.info("New HTML GET Request: /getLocation?userId= {}", userId);
         VisitedLocationDTO visitedLocation = gpsService.getUserLocation(userId);
-        logger.info(visitedLocation.toString());
+        logger.info(" -> visitedLocation = {}", visitedLocation.toString());
         return visitedLocation;
     }
 

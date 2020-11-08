@@ -2,6 +2,8 @@ package com.tripmaster.TourGuideV2.service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +105,8 @@ public class RewardsService implements IRewardsService {
         proximityBuffer = defaultProximityBuffer;
     }
 
+    int i = 1;
+
     /**
      * Asynchronous method use to calculate user rewards.
      * 
@@ -112,25 +116,25 @@ public class RewardsService implements IRewardsService {
     @Override
     public CompletableFuture<?> calculateRewards(User user,
             List<Attraction> attractions) {
-
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
         return CompletableFuture.supplyAsync(() -> {
             user.getVisitedLocations().forEach(vl -> {
                 attractions.stream()
-                        //.filter(a -> nearAttraction(vl, a))
+                        .filter(a -> nearAttraction(vl, a))
                         .forEach(a -> {
-                            if (user.getUserRewards().stream()
-                                    .noneMatch(r -> r.attraction
-                                            .getAttractionName()
+                            if (user.getUserRewards().stream().noneMatch(
+                                    r -> r.attraction.getAttractionName()
                                             .equals(a.getAttractionName()))) {
                                 user.addUserReward(new UserReward(vl, a,
                                         getRewardPoints(a, user)));
+                                System.out.println("reward " + i);
+                                i++;
                             }
                         });
-
             });
-
             return user;
-        });
+        }, executorService);
+        
     }
 
     /**

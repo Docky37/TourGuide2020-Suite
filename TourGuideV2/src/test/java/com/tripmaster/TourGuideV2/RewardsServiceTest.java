@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -84,18 +85,19 @@ public class RewardsServiceTest {
     }
 
     @Test // Here we test the calculateRewards and getRewardPoints methods
-    public void givenOneVisitedLocationAndOneAttraction_whenCalculateRewards_thenUserRewardsListSizeIsEqualTo1()
+    @DisplayName("Given a nearby attraction when calculateRewards then 1 reward created")
+    public void given1VisitedLocationAnd2NearbyAttractions_whenCalculateRewards_thenUserRewardsListSizeIsEqualTo2()
             throws InterruptedException, ExecutionException {
         System.out.println(
-                "\n\n *** given 1 VisitedLocation & 1 Attraction when calculateRewards"
+                "\n\n *** Given a nearby attraction when calculateRewards"
                         + " then UserRewardsList size is equal to 1. ***");
         // GIVEN
         User user = new User(UUID.randomUUID(), "jon", "000",
                 "jon@tourGuide.com");
         user.addToVisitedLocations(
                 new VisitedLocation(user.getUserId(), new Location(
-                        attractions.get(0).getLatitude(),
-                        attractions.get(0).getLongitude()),
+                        attractions.get(3).getLatitude(),
+                        attractions.get(3).getLongitude()),
                         new Date()));
 
         mockWebServer.enqueue(
@@ -104,6 +106,7 @@ public class RewardsServiceTest {
                         .setHeader(HttpHeaders.CONTENT_TYPE,
                                 MediaType.APPLICATION_JSON_VALUE)
                         .setBody("77"));
+
 
         // WHEN
         CompletableFuture<?> result = rewardsService.calculateRewards(user,
@@ -117,9 +120,10 @@ public class RewardsServiceTest {
     }
 
     @Test // Here we test isWithinAttractionProximity method
+    @DisplayName("Given 1 Attraction, when IsWithinAttractionProximity of 2 Locations then first return true then false")
     public void givenAnAttraction_whenIsWithinAttractionProximityOf2Locations_thenFirstReturnTrueThenFalse() {
         System.out.println(
-                "\n\n *** givenAnAttraction_whenIsWithinAttractionProximityOf2Locations_thenFirstReturnTrueThenFalse ***");
+                "\n\n *** Given 1 Attraction, when IsWithinAttractionProximity of 2 Locations then first return true then false ***");
         /*
          * Here we test if the Eiffel tower isWithinAttractionProximity of the
          * Charles De Gaulle Terminal 2 -> Less than 16 miles, it's true!
@@ -138,9 +142,10 @@ public class RewardsServiceTest {
     }
 
     @Test // Here we test the getDistance method between to locations
+    @DisplayName("Given 2 Locations, when GetDistance then return the rigth distance")
     public void given2Locations_whenGetDistance_thenReturnTheRigthDistance() {
         System.out.println(
-                "\n\n *** givenALocationAndTwoAttractions_whenNearAttraction_thenFirstReturnTrueThenFalse ***");
+                "\n\n *** Given 2 Locations, when GetDistance then return the rigth distance ***");
         /*
          * Here we calculate the distance between the Eiffel tower and the
          * Montparnasse Station. Google result is 1.67 miles
@@ -160,11 +165,12 @@ public class RewardsServiceTest {
         assertThat(distance).isEqualTo(422);
     }
 
-    @Test // Here we test both calculate rewards and nearAttraction method
+    @Test // Here we test both calculate rewards and private nearAttraction method
+    @DisplayName("Given MaxValue for ProximityBuffer, whenGetAttractions then return all Attractions")
     public void givenAMaxIntProximityBuffer_whenCalculateRewards_thenReturnAllAttractions()
             throws InterruptedException, ExecutionException {
         System.out.println(
-                "\n\n *** givenAMaxIntProximityBuffer_whenGetAttractions_thenReturnAllAttractions ***");
+                "\n\n *** Given MaxValue for ProximityBuffer, whenGetAttractions then return all Attractions ***");
         // GIVEN
         rewardsService.setProximityBuffer(Integer.MAX_VALUE);
         User user = new User(UUID.randomUUID(), "jon", "000",

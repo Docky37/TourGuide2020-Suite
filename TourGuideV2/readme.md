@@ -17,3 +17,9 @@ TourGuideServi2020 is now a suite of 4 SpringBoot applications:
 All applications are build with SpringBoot v2.3.4 and Gradle.
 The requests between TourGuide and other API are done with WebClient.
 JUnit 5 manages the tests and MockWebServer is used to mock the WebClient. 
+
+## Content
+
+The v2.0.beta_release (03 Nov. 2020) is the first release of the new architecture of TourGuide.  
+
+The v2.0.1.beta_version (08 Nov. 2020) optimizes the performances with less than 3 minutes spent to localize 100,000 users and less than 7 minutes to calculate 100,000 users' rewards. 

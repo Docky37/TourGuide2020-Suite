@@ -11,31 +11,42 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tripmaster.rewards.service.RewardsService;
 
+/**
+ * The controller of GetRewards application exposes one endpoint (/getReward)
+ * that allows us to get the reward points obtained following an attraction
+ * visit.
+ *
+ * @author TripMaster
+ * @author Thierry Schreiner
+ */
 @RestController
 public class RewardsController {
-    int i = 1;
+
     /**
      * Create a SLF4J/LOG4J LOGGER instance.
      */
     private Logger logger = LoggerFactory.getLogger(RewardsController.class);
 
+    /**
+     * RewardsService declaration, for Spring injection.
+     */
     @Autowired
-    RewardsService rewardsService;
+    private RewardsService rewardsService;
 
     /**
      * HTML GET request used to get reward points from RewardsCentral jar
      * library.
      *
+     * @param attractionId
+     * @param userId
      * @return an int
      */
     @GetMapping("/getReward")
-    public int getUserRewards(@RequestParam UUID attractionId,
-            @RequestParam UUID userId) {
+    public int getUserRewards(@RequestParam final UUID attractionId,
+            @RequestParam final UUID userId) {
         logger.info("HTML GET Request on localhost:8787");
         int rewardPoints = rewardsService.getRewardPoints(attractionId, userId);
-        logger.info(" {} -> User {} reward = {} points", i, userId,
-                rewardPoints);
-        i++;
+        logger.info(" {} -> User {} reward = {} points", userId, rewardPoints);
         return rewardPoints;
     }
 

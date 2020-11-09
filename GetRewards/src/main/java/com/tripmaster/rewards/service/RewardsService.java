@@ -16,7 +16,6 @@ import rewardCentral.RewardCentral;
  * @author TripMaster
  * @author Thierry Schreiner
  */
-
 @Service
 public class RewardsService implements IRewardsService {
 
@@ -26,35 +25,36 @@ public class RewardsService implements IRewardsService {
     private Logger logger = LoggerFactory.getLogger(RewardsService.class);
 
     /**
-     * Creation of GpsUtil instance.
+     * Declares a GpsUtil instance, that will be initialized by Spring
+     * injection.
      */
     @Autowired
-    public RewardCentral rewardsCentral;
+    private RewardCentral rewardsCentral;
 
     /**
-     * Class constructor.
-     * 
-     * @param rewardCentral
+     * No parameter class constructor.
      */
-    
     public RewardsService() {
-        this.rewardsCentral = new RewardCentral();
-    }
-    
-    public RewardsService(RewardCentral pRewardCentral) {
-        this.rewardsCentral = pRewardCentral;
     }
 
+    /**
+     * Class constructor with one parameter.
+     *
+     * @param pRewardCentral
+     */
+    public RewardsService(final RewardCentral pRewardCentral) {
+        this.rewardsCentral = pRewardCentral;
+    }
 
     /**
      * This method calls a method of the RewardCentral.jar library in order to
      * get the attraction reward points for the given user.
      *
-     * @param attraction
-     * @param user
+     * @param attractionId
+     * @param userId
      * @return an int: the count of reward points
      */
-    public int getRewardPoints(UUID attractionId, UUID userId) {
+    public int getRewardPoints(final UUID attractionId, final UUID userId) {
         logger.debug(" -> getRewardPoints(?,?", attractionId, userId);
         return rewardsCentral.getAttractionRewardPoints(attractionId, userId);
     }

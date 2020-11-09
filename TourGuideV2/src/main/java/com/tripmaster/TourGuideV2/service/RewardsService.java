@@ -31,6 +31,12 @@ public class RewardsService implements IRewardsService {
      * Create a SLF4J/LOG4J LOGGER instance.
      */
     private Logger logger = LoggerFactory.getLogger(RewardsService.class);
+
+    /**
+     * Number 60 use in distance calculation.
+     */
+    private static final int SIXTY = 60;
+
     /**
      * Number of statute miles in one nautical mile.
      */
@@ -39,34 +45,34 @@ public class RewardsService implements IRewardsService {
     /**
      * Proximity buffer default value in miles.
      */
-    private int defaultProximityBuffer = 10;
+    private static final int DEFAULT_PROXIMITY_BUFFER = 10;
+
     /**
      * Current value of proximity buffer.
      */
-    private int proximityBuffer = defaultProximityBuffer;
+    private int proximityBuffer = DEFAULT_PROXIMITY_BUFFER;
+
     /**
      * The maximum distance below which an attraction is close.
      */
-    private int attractionProximityRange = 200;
+    private static final int ATTRACTION_PROXIMITY_RANGE = 200;
 
     /**
      * A Rewards Webclient declaration. The bean is injected by Spring with the
      * class constructor @Autowired annotation.
      */
-    WebClient webClientReward;
+    private WebClient webClientReward;
 
     /**
      * This class constructor allows Spring to inject one WebClient bean,
      * specified by the @Qualifier annotation (because there are 3 qualified
      * beans known by Spring context.
      *
-     * @param gpsUtil
-     * @param rewardCentral
+     * @param pWebClientReward
      */
     @Autowired
     public RewardsService(
-            @Qualifier("getWebClientReward") final WebClient pWebClientReward)
-    {
+            @Qualifier("getWebClientReward") final WebClient pWebClientReward) {
         webClientReward = pWebClientReward;
     }
 
@@ -83,18 +89,19 @@ public class RewardsService implements IRewardsService {
      * @param testMode
      * @param pWebClientReward
      */
-    public RewardsService(String testMode, WebClient pWebClientReward) {
+    public RewardsService(final String testMode,
+            final WebClient pWebClientReward) {
         webClientReward = pWebClientReward;
     }
 
     /**
      * Setter of proximityBuffer.
-     * 
-     * @param proximityBuffer
+     *
+     * @param pProximityBuffer
      */
     @Override
-    public void setProximityBuffer(int proximityBuffer) {
-        this.proximityBuffer = proximityBuffer;
+    public void setProximityBuffer(final int pProximityBuffer) {
+        proximityBuffer = pProximityBuffer;
     }
 
     /**
@@ -102,20 +109,18 @@ public class RewardsService implements IRewardsService {
      */
     @Override
     public void setDefaultProximityBuffer() {
-        proximityBuffer = defaultProximityBuffer;
+        proximityBuffer = DEFAULT_PROXIMITY_BUFFER;
     }
-
-    int i = 1;
 
     /**
      * Asynchronous method use to calculate user rewards.
-     * 
+     *
      * @param user
      * @return a CompletableFuture<?>
      */
     @Override
-    public CompletableFuture<?> calculateRewards(User user,
-            List<Attraction> attractions) {
+    public CompletableFuture<?> calculateRewards(final User user,
+            final List<Attraction> attractions) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         return CompletableFuture.supplyAsync(() -> {
             user.getVisitedLocations().forEach(vl -> {
@@ -123,18 +128,16 @@ public class RewardsService implements IRewardsService {
                         .filter(a -> nearAttraction(vl, a))
                         .forEach(a -> {
                             if (user.getUserRewards().stream().noneMatch(
-                                    r -> r.attraction.getAttractionName()
+                                    r -> r.getAttraction().getAttractionName()
                                             .equals(a.getAttractionName()))) {
                                 user.addUserReward(new UserReward(vl, a,
                                         getRewardPoints(a, user)));
-                                System.out.println("reward " + i);
-                                i++;
                             }
                         });
             });
             return user;
         }, executorService);
-        
+
     }
 
     /**
@@ -147,11 +150,12 @@ public class RewardsService implements IRewardsService {
      * @return a boolean
      */
     @Override
-    public boolean isWithinAttractionProximity(Attraction attraction,
-            Location location) {
+    public boolean isWithinAttractionProximity(final Attraction attraction,
+            final Location location) {
         logger.debug("isWithinAttractionProximity\n distance = "
                 + getDistance(attraction, location));
-        return !(getDistance(attraction, location) > attractionProximityRange);
+        return !(getDistance(attraction,
+                location) > ATTRACTION_PROXIMITY_RANGE);
     }
 
     /**
@@ -163,19 +167,13 @@ public class RewardsService implements IRewardsService {
      * @param attraction
      * @return a boolean
      */
-    private boolean nearAttraction(VisitedLocation visitedLocation,
-            Attraction attraction) {
+    private boolean nearAttraction(final VisitedLocation visitedLocation,
+            final Attraction attraction) {
         logger.debug("nearAttraction - distance = "
                 + getDistance(attraction, visitedLocation.getLocation()));
 
         return !(getDistance(attraction,
                 visitedLocation.getLocation()) > proximityBuffer);
-    }
-
-    public double getDistance(Attraction attraction, Location location) {
-        double distance = getDistance(new Location(attraction.getLatitude(),
-                attraction.getLongitude()), location);
-        return distance;
     }
 
     /**
@@ -192,6 +190,22 @@ public class RewardsService implements IRewardsService {
                         + "&userId=" + user.getUserId())
                 .retrieve()
                 .bodyToMono(Integer.class).block();
+    }
+
+    /**
+     * This method creates a location from the attraction latitude and longitude
+     * and uses the getDistance(final Location loc1, final Location loc2) method
+     * to get the distance between the attraction and the user location.
+     *
+     * @param attraction
+     * @param location
+     * @return a double
+     */
+    public double getDistance(final Attraction attraction,
+            final Location location) {
+        double distance = getDistance(new Location(attraction.getLatitude(),
+                attraction.getLongitude()), location);
+        return distance;
     }
 
     /**
@@ -212,7 +226,7 @@ public class RewardsService implements IRewardsService {
                 .acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1)
                         * Math.cos(lat2) * Math.cos(lon1 - lon2));
 
-        double nauticalMiles = 60 * Math.toDegrees(angle);
+        double nauticalMiles = SIXTY * Math.toDegrees(angle);
         double statuteMiles = STATUTE_MILES_PER_NAUTICAL_MILE * nauticalMiles;
         return statuteMiles;
     }

@@ -17,6 +17,10 @@ import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 @Service
 public interface ITourGuideService {
 
+    /**
+     * This attribute defines the number of nearby attraction that will be
+     * suggested.
+     */
     int SIZE_OF_NEARBY_ATTRACTIONS_LIST = 5;
 
     /**
@@ -39,14 +43,14 @@ public interface ITourGuideService {
      * Get a user (of the internalUserMap) by his userName.
      *
      * @param userName
-     * @return
+     * @return a User
      */
     User getUser(String userName);
 
     /**
      * Get all users of the internalUserMap.
      *
-     * @return
+     * @return a List of Users
      */
     List<User> getAllUsers();
 
@@ -72,7 +76,7 @@ public interface ITourGuideService {
      * Reward for the given user.
      *
      * @param user
-     * @return
+     * @return a VisitedLocationDTO
      */
     VisitedLocationDTO trackUserLocation(User user);
 
@@ -88,7 +92,13 @@ public interface ITourGuideService {
      */
     AttractionsSuggestionDTO getAttractionsSuggestion(User user);
 
+    /**
+     * Get the list of all attractions.
+     *
+     * @return a List<Attraction>
+     */
     List<Attraction> getAllAttractions();
+
     /**
      * Get the list of the n closest attractions. The number n is defined by the
      * SIZE_OF_NEARBY_ATTRACTIONS_LIST constant.

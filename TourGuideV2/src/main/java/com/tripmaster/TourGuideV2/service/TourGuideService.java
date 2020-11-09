@@ -58,29 +58,30 @@ public class TourGuideService implements ITourGuideService {
      * RewardService declaration, the bean is injected by Spring with the class
      * constructor @Autowired annotation.
      */
-    IRewardsService rewardsService;
+    private IRewardsService rewardsService;
 
     /**
      * A TripDeals Webclient declaration. The bean is injected by Spring with
      * the class constructor @Autowired annotation.
      */
-    WebClient webClientTripDeals;
+    private WebClient webClientTripDeals;
 
     /**
      * A GpsTools Webclient declaration. The bean is injected by Spring with the
      * class constructor @Autowired annotation.
      */
-    WebClient webClientGps;
+    private WebClient webClientGps;
 
     /**
-     * 
+     * A Tracker declaration. The tracker instance is create later in the class
+     * constructor.
      */
-    public final Tracker tracker;
+    private final Tracker tracker;
 
     /**
      * Create a testMode boolean instance initialized at true.
      */
-    boolean testMode = true;
+    private boolean testMode = true;
 
     /**
      * This class constructor allows Spring to inject 3 beans, RewardsService
@@ -92,9 +93,9 @@ public class TourGuideService implements ITourGuideService {
      */
     @Autowired
     public TourGuideService(final IRewardsService pRewardsService,
-            @Qualifier("getWebClientTripDeals") final WebClient pWebClientTripDeals,
-            @Qualifier("getWebClientGps") final WebClient pWebClientGps)
-    {
+            @Qualifier("getWebClientTripDeals")
+                    final WebClient pWebClientTripDeals,
+            @Qualifier("getWebClientGps") final WebClient pWebClientGps) {
         rewardsService = pRewardsService;
         webClientGps = pWebClientGps;
         webClientTripDeals = pWebClientTripDeals;
@@ -127,30 +128,30 @@ public class TourGuideService implements ITourGuideService {
      */
     public TourGuideService(final String test,
             final IRewardsService pRewardsService,
-            final WebClient pWebClientTripDeals, final WebClient pWebClientGps)
-    {
+            final WebClient pWebClientTripDeals,
+            final WebClient pWebClientGps) {
         rewardsService = pRewardsService;
         rewardsService = pRewardsService;
         webClientTripDeals = pWebClientTripDeals;
         webClientGps = pWebClientGps;
 
         classInitialization();
-        tracker = null; //new Tracker(this);
-        //addShutDownHook();
+        tracker = null; // new Tracker(this);
+        // addShutDownHook();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public UserRewardsDTO getUserRewards(User user) {
+    public UserRewardsDTO getUserRewards(final User user) {
         List<UserReward> userRewards = user.getUserRewards();
         UserRewardsDTO userRewardsDTO = new UserRewardsDTO();
         userRewardsDTO.setUserName(user.getUserName());
         userRewards.forEach(uR -> userRewardsDTO
                 .addUserRewardDTO(new UserRewardDTO(
-                        uR.visitedLocation,
-                        uR.attraction,
+                        uR.getVisitedLocation(),
+                        uR.getAttraction(),
                         uR.getRewardPoints())));
         return userRewardsDTO;
     }
@@ -164,7 +165,7 @@ public class TourGuideService implements ITourGuideService {
      * @return a VisitedLocation
      */
     @Override
-    public VisitedLocationDTO getUserLocation(User user) {
+    public VisitedLocationDTO getUserLocation(final User user) {
         VisitedLocation visitedLocation;
         VisitedLocationDTO visitedLocationDTO;
         if (user.getVisitedLocations().size() > 0) {
@@ -192,7 +193,7 @@ public class TourGuideService implements ITourGuideService {
      * {@inheritDoc}
      */
     @Override
-    public User getUser(String userName) {
+    public User getUser(final String userName) {
         return internalUserMap.get(userName);
     }
 
@@ -208,7 +209,7 @@ public class TourGuideService implements ITourGuideService {
      * {@inheritDoc}
      */
     @Override
-    public void addUser(User user) {
+    public void addUser(final User user) {
         if (!internalUserMap.containsKey(user.getUserName())) {
             internalUserMap.put(user.getUserName(), user);
         }
@@ -218,12 +219,12 @@ public class TourGuideService implements ITourGuideService {
      * {@inheritDoc}
      */
     // @Override
-    public List<ProviderDTO> getTripDeals(User user) {
+    public List<ProviderDTO> getTripDeals(final User user) {
         int cumulatativeRewardPoints = user.getUserRewards().stream()
                 .mapToInt(i -> i.getRewardPoints()).sum();
 
         Flux<ProviderDTO> flux = webClientTripDeals.get()
-                .uri("/getTripDeals?tripPricerApiKey=" + tripPricerApiKey
+                .uri("/getTripDeals?tripPricerApiKey=" + TRIP_PRICER_API_KEY
                         + "&userId=" + user.getUserId()
                         + "&numberOfAdults=" + user.getUserPreferences()
                                 .getNumberOfAdults()
@@ -251,7 +252,7 @@ public class TourGuideService implements ITourGuideService {
      * {@inheritDoc}
      */
     @Override
-    public VisitedLocationDTO trackUserLocation(User user) {
+    public VisitedLocationDTO trackUserLocation(final User user) {
         final String getLocationUri = "/getLocation?userId=" + user.getUserId();
 
         VisitedLocationDTO visitedLocationDTO = webClientGps.get()
@@ -271,7 +272,7 @@ public class TourGuideService implements ITourGuideService {
      */
     @Override
     public List<Attraction> getNearByAttractions(
-            VisitedLocation visitedLocation) {
+            final VisitedLocation visitedLocation) {
         List<Attraction> listOfAttraction = getAllAttractions();
 
         List<Attraction> nearbyFiveAttractions = new ArrayList<>();
@@ -287,7 +288,9 @@ public class TourGuideService implements ITourGuideService {
         return nearbyFiveAttractions;
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public List<Attraction> getAllAttractions() {
         final String attractionUri = "/getAllAttractions";
 
@@ -320,14 +323,15 @@ public class TourGuideService implements ITourGuideService {
      * @see getNearByAttractions(VisitedLocation visitedLocation)
      */
     @Override
-    public AttractionsSuggestionDTO getAttractionsSuggestion(User user) {
+    public AttractionsSuggestionDTO getAttractionsSuggestion(final User user) {
 
         AttractionsSuggestionDTO suggestion = new AttractionsSuggestionDTO();
         suggestion.setUserLocation(new LocationDTO(
                 user.getLastVisitedLocation().getLocation().getLatitude(),
                 user.getLastVisitedLocation().getLocation().getLongitude()));
 
-        TreeMap<String, NearbyAttractionDTO> suggestedAttractions = new TreeMap<>();
+        TreeMap<String, NearbyAttractionDTO> suggestedAttractions =
+                new TreeMap<>();
         List<Attraction> attractionsList = getNearByAttractions(
                 user.getLastVisitedLocation());
         final AtomicInteger indexHolder = new AtomicInteger(1);
@@ -380,15 +384,50 @@ public class TourGuideService implements ITourGuideService {
         });
     }
 
-    /**********************************************************************************
-     * 
-     * Methods Below: For Internal Testing
-     * 
-     **********************************************************************************/
-    private static final String tripPricerApiKey = "test-server-api-key";
-    // Database connection will be used for external users, but for testing
-    // purposes internal users are provided and stored in memory
+    /*
+     * *************************************************************************
+     *
+     * Methods Below: For Internal Testing.
+     *
+     */
+
+    /**
+     * The API Key that is mandatory to use TripPricer.
+     */
+    public static final String TRIP_PRICER_API_KEY = "test-server-api-key";
+
+    /**
+     * Database connection will be used for external users, but for testing
+     * purposes internal users are provided and stored in memory.
+     */
     private final Map<String, User> internalUserMap = new HashMap<>();
+
+    /**
+     * Defines the number of visitedLocations to create for each user.
+     */
+    private static final int NUMBER_OF_USER_VISITED_LOCATIONS_TO_CREATE = 3;
+
+    /**
+     * Define the north limit of user's locations area (USA for Tests).
+     */
+    private static final double LATITUDE_NORTH_LIMIT = 42;
+    /**
+     * Define the south limit of user's locations area (USA for Tests).
+     */
+    private static final double LATITUDE_SOUTH_LIMIT = 25;
+    /**
+     * Define the west limit of user's locations area (USA for Tests).
+     */
+    private static final double LONGITUDE_WEST_LIMIT = -125;
+    /**
+     * Define the east limit of user's locations area (USA for Tests).
+     */
+    private static final double LONGITUDE_EAST_LIMIT = -66;
+
+    /**
+     * Number 30 used in time randomization.
+     */
+    private static final int THIRTY = 30;
 
     /**
      * This method creates users for tests.
@@ -415,16 +454,18 @@ public class TourGuideService implements ITourGuideService {
      * calling 3 sub method to generate randomized latitude, longitude and time.
      *
      * @param user
+     * @param attractions
      */
-    private void generateUserLocationHistory(User user,
-            List<Attraction> attractions) {
-        IntStream.range(0, 3).forEach(i -> {
-            user.addToVisitedLocations(
-                    new VisitedLocation(user.getUserId(),
-                            new Location(generateRandomLatitude(),
-                                    generateRandomLongitude()),
-                            getRandomTime()));
-        });
+    private void generateUserLocationHistory(final User user,
+            final List<Attraction> attractions) {
+        IntStream.range(0, NUMBER_OF_USER_VISITED_LOCATIONS_TO_CREATE)
+                .forEach(i -> {
+                    user.addToVisitedLocations(
+                            new VisitedLocation(user.getUserId(),
+                                    new Location(generateRandomLatitude(),
+                                            generateRandomLongitude()),
+                                    getRandomTime()));
+                });
 
     }
 
@@ -434,8 +475,8 @@ public class TourGuideService implements ITourGuideService {
      * @return a double
      */
     private double generateRandomLongitude() {
-        double leftLimit = -125;// -180;
-        double rightLimit = -66;// 180;
+        double leftLimit = LONGITUDE_WEST_LIMIT; // -180;
+        double rightLimit = LONGITUDE_EAST_LIMIT; // 180;
         return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
     }
 
@@ -445,8 +486,8 @@ public class TourGuideService implements ITourGuideService {
      * @return a double
      */
     private double generateRandomLatitude() {
-        double leftLimit = 28.0;// -85.05112878;
-        double rightLimit = 42.0;// 85.05112878;
+        double leftLimit = LATITUDE_NORTH_LIMIT; // -85.05112878;
+        double rightLimit = LATITUDE_SOUTH_LIMIT; // 85.05112878;
         return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
     }
 
@@ -457,8 +498,17 @@ public class TourGuideService implements ITourGuideService {
      */
     private Date getRandomTime() {
         LocalDateTime localDateTime = LocalDateTime.now()
-                .minusDays(new Random().nextInt(30));
+                .minusDays(new Random().nextInt(THIRTY));
         return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
+    }
+
+    /**
+     * Getter of Tracker.
+     *
+     * @return a Tracker
+     */
+    public Tracker getTracker() {
+        return tracker;
     }
 
 }

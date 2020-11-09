@@ -7,23 +7,17 @@ public class ProviderDTO {
     /**
      * The id of this provided trip.
      */
-    UUID tripId;
+    private UUID tripId;
 
     /**
      * The name of this provided trip.
      */
-    String name;
+    private String name;
 
     /**
      * The price of this provided trip.
      */
-    double price;
-
-    /**
-     * No parameters class constructor.
-     */
-    public ProviderDTO() {
-    }
+    private double price;
 
     /**
      * All parameters class constructor.
@@ -32,10 +26,17 @@ public class ProviderDTO {
      * @param pName
      * @param pPrice
      */
-    public ProviderDTO(UUID pTripId, String pName, double pPrice) {
+    public ProviderDTO(final UUID pTripId, final String pName,
+            final double pPrice) {
         tripId = pTripId;
         name = pName;
         price = pPrice;
+    }
+
+    /**
+     * No parameters protected class constructor.
+     */
+    protected ProviderDTO() {
     }
 
     /**
@@ -50,7 +51,7 @@ public class ProviderDTO {
     /**
      * Getter of the name attribute.
      *
-     * @return
+     * @return a String
      */
     public String getName() {
         return name;

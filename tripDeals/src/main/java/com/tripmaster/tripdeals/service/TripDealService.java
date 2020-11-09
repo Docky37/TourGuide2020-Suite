@@ -13,6 +13,13 @@ import com.tripmaster.tripdeals.dto.ProviderDTO;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
 
+/**
+ * This class contains one method used to get TripDeals propositions from
+ * TripPricer application.
+ *
+ * @author TripMaster
+ * @author Thierry Schreiner
+ */
 @Service
 public class TripDealService implements ITripDealService {
 
@@ -21,17 +28,23 @@ public class TripDealService implements ITripDealService {
      */
     private Logger logger = LoggerFactory.getLogger(TripDealService.class);
 
-    TripPricer tripPricer = new TripPricer();
+    /**
+     * Declaration and initialization of a TripPricer instance.
+     */
+    private TripPricer tripPricer = new TripPricer();
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<ProviderDTO> getTripDeals(final String tripPricerApiKey,
-            final UUID userId, final int NumberOfAdult,
+            final UUID userId, final int numberOfAdult,
             final int numberOfChildren, final int tripDuration,
             final int cumulatativeRewardPoints) {
         logger.debug(" -> getTripDeals");
 
         List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, userId,
-                NumberOfAdult, numberOfChildren, tripDuration,
+                numberOfAdult, numberOfChildren, tripDuration,
                 cumulatativeRewardPoints);
 
         List<ProviderDTO> providerDTOList = new ArrayList<>();

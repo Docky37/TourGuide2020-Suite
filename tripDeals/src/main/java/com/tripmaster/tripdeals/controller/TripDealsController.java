@@ -33,18 +33,18 @@ public class TripDealsController {
      * TripDealService declaration. The bean is injected by Spring.
      */
     @Autowired
-    ITripDealService tripDealService;
+    private ITripDealService tripDealService;
 
     /**
      * HTML GET request on /getTripDeals used to get a list of ProviderDTO.
      *
      * @param tripPricerApiKey
      * @param userId
-     * @param NumberOfAdult
+     * @param numberOfAdult
      * @param numberOfChildren
      * @param tripDuration
      * @param cumulatativeRewardPoints
-     * @return
+     * @return a List<ProviderDTO>
      */
     @GetMapping("/getTripDeals")
     public List<ProviderDTO> getTripDeals(

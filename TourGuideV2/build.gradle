@@ -48,7 +48,20 @@ jacocoTestReport {
         html.destination file("${buildDir}/jacocoHtml")
     }
 }
+test.finalizedBy jacocoTestReport
+check.dependsOn jacocoTestCoverageVerification
 
+jacocoTestCoverageVerification {
+  violationRules {
+    rule {
+      limit {
+        counter = 'LINE'
+        value = 'COVEREDRATIO'
+        minimum = 0.5
+      }
+    }
+  }
+}
 test {
     useJUnitPlatform()
     
@@ -88,6 +101,7 @@ test {
         jmx = false
     }
 }
+
 checkstyle {
     configFile = file('build/reports/checkstyle-checker.xml');
     reportsDir = file("$project.buildDir/reports/checkstyle/")

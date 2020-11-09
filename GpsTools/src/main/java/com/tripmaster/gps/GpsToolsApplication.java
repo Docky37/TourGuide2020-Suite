@@ -12,7 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Thierry Schreiner
  */
 @SpringBootApplication
-public final class GpsToolsApplication {
+public class GpsToolsApplication {
 
     /**
      * Main method that provides the entry point of this Spring application.
@@ -28,7 +28,7 @@ public final class GpsToolsApplication {
     /**
      * No argument empty class constructor.
      */
-    private GpsToolsApplication() {
+    protected GpsToolsApplication() {
     }
 
 }

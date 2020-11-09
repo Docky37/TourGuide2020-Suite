@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Thierry Schreiner
  */
 @SpringBootApplication
-public final class TripDealsApplication {
+public class TripDealsApplication {
 
     /**
      * Main method that provides the entry point of this Spring application.
@@ -24,7 +24,7 @@ public final class TripDealsApplication {
     /**
      * Empty class constructor.
      */
-    private TripDealsApplication() {
+    protected TripDealsApplication() {
     }
 
 }

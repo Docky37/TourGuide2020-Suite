@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Thierry Schreiner
  */
 @SpringBootApplication
-public final class TourGuideV2Application {
+public class TourGuideV2Application {
 
     /**
      * Main method that provides the entry point of this Spring application.
@@ -25,7 +25,7 @@ public final class TourGuideV2Application {
     /**
      * Empty class constructor.
      */
-    private TourGuideV2Application() {
+    protected TourGuideV2Application() {
     }
 
 }

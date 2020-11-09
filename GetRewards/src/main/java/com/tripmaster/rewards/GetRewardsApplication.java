@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Thierry Schreiner
  */
 @SpringBootApplication
-public final class GetRewardsApplication {
+public class GetRewardsApplication {
 
     /**
      * Main method that provides the entry point of this Spring application.
@@ -24,7 +24,7 @@ public final class GetRewardsApplication {
     /**
      * Empty class constructor.
      */
-    private GetRewardsApplication() {
+    protected GetRewardsApplication() {
     }
 
 }

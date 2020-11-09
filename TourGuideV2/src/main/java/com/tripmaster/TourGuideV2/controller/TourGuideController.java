@@ -19,6 +19,13 @@ import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 import com.tripmaster.TourGuideV2.service.ITourGuideService;
 import com.tripmaster.TourGuideV2.service.TourGuideService;
 
+/**
+ * This controller exposes five endPoints to that gives TourGuide
+ * functionalities.
+ *
+ * @author TripMaster
+ * @author Thierry Schreiner
+ */
 @RestController
 public class TourGuideController {
 
@@ -32,7 +39,7 @@ public class TourGuideController {
      * created.
      */
     @Autowired
-    ITourGuideService tourGuideService;
+    private ITourGuideService tourGuideService;
 
     /**
      * HTML GET request that returns a welcome message.
@@ -53,7 +60,7 @@ public class TourGuideController {
      * @return a String
      */
     @GetMapping("/getLocation")
-    public LocationDTO getLocation(@RequestParam String userName) {
+    public LocationDTO getLocation(@RequestParam final String userName) {
         logger.info("New HTML Request on /getLocation for {}", userName);
         VisitedLocationDTO visitedLocationDTO = tourGuideService
                 .getUserLocation(getUser(userName));
@@ -81,7 +88,7 @@ public class TourGuideController {
      */
     @GetMapping("/getNearbyAttractions")
     public AttractionsSuggestionDTO getNearbyAttractions(
-            @RequestParam String userName) {
+            @RequestParam final String userName) {
         logger.info("New HTML Request on /getNearbyAttractions for {}",
                 userName);
         AttractionsSuggestionDTO suggestion = tourGuideService
@@ -98,7 +105,7 @@ public class TourGuideController {
      * @return a String the serialized List of UserRewwards
      */
     @GetMapping("/getRewards")
-    public UserRewardsDTO getRewards(@RequestParam String userName) {
+    public UserRewardsDTO getRewards(@RequestParam final String userName) {
         logger.info("New HTML Request on /getRewards for {}", userName);
         return tourGuideService.getUserRewards(getUser(userName));
     }
@@ -125,7 +132,7 @@ public class TourGuideController {
      * @return a String
      */
     @GetMapping("/getTripDeals")
-    public List<ProviderDTO> getTripDeals(@RequestParam String userName) {
+    public List<ProviderDTO> getTripDeals(@RequestParam final String userName) {
         logger.info("New HTML Request on /getRewards for {}", userName);
         List<ProviderDTO> providers = tourGuideService
                 .getTripDeals(getUser(userName));
@@ -134,13 +141,13 @@ public class TourGuideController {
 
     /**
      * Returns the User who responds to the given userName parameter. Used by
-     * previous HTML request. This private sub method is used by pevious html
+     * previous HTML request. This private sub method is used by previous HTML
      * requests.
      *
      * @param userName
-     * @return
+     * @return a User
      */
-    private User getUser(String userName) {
+    private User getUser(final String userName) {
         return tourGuideService.getUser(userName);
     }
 

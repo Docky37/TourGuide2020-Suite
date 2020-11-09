@@ -13,30 +13,46 @@ import org.apache.commons.lang3.time.StopWatch;
 import com.tripmaster.TourGuideV2.domain.User;
 import com.tripmaster.TourGuideV2.service.ITourGuideService;
 
-
 /**
- * 
+ * This class in charge of regularly launch the tracking of all users location.
  *
  * @author TripMaster
  * @author Thierry Schreiner
  */
 @Component
 public class Tracker extends Thread {
+
+    /**
+     * Create a SLF4J/LOG4J LOGGER instance.
+     */
     private Logger logger = LoggerFactory.getLogger(Tracker.class);
-    private static final long trackingPollingInterval = TimeUnit.MINUTES
+    /**
+     * Defines the interval in minutes between to calls for users tracking.
+     */
+    private static final long TRACKING_POLLING_INTERVAL = TimeUnit.MINUTES
             .toSeconds(5);
+    /**
+     * Create an instance of a single thread ExecutorService.
+     */
     private final ExecutorService executorService = Executors
             .newSingleThreadExecutor();
+    /**
+     * TourGuideService instance declaration.
+     */
     private final ITourGuideService tourGuideService;
-    private boolean stop = false;
+    /**
+     * Declares and initializes to false a boolean, that indicates if tracker is
+     * stopped (true) or run (false).
+     */
+    private boolean isTrackerStopped = false;
 
     /**
      * Class constructor.
      *
-     * @param tourGuideService
+     * @param pTourGuideService
      */
-    public Tracker(ITourGuideService tourGuideService) {
-        this.tourGuideService = tourGuideService;
+    public Tracker(final ITourGuideService pTourGuideService) {
+        this.tourGuideService = pTourGuideService;
         executorService.submit(this);
     }
 
@@ -44,7 +60,7 @@ public class Tracker extends Thread {
      * Assures to shut down the Tracker thread.
      */
     public void stopTracking() {
-        stop = true;
+        isTrackerStopped = true;
         executorService.shutdownNow();
     }
 
@@ -55,7 +71,7 @@ public class Tracker extends Thread {
     public void run() {
         StopWatch stopWatch = new StopWatch();
         while (true) {
-            if (Thread.currentThread().isInterrupted() || stop) {
+            if (Thread.currentThread().isInterrupted() || isTrackerStopped) {
                 logger.debug("Tracker stopping");
                 break;
             }
@@ -71,7 +87,7 @@ public class Tracker extends Thread {
             stopWatch.reset();
             try {
                 logger.debug("Tracker sleeping");
-                TimeUnit.SECONDS.sleep(trackingPollingInterval);
+                TimeUnit.SECONDS.sleep(TRACKING_POLLING_INTERVAL);
             } catch (InterruptedException e) {
                 break;
             }

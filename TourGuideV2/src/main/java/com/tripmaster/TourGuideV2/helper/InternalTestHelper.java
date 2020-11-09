@@ -7,21 +7,26 @@ package com.tripmaster.TourGuideV2.helper;
  * @author TripMaster
  * @author Thierry Schreiner
  */
-public class InternalTestHelper {
+public final class InternalTestHelper {
 
     /**
-     * The number of internal users to create for tests.
-     * (Set this default up to 100,000 for testing)
+     * This attribute defines the default number of users.
      */
-    private static int internalUserNumber = 10;
+    static final int DEFAULT_USER_NUMBER = 100;
+
+    /**
+     * The number of internal users to create for tests. (Set this default up to
+     * 100,000 for testing)
+     */
+    private static int internalUserNumber = DEFAULT_USER_NUMBER;
 
     /**
      * Setter of internalUserNumber.
      *
-     * @param internalUserNumber
+     * @param pInternalUserNumber
      */
-    public static void setInternalUserNumber(int internalUserNumber) {
-        InternalTestHelper.internalUserNumber = internalUserNumber;
+    public static void setInternalUserNumber(final int pInternalUserNumber) {
+        InternalTestHelper.internalUserNumber = pInternalUserNumber;
     }
 
     /**
@@ -31,5 +36,11 @@ public class InternalTestHelper {
      */
     public static int getInternalUserNumber() {
         return internalUserNumber;
+    }
+
+    /**
+     * No argument empty class constructor.
+     */
+    private InternalTestHelper() {
     }
 }

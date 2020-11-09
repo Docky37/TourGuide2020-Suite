@@ -4,23 +4,44 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
-
+/**
+ * This class defines 3 WebClient beans that allows TourGuide to send requests
+ * to the other application of TourGuide2020-Suite.
+ *
+ * @author TripMaster
+ * @author Thierry Schreiner
+ */
 @Configuration
 public class TourGuideModule {
-	
-	@Bean
-	public WebClient getWebClientTripDeals() {
-		return WebClient.create("http://localhost:8888");
-	}
-	
-	@Bean
-	public WebClient getWebClientGps() {
-		return WebClient.create("http://localhost:8889");
-	}
-	
-	@Bean
-	public WebClient getWebClientReward() {
-		return WebClient.create("http://localhost:8787");
-	}
-	
+
+    /**
+     * Defines the WebClient beans to deal with TripDeals API.
+     *
+     * @return a WebClient
+     */
+    @Bean
+    public WebClient getWebClientTripDeals() {
+        return WebClient.create("http://localhost:8888");
+    }
+
+    /**
+     * Defines the WebClient beans to deal with GpsTools API.
+     *
+     * @return a WebClient
+     */
+    @Bean
+    public WebClient getWebClientGps() {
+        return WebClient.create("http://localhost:8889");
+    }
+
+    /**
+     * Defines the WebClient beans to deal with GetRewards API.
+     *
+     * @return a WebClient
+     */
+    @Bean
+    public WebClient getWebClientReward() {
+        return WebClient.create("http://localhost:8787");
+    }
+
 }

@@ -17,31 +17,58 @@ import com.tripmaster.TourGuideV2.dto.ProviderDTO;
  * @author Thierry Schreiner
  */
 public class User {
+
+    /**
+     * The id (an UUID) of the User.
+     */
     private final UUID userId;
+    /**
+     * The user name of this User.
+     */
     private final String userName;
+    /**
+     * The phone number of this User.
+     */
     private String phoneNumber;
+    /**
+     * The emailAddress of this User.
+     */
     private String emailAddress;
+    /**
+     * The date of the last visitedLocation data entry.
+     */
     private Date latestLocationTimestamp;
+    /**
+     * The List of all user's visitedLocations.
+     */
     private List<VisitedLocation> visitedLocations = new ArrayList<>();
+    /**
+     * The List of all user's rewards.
+     */
     private List<UserReward> userRewards = new ArrayList<>();
+    /**
+     * The date of the last visitedLocation data entry.
+     */
     private UserPreferences userPreferences = new UserPreferences();
+    /**
+     * The List of Trip deals propositions (ProviderDTO).
+     */
     private List<ProviderDTO> tripDeals = new ArrayList<>();
 
     /**
-     * Class constructor.
+     * All parameters Class constructor.
      *
-     * @param userId
-     * @param userName
-     * @param phoneNumber
-     * @param emailAddress
+     * @param pUserId
+     * @param pUserName
+     * @param pPhoneNumber
+     * @param pEmailAddress
      */
-    public User(UUID userId, String userName, String phoneNumber,
-            String emailAddress)
-    {
-        this.userId = userId;
-        this.userName = userName;
-        this.phoneNumber = phoneNumber;
-        this.emailAddress = emailAddress;
+    public User(final UUID pUserId, final String pUserName,
+            final String pPhoneNumber, final String pEmailAddress) {
+        this.userId = pUserId;
+        this.userName = pUserName;
+        this.phoneNumber = pPhoneNumber;
+        this.emailAddress = pEmailAddress;
     }
 
     /**
@@ -63,15 +90,6 @@ public class User {
     }
 
     /**
-     * Setter of phoneNumber.
-     *
-     * @param phoneNumber
-     */
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    /**
      * Getter of phoneNumber.
      *
      * @return a String
@@ -81,12 +99,12 @@ public class User {
     }
 
     /**
-     * Setter of emailAddress.
+     * Setter of phoneNumber.
      *
-     * @param emailAddress
+     * @param pPhoneNumber
      */
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
+    public void setPhoneNumber(final String pPhoneNumber) {
+        phoneNumber = pPhoneNumber;
     }
 
     /**
@@ -99,12 +117,22 @@ public class User {
     }
 
     /**
+     * Setter of emailAddress.
+     *
+     * @param pEmailAddress
+     */
+    public void setEmailAddress(final String pEmailAddress) {
+        emailAddress = pEmailAddress;
+    }
+
+    /**
      * Setter of latestLocationTimestamp.
      *
-     * @param latestLocationTimestamp
+     * @param pLatestLocationTimestamp
      */
-    public void setLatestLocationTimestamp(Date latestLocationTimestamp) {
-        this.latestLocationTimestamp = latestLocationTimestamp;
+    private void setLatestLocationTimestamp(
+            final Date pLatestLocationTimestamp) {
+        latestLocationTimestamp = (Date) pLatestLocationTimestamp.clone();
     }
 
     /**
@@ -113,7 +141,7 @@ public class User {
      * @return a Date
      */
     public Date getLatestLocationTimestamp() {
-        return latestLocationTimestamp;
+        return (Date) latestLocationTimestamp.clone();
     }
 
     /**
@@ -121,14 +149,15 @@ public class User {
      *
      * @param visitedLocation
      */
-    public void addToVisitedLocations(VisitedLocation visitedLocation) {
+    public void addToVisitedLocations(final VisitedLocation visitedLocation) {
         visitedLocations.add(visitedLocation);
+        setLatestLocationTimestamp(visitedLocation.getTimeVisited());
     }
 
     /**
      * Getter of the visitedLocations List.
      *
-     * @return
+     * @return a List<VisitedLocation>
      */
     public List<VisitedLocation> getVisitedLocations() {
         return visitedLocations;
@@ -146,7 +175,7 @@ public class User {
      *
      * @param userReward
      */
-    public void addUserReward(UserReward userReward) {
+    public void addUserReward(final UserReward userReward) {
         userRewards.add(userReward);
     }
 
@@ -171,10 +200,10 @@ public class User {
     /**
      * Setter of userPreferences.
      *
-     * @param userPreferences
+     * @param pUserPreferences
      */
-    public void setUserPreferences(UserPreferences userPreferences) {
-        this.userPreferences = userPreferences;
+    public void setUserPreferences(final UserPreferences pUserPreferences) {
+        userPreferences = pUserPreferences;
     }
 
     /**
@@ -189,10 +218,10 @@ public class User {
     /**
      * Setter of the tripDeals list.
      *
-     * @param tripDeals
+     * @param pTripDeals
      */
-    public void setTripDeals(List<ProviderDTO> tripDeals) {
-        this.tripDeals = tripDeals;
+    public void setTripDeals(final List<ProviderDTO> pTripDeals) {
+        tripDeals = pTripDeals;
     }
 
     /**
@@ -200,9 +229,9 @@ public class User {
      *
      * @return a List<Provider>
      */
-    /*public List<Provider> getTripDeals() {
+    public List<ProviderDTO> getTripDeals() {
         return tripDeals;
-    }*/
+    }
 
     /**
      * Used by the following toString method for the concatenation of the
@@ -217,9 +246,9 @@ public class User {
     public String toString() {
         visitedLocations
                 .forEach(l -> this.serializedVisitedLocations += " {lat="
-                        + l.location.latitude
-                        + ", long=" + l.location.longitude + ", "
-                        + l.timeVisited.toString()
+                        + l.getLocation().getLatitude()
+                        + ", long=" + l.getLocation().getLongitude() + ", "
+                        + l.getTimeVisited().toString()
                         + "}");
 
         return "User [userId=" + userId + ", userName=" + userName

@@ -55,7 +55,7 @@ public class UserPreferences {
     private int numberOfChildren = 0;
 
     /**
-     * Empty class constructor
+     * Empty class constructor.
      */
     public UserPreferences() {
     }
@@ -63,10 +63,10 @@ public class UserPreferences {
     /**
      * Setter of attractionProximity.
      *
-     * @param attractionProximity
+     * @param pAttractionProximity
      */
-    public void setAttractionProximity(int attractionProximity) {
-        this.attractionProximity = attractionProximity;
+    public void setAttractionProximity(final int pAttractionProximity) {
+        attractionProximity = pAttractionProximity;
     }
 
     /**
@@ -90,10 +90,10 @@ public class UserPreferences {
     /**
      * Setter of lowerPricePoint.
      *
-     * @param lowerPricePoint
+     * @param pLowerPricePoint
      */
-    public void setLowerPricePoint(Money lowerPricePoint) {
-        this.lowerPricePoint = lowerPricePoint;
+    public void setLowerPricePoint(final Money pLowerPricePoint) {
+        lowerPricePoint = pLowerPricePoint;
     }
 
     /**
@@ -108,10 +108,10 @@ public class UserPreferences {
     /**
      * Setter of highPricePoint.
      *
-     * @param highPricePoint
+     * @param pHighPricePoint
      */
-    public void setHighPricePoint(Money highPricePoint) {
-        this.highPricePoint = highPricePoint;
+    public void setHighPricePoint(final Money pHighPricePoint) {
+        highPricePoint = pHighPricePoint;
     }
 
     /**
@@ -126,16 +126,16 @@ public class UserPreferences {
     /**
      * Setter of tripDuration.
      *
-     * @param tripDuration
+     * @param pTripDuration
      */
-    public void setTripDuration(int tripDuration) {
-        this.tripDuration = tripDuration;
+    public void setTripDuration(final int pTripDuration) {
+        tripDuration = pTripDuration;
     }
 
     /**
      * Getter of ticketQuantity.
      *
-     * @return
+     * @return an int
      */
     public int getTicketQuantity() {
         return ticketQuantity;
@@ -144,10 +144,10 @@ public class UserPreferences {
     /**
      * Setter of ticketQuantity.
      *
-     * @param ticketQuantity
+     * @param pTicketQuantity
      */
-    public void setTicketQuantity(int ticketQuantity) {
-        this.ticketQuantity = ticketQuantity;
+    public void setTicketQuantity(final int pTicketQuantity) {
+        ticketQuantity = pTicketQuantity;
     }
 
     /**
@@ -161,11 +161,11 @@ public class UserPreferences {
 
     /**
      * Setter of numberOfAdults.
-     * 
-     * @param numberOfAdults
+     *
+     * @param pNumberOfAdults
      */
-    public void setNumberOfAdults(int numberOfAdults) {
-        this.numberOfAdults = numberOfAdults;
+    public void setNumberOfAdults(final int pNumberOfAdults) {
+        numberOfAdults = pNumberOfAdults;
     }
 
     /**
@@ -179,11 +179,11 @@ public class UserPreferences {
 
     /**
      * Setter of numberOfChildren.
-     * 
-     * @param numberOfChildren
+     *
+     * @param pNumberOfChildren
      */
-    public void setNumberOfChildren(int numberOfChildren) {
-        this.numberOfChildren = numberOfChildren;
+    public void setNumberOfChildren(final int pNumberOfChildren) {
+        numberOfChildren = pNumberOfChildren;
     }
 
     /**

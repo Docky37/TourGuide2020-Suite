@@ -1,6 +1,5 @@
 package com.tripmaster.TourGuideV2.domain;
 
-
 /**
  * This class is used to store the details of a reward.
  *
@@ -12,12 +11,12 @@ public class UserReward {
     /**
      * The visitedLocation that gives this reward.
      */
-    public final VisitedLocation visitedLocation;
+    private final VisitedLocation visitedLocation;
 
     /**
      * The attraction concerned by this reward.
      */
-    public final Attraction attraction;
+    private final Attraction attraction;
 
     /**
      * The number of points of this reward.
@@ -27,36 +26,45 @@ public class UserReward {
     /**
      * All parameters class constructor.
      *
-     * @param visitedLocation
-     * @param attraction
-     * @param rewardPoints
+     * @param pVisitedLocation
+     * @param pAttraction
+     * @param pRewardPoints
      */
-    public UserReward(VisitedLocation visitedLocation, Attraction attraction,
-            int rewardPoints)
-    {
-        this.visitedLocation = visitedLocation;
-        this.attraction = attraction;
-        this.rewardPoints = rewardPoints;
+    public UserReward(final VisitedLocation pVisitedLocation,
+            final Attraction pAttraction, final int pRewardPoints) {
+        visitedLocation = pVisitedLocation;
+        attraction = pAttraction;
+        rewardPoints = pRewardPoints;
     }
 
     /**
      * Class constructor without rewardPoints parameter.
      *
-     * @param visitedLocation
-     * @param attraction
+     * @param pVisitedLocation
+     * @param pAttraction
      */
-    public UserReward(VisitedLocation visitedLocation, Attraction attraction) {
-        this.visitedLocation = visitedLocation;
-        this.attraction = attraction;
+    public UserReward(final VisitedLocation pVisitedLocation,
+            final Attraction pAttraction) {
+        visitedLocation = pVisitedLocation;
+        attraction = pAttraction;
+    }
+
+    /**
+     * Getter of attraction attribute.
+     *
+     * @return an Attraction
+     */
+    public Attraction getAttraction() {
+        return attraction;
     }
 
     /**
      * Setter of rewardPoints.
      *
-     * @param rewardPoints
+     * @param pRewardPoints
      */
-    public void setRewardPoints(int rewardPoints) {
-        this.rewardPoints = rewardPoints;
+    public void setRewardPoints(final int pRewardPoints) {
+        this.rewardPoints = pRewardPoints;
     }
 
     /**
@@ -67,7 +75,16 @@ public class UserReward {
     public int getRewardPoints() {
         return rewardPoints;
     }
-    
+
+    /**
+     * Getter of VisitedLocation attribute.
+     *
+     * @return a VisitedLocation
+     */
+    public VisitedLocation getVisitedLocation() {
+        return visitedLocation;
+    }
+
     /**
      * Serialization method.
      */

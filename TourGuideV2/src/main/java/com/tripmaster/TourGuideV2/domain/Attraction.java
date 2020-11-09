@@ -11,7 +11,11 @@ import java.util.UUID;
  */
 public class Attraction {
 
-    UUID attractionId;
+    /**
+     * The id (an UUID) of the attraction.
+     */
+    private UUID attractionId;
+
     /**
      * The name of this attraction.
      */
@@ -49,8 +53,7 @@ public class Attraction {
      */
     public Attraction(final UUID pAttractionId, final String pAttractionName,
             final String pCity, final String pState,
-            final double pLatitude, final double pLongitude)
-    {
+            final double pLatitude, final double pLongitude) {
         attractionId = pAttractionId;
         attractionName = pAttractionName;
         city = pCity;

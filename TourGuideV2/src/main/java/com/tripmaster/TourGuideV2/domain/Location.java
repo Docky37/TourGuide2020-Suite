@@ -11,16 +11,20 @@ import java.util.UUID;
  */
 public class Location {
 
-    UUID userId;
+    /**
+     * The id (an UUID) of the User tracked at this Location.
+     */
+    private UUID userId;
+
     /**
      * The latitude of the Global Position location.
      */
-    double latitude;
+    private double latitude;
 
     /**
      * The longitude of the Global Position location.
      */
-    double longitude;
+    private double longitude;
 
     /**
      * Class constructor with 2 parameters.
@@ -42,8 +46,7 @@ public class Location {
      * @param pLongitude
      */
     public Location(final UUID pUserId, final double pLatitude,
-            final double pLongitude)
-    {
+            final double pLongitude) {
         userId = pUserId;
         latitude = pLatitude;
         longitude = pLongitude;

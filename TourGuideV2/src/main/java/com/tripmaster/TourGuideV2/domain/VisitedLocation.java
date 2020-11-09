@@ -16,18 +16,18 @@ public class VisitedLocation {
     /**
      * The id attribute of the user.
      */
-    UUID userId;
+    private UUID userId;
 
     /**
      * This attribute tells us when this visitedLocation has been collected by
      * gpsUtil.
      */
-    Date timeVisited;
+    private Date timeVisited;
 
     /**
      * The location(latitude and longitude) of the VisitedLocation.
      */
-    Location location;
+    private Location location;
 
     /**
      * Class constructor with 2 parameters..
@@ -37,7 +37,7 @@ public class VisitedLocation {
      */
     public VisitedLocation(final Location pLocation, final Date pTimeVisited) {
         userId = UUID.randomUUID();
-        timeVisited = pTimeVisited;
+        timeVisited = (Date) pTimeVisited.clone();
         location = pLocation;
     }
 
@@ -54,16 +54,15 @@ public class VisitedLocation {
      * @param pLocation
      * @param pTimeVisited
      */
-    public VisitedLocation(UUID pUserId, Location pLocation,
-            Date pTimeVisited)
-    {
+    public VisitedLocation(final UUID pUserId, final Location pLocation,
+            final Date pTimeVisited) {
         userId = pUserId;
-        timeVisited = pTimeVisited;
+        timeVisited = (Date) pTimeVisited.clone();
         location = pLocation;
     }
 
     /**
-     * Getter of userId
+     * Getter of userId.
      *
      * @return an UUID
      */
@@ -77,7 +76,7 @@ public class VisitedLocation {
      * @return a LocalDateTime
      */
     public Date getTimeVisited() {
-        return timeVisited;
+        return (Date) timeVisited.clone();
     }
 
     /**

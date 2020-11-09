@@ -16,7 +16,7 @@ public class VisitedLocationDTO {
     /**
      * The id of the owner of this visitedLocation.
      */
-    UUID userId;
+    private UUID userId;
 
     /**
      * This attribute tells us when this visitedLocation has been collected by
@@ -37,7 +37,7 @@ public class VisitedLocationDTO {
      * @param pLocation
      */
     public VisitedLocationDTO(final LocationDTO pLocation,
-            final Date pTimeVisited, UUID pUserId){
+            final Date pTimeVisited, final UUID pUserId) {
         timeVisited = pTimeVisited;
         location = pLocation;
         userId = pUserId;

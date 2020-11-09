@@ -37,7 +37,6 @@ public class AttractionDTO {
     /**
      * Full parameters class constructor.
      *
-     * @param pAttractionId
      * @param pAttractionName
      * @param pCity
      * @param pLatitude
@@ -46,8 +45,7 @@ public class AttractionDTO {
      */
     public AttractionDTO(final String pAttractionName,
             final String pCity, final String pState,
-            final double pLatitude, final double pLongitude)
-    {
+            final double pLatitude, final double pLongitude) {
         attractionName = pAttractionName;
         city = pCity;
         state = pState;
@@ -112,7 +110,8 @@ public class AttractionDTO {
     @Override
     public String toString() {
         return "{\"attractionName\":" + attractionName + "\", \"city\":"
-                + city + "\", \"state\":" + state + "\", \"latitude\":" + latitude
+                + city + "\", \"state\":" + state + "\", \"latitude\":"
+                + latitude
                 + ", \"longitude\":" + longitude + "}";
     }
- }
+}

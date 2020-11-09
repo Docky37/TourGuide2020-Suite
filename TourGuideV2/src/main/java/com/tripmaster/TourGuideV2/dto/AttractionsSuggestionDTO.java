@@ -2,7 +2,6 @@ package com.tripmaster.TourGuideV2.dto;
 
 import java.util.Map;
 
-
 public class AttractionsSuggestionDTO {
 
     /**
@@ -33,10 +32,10 @@ public class AttractionsSuggestionDTO {
     /**
      * Setter of userLocation.
      *
-     * @param userLocation
+     * @param pUserLocation
      */
-    public void setUserLocation(LocationDTO userLocation) {
-        this.userLocation = userLocation;
+    public void setUserLocation(final LocationDTO pUserLocation) {
+        userLocation = pUserLocation;
     }
 
     /**
@@ -53,13 +52,16 @@ public class AttractionsSuggestionDTO {
     /**
      * Setter of suggestedAttraction.
      *
-     * @param suggestedAttraction
+     * @param pSuggestedAttractions
      */
     public void setSuggestedAttractions(
-            Map<String, NearbyAttractionDTO> suggestedAttractions) {
-        this.suggestedAttractions = suggestedAttractions;
+            final Map<String, NearbyAttractionDTO> pSuggestedAttractions) {
+        suggestedAttractions = pSuggestedAttractions;
     }
 
+    /**
+     * Serialization method.
+     */
     @Override
     public String toString() {
         return "AttractionsSuggestionDTO [userLocation=" + userLocation

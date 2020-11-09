@@ -14,12 +14,12 @@ public class UserRewardDTO {
     /**
      * The visitedLocation that gives this reward.
      */
-    public final VisitedLocation visitedLocation;
+    private final VisitedLocation visitedLocation;
 
     /**
      * The attraction concerned by this reward.
      */
-    public final Attraction attraction;
+    private final Attraction attraction;
 
     /**
      * The number of points of this reward.
@@ -29,36 +29,36 @@ public class UserRewardDTO {
     /**
      * All parameters class constructor.
      *
-     * @param visitedLocation
-     * @param attraction
-     * @param rewardPoints
+     * @param pVisitedLocation
+     * @param pAttraction
+     * @param pRewardPoints
      */
-    public UserRewardDTO(VisitedLocation visitedLocation, Attraction attraction,
-            int rewardPoints)
-    {
-        this.visitedLocation = visitedLocation;
-        this.attraction = attraction;
-        this.rewardPoints = rewardPoints;
+    public UserRewardDTO(final VisitedLocation pVisitedLocation,
+            final Attraction pAttraction, final int pRewardPoints) {
+        visitedLocation = pVisitedLocation;
+        attraction = pAttraction;
+        rewardPoints = pRewardPoints;
     }
 
     /**
      * Class constructor without rewardPoints parameter.
      *
-     * @param visitedLocation
-     * @param attraction
+     * @param pVisitedLocation
+     * @param pAttraction
      */
-    public UserRewardDTO(VisitedLocation visitedLocation, Attraction attraction) {
-        this.visitedLocation = visitedLocation;
-        this.attraction = attraction;
+    public UserRewardDTO(final VisitedLocation pVisitedLocation,
+            final Attraction pAttraction) {
+        visitedLocation = pVisitedLocation;
+        attraction = pAttraction;
     }
 
     /**
      * Setter of rewardPoints.
      *
-     * @param rewardPoints
+     * @param pRewardPoints
      */
-    public void setRewardPoints(int rewardPoints) {
-        this.rewardPoints = rewardPoints;
+    public void setRewardPoints(final int pRewardPoints) {
+        rewardPoints = pRewardPoints;
     }
 
     /**
@@ -69,7 +69,7 @@ public class UserRewardDTO {
     public int getRewardPoints() {
         return rewardPoints;
     }
-    
+
     /**
      * Serialization method.
      */

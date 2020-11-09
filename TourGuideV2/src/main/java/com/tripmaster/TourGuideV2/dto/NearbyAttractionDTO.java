@@ -1,15 +1,34 @@
 package com.tripmaster.TourGuideV2.dto;
 
+/**
+ * This Data Transfer Object is used as answer to getNearbyAttractions request.
+ *
+ * @author TripMaster
+ * @author Thierry Schreiner
+ */
 public class NearbyAttractionDTO {
 
+    /**
+     * This attribute store the location of the attraction.
+     *
+     * @see LocationDTO
+     */
     private LocationDTO attractionLocation;
 
+    /**
+     * This attribute gives us the distance between the attraction and the
+     * current user's location.
+     */
     private double distance;
 
+    /**
+     * This attribute tells us the reward user will get by visiting this
+     * attraction.
+     */
     private int userReward;
 
     /**
-     * Empty class constructor
+     * Empty class constructor.
      */
     protected NearbyAttractionDTO() {
     }
@@ -17,17 +36,15 @@ public class NearbyAttractionDTO {
     /**
      * All parameters class constructor.
      *
-     * @param attractionLocation
-     * @param distance
-     * @param userReward
+     * @param pAttractionLocation
+     * @param pDistance
+     * @param pUserReward
      */
-    public NearbyAttractionDTO(LocationDTO attractionLocation, double distance,
-            int userReward)
-    {
-        super();
-        this.attractionLocation = attractionLocation;
-        this.distance = distance;
-        this.userReward = userReward;
+    public NearbyAttractionDTO(final LocationDTO pAttractionLocation,
+            final double pDistance, final int pUserReward) {
+        attractionLocation = pAttractionLocation;
+        distance = pDistance;
+        userReward = pUserReward;
     }
 
     /**
@@ -42,10 +59,10 @@ public class NearbyAttractionDTO {
     /**
      * Setter of attractionLocation.
      *
-     * @param attractionLocation
+     * @param pAttractionLocation
      */
-    public void setAttractionLocation(LocationDTO attractionLocation) {
-        this.attractionLocation = attractionLocation;
+    public void setAttractionLocation(final LocationDTO pAttractionLocation) {
+        this.attractionLocation = pAttractionLocation;
     }
 
     /**
@@ -60,10 +77,10 @@ public class NearbyAttractionDTO {
     /**
      * Setter of distance.
      *
-     * @param distance
+     * @param pDistance
      */
-    public void setDistance(double distance) {
-        this.distance = distance;
+    public void setDistance(final double pDistance) {
+        distance = pDistance;
     }
 
     /**
@@ -78,10 +95,10 @@ public class NearbyAttractionDTO {
     /**
      * Setter of userReward.
      *
-     * @param userReward
+     * @param pUserReward
      */
-    public void setUserReward(int userReward) {
-        this.userReward = userReward;
+    public void setUserReward(final int pUserReward) {
+        userReward = pUserReward;
     }
 
 }

@@ -6,7 +6,7 @@ import java.util.List;
 public class UserRewardsDTO {
 
     /**
-     * This attribute store the name of the user. 
+     * This attribute store the name of the user.
      */
     private String userName;
 
@@ -33,15 +33,16 @@ public class UserRewardsDTO {
     /**
      * Setter of userName attribute.
      *
-     * @param userName
+     * @param pUserName
      */
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUserName(final String pUserName) {
+        userName = pUserName;
     }
 
     /**
      * Getter of userRewardsDTO attribute.
-     * @return
+     *
+     * @return a List<UserRewardDTO>
      */
     public List<UserRewardDTO> getUserRewardsDTO() {
         return userRewardsDTO;
@@ -50,17 +51,19 @@ public class UserRewardsDTO {
     /**
      * Method used to add a new userRewardDTO to the list of user Rewards.
      *
-     * @param userRewardDTO
+     * @param pUserRewardDTO
      */
-    public void addUserRewardDTO(UserRewardDTO userRewardDTO) {
-        userRewardsDTO.add(userRewardDTO);
+    public void addUserRewardDTO(final UserRewardDTO pUserRewardDTO) {
+        userRewardsDTO.add(pUserRewardDTO);
     }
 
+    /**
+     * Serialization method.
+     */
     @Override
     public String toString() {
         return "UserRewardsDTO [userName=" + userName + ", userRewardsDTO="
                 + userRewardsDTO + "]";
     }
 
-    
 }

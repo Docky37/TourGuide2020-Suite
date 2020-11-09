@@ -27,13 +27,12 @@ import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 
 import com.tripmaster.TourGuideV2.helper.InternalTestHelper;
 import com.tripmaster.TourGuideV2.service.IRewardsService;
-import com.tripmaster.TourGuideV2.service.ITourGuideService;
 import com.tripmaster.TourGuideV2.service.RewardsService;
 import com.tripmaster.TourGuideV2.service.TourGuideService;
 
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
-public class PerformanceTest {
+public class PerformanceIT {
 
     IRewardsService rewardsService = new RewardsService(
             WebClient.create("http://localhost:8787"));
@@ -96,7 +95,7 @@ public class PerformanceTest {
         countDownLatch.await();
         executorService.shutdown();
         stopWatch.stop();
-        tourGuideService.tracker.stopTracking();
+        tourGuideService.getTracker().stopTracking();
 
         System.out.println("highVolumeTrackLocation: Time Elapsed: "
                 + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime())
@@ -113,7 +112,7 @@ public class PerformanceTest {
         InternalTestHelper.setInternalUserNumber(100000);
         TourGuideService tourGuideService = new TourGuideService(
                 rewardsService, webClientTripDeals, webClientGps);
-        tourGuideService.tracker.stopTracking();
+        tourGuideService.getTracker().stopTracking();
         ExecutorService executorService = Executors.newFixedThreadPool(1000);
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();

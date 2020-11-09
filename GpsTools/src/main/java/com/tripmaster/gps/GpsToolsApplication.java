@@ -5,12 +5,30 @@ import java.util.Locale;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * This class contains the main method used to run the application.
+ *
+ * @author TripMaster
+ * @author Thierry Schreiner
+ */
 @SpringBootApplication
-public class GpsToolsApplication {
+public final class GpsToolsApplication {
 
-	public static void main(String[] args) {
+    /**
+     * Main method that provides the entry point of this Spring application.
+     *
+     * @param args
+     */
+
+    public static void main(final String[] args) {
         Locale.setDefault(Locale.US);
-		SpringApplication.run(GpsToolsApplication.class, args);
-	}
+        SpringApplication.run(GpsToolsApplication.class, args);
+    }
+
+    /**
+     * No argument empty class constructor.
+     */
+    private GpsToolsApplication() {
+    }
 
 }

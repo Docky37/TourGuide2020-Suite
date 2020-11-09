@@ -26,21 +26,23 @@ public class GpsService implements IGpsService {
     private Logger logger = LoggerFactory.getLogger(GpsService.class);
 
     /**
-     * 
+     * Create an instance of GpsUtil.
      */
-    public GpsUtil gpsUtil = new GpsUtil();
+    private GpsUtil gpsUtil = new GpsUtil();
 
     /**
-     * 
+     * Declaration of a AttractionMapping instance that will be injected by
+     * Spring.
      */
     @Autowired
-    public AttractionMapping attractionMapping;
+    private AttractionMapping attractionMapping;
 
     /**
-     * 
+     * Declaration of a VisitedLocationMapping instance that will be injected by
+     * Spring.
      */
     @Autowired
-    public VisitedLocationMapping visitedLocationMapping;
+    private VisitedLocationMapping visitedLocationMapping;
 
     /**
      * No argument empty constructor.
@@ -50,19 +52,21 @@ public class GpsService implements IGpsService {
 
     /**
      * Class constructor used to inject Mock beans for tests.
+     *
+     * @param pVisitedLocationMapping
+     * @param pAttractionMapping
      */
-    public GpsService(VisitedLocationMapping visitedLocationMapping,
-            AttractionMapping attractionMapping)
-    {
-        this.visitedLocationMapping = visitedLocationMapping;
-        this.attractionMapping = attractionMapping;
+    public GpsService(final VisitedLocationMapping pVisitedLocationMapping,
+            final AttractionMapping pAttractionMapping) {
+        visitedLocationMapping = pVisitedLocationMapping;
+        attractionMapping = pAttractionMapping;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public VisitedLocationDTO getUserLocation(UUID userId) {
+    public VisitedLocationDTO getUserLocation(final UUID userId) {
 
         VisitedLocationDTO visitedLocationDTO = visitedLocationMapping
                 .mapToDTO(gpsUtil.getUserLocation(userId), userId);

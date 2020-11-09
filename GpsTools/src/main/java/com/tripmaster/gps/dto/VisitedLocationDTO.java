@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * DTO used to transfer the data of a gpsUtil VisitedLocation class, witch is
+ * DTO used to transfer the data of a gpsUtil VisitedLocation class, which is
  * the location where a user was at such time.
  *
  * @author Thierry SCHREINER
@@ -16,7 +16,7 @@ public class VisitedLocationDTO {
     /**
      * The id of the owner of this visitedLocation.
      */
-    UUID userId;
+    private UUID userId;
 
     /**
      * This attribute tells us when this visitedLocation has been collected by
@@ -39,9 +39,8 @@ public class VisitedLocationDTO {
      * @param pUserId
      */
     public VisitedLocationDTO(final LocationDTO pLocation,
-            final Date pTimeVisited, UUID pUserId)
-    {
-        timeVisited = pTimeVisited;
+            final Date pTimeVisited, final UUID pUserId) {
+        timeVisited = (Date) pTimeVisited.clone();
         location = pLocation;
         userId = pUserId;
     }
@@ -66,7 +65,7 @@ public class VisitedLocationDTO {
      *
      * @param pUserId
      */
-    public void setUserId(UUID pUserId) {
+    public void setUserId(final UUID pUserId) {
         this.userId = pUserId;
     }
 
@@ -76,7 +75,7 @@ public class VisitedLocationDTO {
      * @return a LocalDateTime
      */
     public Date getTimeVisited() {
-        return timeVisited;
+        return (Date) timeVisited.clone();
     }
 
     /**
@@ -94,7 +93,8 @@ public class VisitedLocationDTO {
     @Override
     public String toString() {
         return "{location:" + location.toString()
-                + ", timeVisited=" + timeVisited + ", userId:" + userId + "}";
+                + ", timeVisited=" + timeVisited.clone() + ", userId:" + userId
+                + "}";
     }
 
 }

@@ -52,8 +52,7 @@ public class AttractionDTO {
      */
     public AttractionDTO(final UUID pAttractionId, final String pAttractionName,
             final String pCity, final String pState,
-            final double pLatitude, final double pLongitude)
-    {
+            final double pLatitude, final double pLongitude) {
         attractionId = pAttractionId;
         attractionName = pAttractionName;
         city = pCity;

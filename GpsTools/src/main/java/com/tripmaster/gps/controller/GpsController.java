@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tripmaster.gps.dto.AttractionDTO;
 import com.tripmaster.gps.dto.VisitedLocationDTO;
-import com.tripmaster.gps.service.GpsService;
+import com.tripmaster.gps.service.IGpsService;
 
 /**
  * This GpsController class exposes two end-points. The first one is used to get
@@ -29,8 +29,12 @@ public class GpsController {
      */
     private Logger logger = LoggerFactory.getLogger(GpsController.class);
 
+    /**
+     * GpsService instance declaration, the bean is injected by Spring when
+     * GpsController is created.
+     */
     @Autowired
-    GpsService gpsService;
+    private IGpsService gpsService;
 
     /**
      * HTML GET request used to get the location of the user by his userId.

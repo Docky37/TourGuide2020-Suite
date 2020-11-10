@@ -1,6 +1,9 @@
 package com.tripmaster.TourGuideV2;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,7 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
+import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -25,10 +28,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.tripmaster.TourGuideV2.domain.Attraction;
 import com.tripmaster.TourGuideV2.domain.Location;
 import com.tripmaster.TourGuideV2.domain.User;
+import com.tripmaster.TourGuideV2.domain.UserReward;
 import com.tripmaster.TourGuideV2.domain.VisitedLocation;
 import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
 import com.tripmaster.TourGuideV2.dto.LocationDTO;
 import com.tripmaster.TourGuideV2.dto.ProviderDTO;
+import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 import com.tripmaster.TourGuideV2.helper.InternalTestHelper;
 import com.tripmaster.TourGuideV2.service.IRewardsService;
@@ -69,7 +74,6 @@ public class TourGuideServiceTest {
 
     @BeforeAll
     static void setUp() throws IOException {
-        InternalTestHelper.setInternalUserNumber(0);
         mockWebServerGps.start();
         mockWebServerTripDeals.start();
         System.out.println("\n\n -> Port for Gps: " + mockWebServerGps.getPort()
@@ -79,6 +83,7 @@ public class TourGuideServiceTest {
 
     @BeforeEach
     void initialize() {
+        InternalTestHelper.setInternalUserNumber(0);
         jsonResult = "[";
         attractions.forEach(
                 a -> jsonResult = jsonResult.concat(a.toString() + ","));
@@ -164,6 +169,27 @@ public class TourGuideServiceTest {
         User retrivedUser2 = tourGuideService.getUser(user2.getUserName());
         assertThat(retrivedUser).isEqualTo(user);
         assertThat(retrivedUser2).isEqualTo(user2);
+    }
+
+    @Test
+    @DisplayName("Given a registred userName, when addUser with same username then User is not registred")
+    void givenAUser_whenAddUser_thenUserIsNotSaved() {
+        System.out.println(
+                "\n *** Given a registred userName, when addUser with same username then User is not saved ***");
+        // GIVEN
+        User user = new User(UUID.randomUUID(), "John DOE", "01.02.03.04.05",
+                "john.doe@tourGuide.com");
+        User user2 = new User(UUID.randomUUID(), "John DOE",
+                "01.02.03.06.07",
+                "jojo@javavousledire.com");
+        tourGuideService.addUser(user);
+        User retrivedUser = tourGuideService.getUser(user.getUserName());
+        assertThat(retrivedUser).isEqualTo(user);
+        // WHEN
+        tourGuideService.addUser(user2);
+        List<User> allUsers = tourGuideService.getAllUsers();
+        // THEN
+        assertThat(allUsers.size()).isEqualTo(1);
     }
 
     @Test
@@ -304,16 +330,17 @@ public class TourGuideServiceTest {
         user.addToVisitedLocations(new VisitedLocation(user.getUserId(),
                 new Location(45d, 1d), new Date()));
 
-        
         // WHEN
         AttractionsSuggestionDTO suggestion = tourGuideService
                 .getAttractionsSuggestion(user);
 
         // THEN
         assertThat(suggestion.getUserLocation().getLatitude())
-                .isEqualTo(user.getLastVisitedLocation().getLocation().getLatitude());
+                .isEqualTo(user.getLastVisitedLocation().getLocation()
+                        .getLatitude());
         assertThat(suggestion.getUserLocation().getLongitude())
-                .isEqualTo(user.getLastVisitedLocation().getLocation().getLongitude());
+                .isEqualTo(user.getLastVisitedLocation().getLocation()
+                        .getLongitude());
         assertThat(suggestion.getSuggestedAttraction().size())
                 .isEqualTo(ITourGuideService.SIZE_OF_NEARBY_ATTRACTIONS_LIST);
     }
@@ -353,6 +380,29 @@ public class TourGuideServiceTest {
     }
 
     @Test
+    @DisplayName("Given a user without rewards, when getTripDeals then returns an empty list")
+    public void givenAUserWithoutRewards_whenGetTripDeals_thenReturnsEmptyList() {
+        System.out.println(
+                "\n *** Given a user without rewards, when getTripDeals then returns an empty list ***");
+        // GIVEN
+
+        mockWebServerTripDeals.enqueue(
+                new MockResponse()
+                        .setResponseCode(400)
+                        .setHeader(HttpHeaders.CONTENT_TYPE,
+                                MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(""));
+
+        User user = new User(UUID.randomUUID(), "jon", "000",
+                "jon@tourGuide.com");
+        // WHEN
+        List<ProviderDTO> providers = tourGuideService.getTripDeals(user);
+        // tourGuideService.tracker.stopTracking();
+        // THEN
+        assertThat(providers.size()).isEqualTo(0);
+    }
+
+    @Test
     @DisplayName("Given users, when call getAllUsersLocation then returns users location list")
     public void givenUsers_whenGetAllUsersLocation_thenReturnsUsersLocationList() {
         System.out.println(
@@ -369,6 +419,117 @@ public class TourGuideServiceTest {
         });
         assertThat(locations.size())
                 .isEqualTo(InternalTestHelper.getInternalUserNumber());
+    }
+
+    @Test
+    @DisplayName("Given a new user, when call getUserLocation method then a new visitedLocation is created")
+    void givenNewUser_whenGetUserLocation_thenANewVisitedLocationIsCreated() {
+        System.out.println(
+                "\n *** Given a new user, when call getUserLocation method then a new visitedLocation is created ***");
+        // GIVEN
+        User user = new User(UUID.randomUUID(), "John DOE", "01.02.03.04.05",
+                "john.doe@tourGuide.com");
+
+        visitedLocationResult = "{\"timeVisited\":\"2020-11-02T21:53:25.603+00:00\","
+                + "\"location\":{\"latitude\":-42.182901,\"longitude\":39.996201},"
+                + "\"userId\":\"" + user.getUserId() + "\"}";
+
+        mockWebServerGps.enqueue(
+                new MockResponse()
+                        .setResponseCode(200)
+                        .setHeader(HttpHeaders.CONTENT_TYPE,
+                                MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(visitedLocationResult));
+
+        jsonResult = "[";
+        attractions.forEach(
+                a -> jsonResult = jsonResult.concat(a.toString() + ","));
+        jsonResult = jsonResult.substring(0,
+                jsonResult.length() - 1);
+        jsonResult = jsonResult.concat("]");
+        System.out.println(jsonResult);
+
+        mockWebServerGps.enqueue(
+                new MockResponse()
+                        .setResponseCode(200)
+                        .setHeader(HttpHeaders.CONTENT_TYPE,
+                                MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(jsonResult));
+
+        // WHEN
+        VisitedLocationDTO visitedLocationDTO = tourGuideService
+                .getUserLocation(user);
+        // THEN
+        assertThat(visitedLocationDTO.getLocation().getLatitude()).isEqualTo(
+                user.getLastVisitedLocation().getLocation().getLatitude());
+        assertThat(visitedLocationDTO.getLocation().getLongitude()).isEqualTo(
+                user.getLastVisitedLocation().getLocation().getLongitude());
+        assertThat(visitedLocationDTO.getTimeVisited()).isEqualTo(
+                user.getLastVisitedLocation().getTimeVisited());
+        verify(rewardsService).calculateRewards(any(User.class),
+                Mockito.<Attraction>anyList());
+    }
+
+    @Test
+    @DisplayName("Given a user, when call getUserRewards method then returns user rewards")
+    void givenAUser_whenGetUserRewards_thenReturnsUserRewards() {
+        System.out.println(
+                "\n *** Given a user, when call getUserRewards method then returns user rewards ***");
+        // GIVEN
+        User user = new User(UUID.randomUUID(), "John DOE", "01.02.03.04.05",
+                "john.doe@tourGuide.com");
+
+        given(rewardsService.getRewardPoints(any(Attraction.class),
+                any(User.class))).willReturn(77);
+
+        user.addUserReward(new UserReward(new VisitedLocation(user.getUserId(),
+                new Location(attractions.get(0).getLatitude(),
+                        attractions.get(0).getLongitude()),
+                new Date()), attractions.get(0)));
+        user.addUserReward(new UserReward(new VisitedLocation(user.getUserId(),
+                new Location(attractions.get(1).getLatitude(),
+                        attractions.get(1).getLongitude()),
+                new Date()), attractions.get(1)));
+
+        // WHEN
+        UserRewardsDTO userRewardsDTO = tourGuideService.getUserRewards(user);
+        // THEN
+        assertThat(userRewardsDTO.getUserName()).isEqualTo("John DOE");
+        assertThat(userRewardsDTO.getUserRewardsDTO().size()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("Given n users to create, when call classInitialization then n users are created")
+    void givenXUsersToCreate_whenCallClassInitialization_thenXUsersHaveBeenCreated() {
+        System.out.println(
+                "\n *** Given n users to create, when call classInitialization"
+                        + " then n users with 3 visitedLocations are created ***");
+        // GIVEN
+        TourGuideService tourGuideService2 = (TourGuideService) tourGuideService;
+        InternalTestHelper.setInternalUserNumber(7);
+
+        jsonResult = "[";
+        attractions.forEach(
+                a -> jsonResult = jsonResult.concat(a.toString() + ","));
+        jsonResult = jsonResult.substring(0,
+                jsonResult.length() - 1);
+        jsonResult = jsonResult.concat("]");
+        System.out.println(jsonResult);
+
+        mockWebServerGps.enqueue(
+                new MockResponse()
+                        .setResponseCode(200)
+                        .setHeader(HttpHeaders.CONTENT_TYPE,
+                                MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(jsonResult));
+
+        // WHEN
+        tourGuideService2.classInitialization();
+        // THEN
+        List<User> allUsers = tourGuideService2.getAllUsers();
+        assertThat(allUsers.size()).isEqualTo(7);
+        allUsers.forEach(
+                u -> assertThat(u.getVisitedLocations().size()).isEqualTo(3));
     }
 
 }

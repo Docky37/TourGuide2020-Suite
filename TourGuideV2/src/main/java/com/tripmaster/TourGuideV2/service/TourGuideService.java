@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.tripmaster.TourGuideV2.domain.Attraction;
 import com.tripmaster.TourGuideV2.domain.User;
@@ -93,8 +94,7 @@ public class TourGuideService implements ITourGuideService {
      */
     @Autowired
     public TourGuideService(final IRewardsService pRewardsService,
-            @Qualifier("getWebClientTripDeals")
-                    final WebClient pWebClientTripDeals,
+            @Qualifier("getWebClientTripDeals") final WebClient pWebClientTripDeals,
             @Qualifier("getWebClientGps") final WebClient pWebClientGps) {
         rewardsService = pRewardsService;
         webClientGps = pWebClientGps;
@@ -108,7 +108,7 @@ public class TourGuideService implements ITourGuideService {
      * This method is used in test mode to initialize service calling a method
      * that creates random data.
      */
-    private void classInitialization() {
+    public void classInitialization() {
         if (testMode) {
             logger.info("TestMode enabled");
             logger.debug("Initializing users");
@@ -193,6 +193,21 @@ public class TourGuideService implements ITourGuideService {
      * {@inheritDoc}
      */
     @Override
+    public VisitedLocationDTO trackUserLocation(final User user) {
+        final String getLocationUri = "/getLocation?userId=" + user.getUserId();
+
+        VisitedLocationDTO visitedLocationDTO = webClientGps.get()
+                .uri(getLocationUri)
+                .retrieve()
+                .bodyToMono(VisitedLocationDTO.class).block();
+
+        return visitedLocationDTO;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public User getUser(final String userName) {
         return internalUserMap.get(userName);
     }
@@ -212,6 +227,10 @@ public class TourGuideService implements ITourGuideService {
     public void addUser(final User user) {
         if (!internalUserMap.containsKey(user.getUserName())) {
             internalUserMap.put(user.getUserName(), user);
+        } else {
+            logger.debug(
+                    "This userName '{}' already exists in internalUserMap!",
+                    user.getUserName());
         }
     }
 
@@ -223,44 +242,28 @@ public class TourGuideService implements ITourGuideService {
         int cumulatativeRewardPoints = user.getUserRewards().stream()
                 .mapToInt(i -> i.getRewardPoints()).sum();
 
-        Flux<ProviderDTO> flux = webClientTripDeals.get()
-                .uri("/getTripDeals?tripPricerApiKey=" + TRIP_PRICER_API_KEY
-                        + "&userId=" + user.getUserId()
-                        + "&numberOfAdults=" + user.getUserPreferences()
-                                .getNumberOfAdults()
-                        + "&numberOfChildren=" + user.getUserPreferences()
-                                .getNumberOfChildren()
-                        + "&tripDuration=" + user.getUserPreferences()
-                                .getTripDuration()
-                        + "&cumulatativeRewardPoints="
-                        + cumulatativeRewardPoints)
-                .retrieve()
-                .bodyToFlux(ProviderDTO.class);
-
         try {
+            Flux<ProviderDTO> flux = webClientTripDeals.get()
+                    .uri("/getTripDeals?tripPricerApiKey=" + TRIP_PRICER_API_KEY
+                            + "&userId=" + user.getUserId()
+                            + "&numberOfAdults=" + user.getUserPreferences()
+                                    .getNumberOfAdults()
+                            + "&numberOfChildren=" + user.getUserPreferences()
+                                    .getNumberOfChildren()
+                            + "&tripDuration=" + user.getUserPreferences()
+                                    .getTripDuration()
+                            + "&cumulatativeRewardPoints="
+                            + cumulatativeRewardPoints)
+                    .retrieve()
+                    .bodyToFlux(ProviderDTO.class);
+
             List<ProviderDTO> providers = flux.collectList().block();
             user.setTripDeals(providers);
             return providers;
-        } catch (Exception e) {
+        } catch (WebClientResponseException e) {
             System.out.println(e);
-            return new ArrayList<ProviderDTO>();
         }
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public VisitedLocationDTO trackUserLocation(final User user) {
-        final String getLocationUri = "/getLocation?userId=" + user.getUserId();
-
-        VisitedLocationDTO visitedLocationDTO = webClientGps.get()
-                .uri(getLocationUri)
-                .retrieve()
-                .bodyToMono(VisitedLocationDTO.class).block();
-
-        return visitedLocationDTO;
+        return new ArrayList<ProviderDTO>();
     }
 
     /**
@@ -330,8 +333,7 @@ public class TourGuideService implements ITourGuideService {
                 user.getLastVisitedLocation().getLocation().getLatitude(),
                 user.getLastVisitedLocation().getLocation().getLongitude()));
 
-        TreeMap<String, NearbyAttractionDTO> suggestedAttractions =
-                new TreeMap<>();
+        TreeMap<String, NearbyAttractionDTO> suggestedAttractions = new TreeMap<>();
         List<Attraction> attractionsList = getNearByAttractions(
                 user.getLastVisitedLocation());
         final AtomicInteger indexHolder = new AtomicInteger(1);
@@ -389,6 +391,7 @@ public class TourGuideService implements ITourGuideService {
      *
      * Methods Below: For Internal Testing.
      *
+     * *************************************************************************
      */
 
     /**
@@ -475,8 +478,8 @@ public class TourGuideService implements ITourGuideService {
      * @return a double
      */
     private double generateRandomLongitude() {
-        double leftLimit = LONGITUDE_WEST_LIMIT; // -180;
-        double rightLimit = LONGITUDE_EAST_LIMIT; // 180;
+        double leftLimit = LONGITUDE_WEST_LIMIT;
+        double rightLimit = LONGITUDE_EAST_LIMIT;
         return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
     }
 
@@ -486,8 +489,8 @@ public class TourGuideService implements ITourGuideService {
      * @return a double
      */
     private double generateRandomLatitude() {
-        double leftLimit = LATITUDE_NORTH_LIMIT; // -85.05112878;
-        double rightLimit = LATITUDE_SOUTH_LIMIT; // 85.05112878;
+        double leftLimit = LATITUDE_NORTH_LIMIT;
+        double rightLimit = LATITUDE_SOUTH_LIMIT;
         return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
     }
 

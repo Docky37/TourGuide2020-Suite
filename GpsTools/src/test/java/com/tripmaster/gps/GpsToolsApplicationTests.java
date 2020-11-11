@@ -11,8 +11,12 @@ import com.tripmaster.gps.controller.GpsController;
 @SpringBootTest
 class GpsToolsApplicationTests {
 
+    /**
+     * GpsController instance declaration, that will be initialized by Spring
+     * injection.
+     */
     @Autowired
-    GpsController controller;
+    private GpsController controller;
 
     @Test
     void contextLoads() {

@@ -94,8 +94,8 @@ public class TourGuideService implements ITourGuideService {
      */
     @Autowired
     public TourGuideService(final IRewardsService pRewardsService,
-            @Qualifier("getWebClientTripDeals") final WebClient pWebClientTripDeals,
-            @Qualifier("getWebClientGps") final WebClient pWebClientGps) {
+        @Qualifier("getWebClientTripDeals") final WebClient pWebClientTripDeals,
+        @Qualifier("getWebClientGps") final WebClient pWebClientGps) {
         rewardsService = pRewardsService;
         webClientGps = pWebClientGps;
         webClientTripDeals = pWebClientTripDeals;
@@ -333,7 +333,8 @@ public class TourGuideService implements ITourGuideService {
                 user.getLastVisitedLocation().getLocation().getLatitude(),
                 user.getLastVisitedLocation().getLocation().getLongitude()));
 
-        TreeMap<String, NearbyAttractionDTO> suggestedAttractions = new TreeMap<>();
+        TreeMap<String, NearbyAttractionDTO> suggestedAttractions =
+                new TreeMap<>();
         List<Attraction> attractionsList = getNearByAttractions(
                 user.getLastVisitedLocation());
         final AtomicInteger indexHolder = new AtomicInteger(1);

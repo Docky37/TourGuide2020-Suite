@@ -1,4 +1,4 @@
-package com.tripmaster.TourGuideV2;
+package com.tripmaster.TourGuideV2.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;

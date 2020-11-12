@@ -1,5 +1,6 @@
 package com.tripmaster.TourGuideV2.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tripmaster.TourGuideV2.domain.Attraction;
 import com.tripmaster.TourGuideV2.domain.User;
+import com.tripmaster.TourGuideV2.dto.AttractionDTO;
 import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
 import com.tripmaster.TourGuideV2.dto.LocationDTO;
 import com.tripmaster.TourGuideV2.dto.ProviderDTO;
@@ -66,6 +69,23 @@ public class TourGuideController {
                 .getUserLocation(getUser(userName));
         logger.info(visitedLocationDTO.toString() + "\n");
         return visitedLocationDTO.getLocation();
+    }
+
+    /**
+     * HTML GET request that return a list of all attractions.
+     *
+     * @return a List<AttractionDTO>
+     */
+    @GetMapping("/getAllAttractions")
+    public List<AttractionDTO> getAllAttractions() {
+        List<Attraction> attractions = tourGuideService.getAllAttractions();
+        List<AttractionDTO> attractionsDTO = new ArrayList<>();
+        attractions.forEach(a -> {
+            attractionsDTO.add(new AttractionDTO(a.getAttractionName(),
+                    a.getCity(), a.getState(), a.getLatitude(),
+                    a.getLongitude()));
+        });
+        return attractionsDTO;
     }
 
     /**

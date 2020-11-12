@@ -261,7 +261,7 @@ public class TourGuideService implements ITourGuideService {
             user.setTripDeals(providers);
             return providers;
         } catch (WebClientResponseException e) {
-            System.out.println(e);
+            logger.error(e.toString());
         }
         return new ArrayList<ProviderDTO>();
     }

@@ -1,6 +1,6 @@
 package com.tripmaster.TourGuideV2.controller;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +23,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -42,8 +43,6 @@ import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 import com.tripmaster.TourGuideV2.service.IRewardsService;
 import com.tripmaster.TourGuideV2.service.ITourGuideService;
-import com.tripmaster.TourGuideV2.service.TourGuideService;
-import com.tripmaster.TourGuideV2.tracker.Tracker;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -64,6 +63,21 @@ public class TourGuideControllerTest {
     @MockBean
     private IRewardsService rewardsService;
 
+    static List<Attraction> attractions = new ArrayList<>();
+    static {
+        Locale.setDefault(Locale.US);
+        attractions.add(new Attraction(UUID.randomUUID(), "Tour Eiffel",
+                "Paris", "France", 48.858482d, 2.294426d));
+        attractions.add(new Attraction(UUID.randomUUID(), "Futuroscope",
+                "Chasseneuil-du-Poitou", "France", 46.669752d, 0.368955d));
+    }
+
+    static String expectedResult = "["
+            + "{\"attractionName\":\"Tour Eiffel\",\"city\":\"Paris\","
+            + "\"latitude\":48.858482,\"longitude\":2.294426,\"state\":\"France\"},"
+            + "{\"attractionName\":\"Futuroscope\",\"city\":\"Chasseneuil-du-Poitou\","
+            + "\"latitude\":46.669752,\"longitude\":0.368955,\"state\":\"France\"}]";
+    
     @BeforeEach
     public void setup() {
         mvc = MockMvcBuilders.webAppContextSetup(context).build();
@@ -91,6 +105,25 @@ public class TourGuideControllerTest {
                 .andReturn();
         // THEN
         verify(tourGuideService).getUserLocation(user);
+    }
+
+    @Test
+    @DisplayName("When reaquest getAllAttractions then calls service getAllAttractions method")
+    public void whenRequestGetAllAttractions_thenCallsServiceGetAllAttractionMethod()
+            throws Exception {
+        // GIVEN
+        given(tourGuideService.getAllAttractions()).willReturn(attractions);
+        // WHEN
+        MvcResult result = mvc.perform(
+                MockMvcRequestBuilders.get("/getAllAttractions"))
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andReturn();
+        result.getResponse().getContentAsString();
+        // THEN
+        verify(tourGuideService).getAllAttractions();
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(expectedResult);
     }
 
     @Test
@@ -153,7 +186,8 @@ public class TourGuideControllerTest {
     }
 
     @Test
-    public void whenRequestAllCurrentLocations_thenCallsServiceGetAllUsersLocations() throws Exception {
+    public void whenRequestAllCurrentLocations_thenCallsServiceGetAllUsersLocations()
+            throws Exception {
         // GIVEN
         UUID userId = UUID.randomUUID();
         String userName = "John DOE";
@@ -173,7 +207,8 @@ public class TourGuideControllerTest {
     }
 
     @Test
-    public void givenAUser_whenRequestGetTripDeals_thenCallsServiceGetTripDeals() throws Exception {
+    public void givenAUser_whenRequestGetTripDeals_thenCallsServiceGetTripDeals()
+            throws Exception {
         // GIVEN
         UUID userId = UUID.randomUUID();
         String userName = "John DOE";

@@ -22,5 +22,9 @@ class GpsToolsApplicationTests {
     void contextLoads() {
         assertThat(controller).isNotNull();
     }
-
+    
+    @Test
+    void mainMethod() {
+        GpsToolsApplication.main(new String[] {"arg1", "arg2", "arg3"});
+    }
 }

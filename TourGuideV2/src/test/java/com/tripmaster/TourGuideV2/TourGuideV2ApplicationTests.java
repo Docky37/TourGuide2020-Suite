@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.tripmaster.TourGuideV2.controller.TourGuideController;
 
 @SpringBootTest
-class TourGuideV2ApplicationTest {
+class TourGuideV2ApplicationTests {
 
     @Autowired
     TourGuideController controller;

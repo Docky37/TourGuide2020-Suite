@@ -31,7 +31,7 @@ public class TourGuideModule {
      */
     @Bean
     public WebClient getWebClientGps() {
-        return WebClient.create("http://localhost:8889");
+        return WebClient.create("http://gps:8889");
     }
 
     /**

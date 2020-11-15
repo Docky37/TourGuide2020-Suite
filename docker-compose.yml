@@ -1,0 +1,21 @@
+version: '3'
+services:
+  gps:
+    image: gps
+    container_name: gps
+    ports:
+      - "8889:8889"
+    networks:
+      - default
+
+  tourguidev2:
+    depends_on:
+      - gps
+    image: tourguide
+    container_name: tourguide
+    ports:
+      - "8080:8080"
+    networks:
+      - default
+
+    

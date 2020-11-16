@@ -14,8 +14,8 @@ import org.javamoney.moneta.Money;
 public class UserPreferences {
 
     /**
-     * The radius of the area where attractions is considered as nearby by the
-     * user.
+     * The radius of the area where attractions is considered as nearby one by
+     * the user.
      */
     private int attractionProximity = Integer.MAX_VALUE;
 
@@ -23,6 +23,7 @@ public class UserPreferences {
      * Attribute that defines US Dollar as used currency of the application.
      */
     private CurrencyUnit currency = Monetary.getCurrency("USD");
+
 
     /**
      * The minimum price value of a TripDeal.
@@ -76,6 +77,24 @@ public class UserPreferences {
      */
     public int getAttractionProximity() {
         return attractionProximity;
+    }
+
+    /**
+     * Getter of currency.
+     *
+     * @return a CurrencyUnit
+     */
+    public CurrencyUnit getCurrency() {
+        return currency;
+    }
+
+    /**
+     * Setter of currency.
+     *
+     * @param pCurrency
+     */
+    public void setCurrency(final CurrencyUnit pCurrency) {
+        currency = pCurrency;
     }
 
     /**

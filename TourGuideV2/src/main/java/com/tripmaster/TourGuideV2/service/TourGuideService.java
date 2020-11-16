@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import com.tripmaster.TourGuideV2.domain.Attraction;
 import com.tripmaster.TourGuideV2.domain.User;
+import com.tripmaster.TourGuideV2.domain.UserPreferences;
 import com.tripmaster.TourGuideV2.domain.UserReward;
 import com.tripmaster.TourGuideV2.domain.VisitedLocation;
 import com.tripmaster.TourGuideV2.domain.Location;
@@ -32,6 +34,7 @@ import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
 import com.tripmaster.TourGuideV2.dto.LocationDTO;
 import com.tripmaster.TourGuideV2.dto.NearbyAttractionDTO;
 import com.tripmaster.TourGuideV2.dto.ProviderDTO;
+import com.tripmaster.TourGuideV2.dto.UserPreferencesDTO;
 import com.tripmaster.TourGuideV2.dto.UserRewardDTO;
 import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
@@ -94,8 +97,9 @@ public class TourGuideService implements ITourGuideService {
      */
     @Autowired
     public TourGuideService(final IRewardsService pRewardsService,
-        @Qualifier("getWebClientTripDeals") final WebClient pWebClientTripDeals,
-        @Qualifier("getWebClientGps") final WebClient pWebClientGps) {
+            @Qualifier("getWebClientTripDeals")
+                    final WebClient pWebClientTripDeals,
+            @Qualifier("getWebClientGps") final WebClient pWebClientGps) {
         rewardsService = pRewardsService;
         webClientGps = pWebClientGps;
         webClientTripDeals = pWebClientTripDeals;
@@ -136,8 +140,7 @@ public class TourGuideService implements ITourGuideService {
         webClientGps = pWebClientGps;
 
         classInitialization();
-        tracker = null; // new Tracker(this);
-        // addShutDownHook();
+        tracker = null; // We don't want to use tracker during unit tests!
     }
 
     /**
@@ -199,7 +202,8 @@ public class TourGuideService implements ITourGuideService {
         VisitedLocationDTO visitedLocationDTO = webClientGps.get()
                 .uri(getLocationUri)
                 .retrieve()
-                .bodyToMono(VisitedLocationDTO.class).block();
+                .bodyToMono(VisitedLocationDTO.class)
+                .block();
 
         return visitedLocationDTO;
     }
@@ -232,6 +236,49 @@ public class TourGuideService implements ITourGuideService {
                     "This userName '{}' already exists in internalUserMap!",
                     user.getUserName());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserPreferencesDTO updateUserPreferences(final User user,
+            final UserPreferencesDTO userNewPreferencesDTO) {
+        UserPreferences userPreferences = user.getUserPreferences();
+        userPreferences.setAttractionProximity(
+                userNewPreferencesDTO.getAttractionProximity());
+        userPreferences.setHighPricePoint(Money.of(
+                userNewPreferencesDTO.getHighPricePoint(),
+                userPreferences.getCurrency()));
+        userPreferences.setLowerPricePoint(Money.of(
+                userNewPreferencesDTO.getLowerPricePoint(),
+                userPreferences.getCurrency()));
+        userPreferences.setNumberOfAdults(
+                userNewPreferencesDTO.getNumberOfAdults());
+        userPreferences.setNumberOfChildren(
+                userNewPreferencesDTO.getNumberOfChildren());
+        userPreferences.setTicketQuantity(
+                userNewPreferencesDTO.getTicketQuantity());
+        userPreferences.setTripDuration(
+                userNewPreferencesDTO.getTripDuration());
+
+        UserPreferencesDTO updatedPreferences = new UserPreferencesDTO();
+        updatedPreferences.setAttractionProximity(
+                userPreferences.getAttractionProximity());
+        updatedPreferences.setHighPricePoint(
+                userPreferences.getHighPricePoint().getNumber().intValue());
+        updatedPreferences.setLowerPricePoint(
+                userPreferences.getLowerPricePoint().getNumber().intValue());
+        updatedPreferences.setNumberOfAdults(
+                userPreferences.getNumberOfAdults());
+        updatedPreferences.setNumberOfChildren(
+                userPreferences.getNumberOfChildren());
+        updatedPreferences.setTicketQuantity(
+                userPreferences.getTicketQuantity());
+        updatedPreferences.setTripDuration(
+                userPreferences.getTripDuration());
+
+        return updatedPreferences;
     }
 
     /**

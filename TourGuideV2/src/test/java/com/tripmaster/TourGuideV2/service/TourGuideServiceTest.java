@@ -13,6 +13,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.money.Monetary;
+
+import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +36,7 @@ import com.tripmaster.TourGuideV2.domain.VisitedLocation;
 import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
 import com.tripmaster.TourGuideV2.dto.LocationDTO;
 import com.tripmaster.TourGuideV2.dto.ProviderDTO;
+import com.tripmaster.TourGuideV2.dto.UserPreferencesDTO;
 import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 import com.tripmaster.TourGuideV2.helper.InternalTestHelper;
@@ -212,12 +216,66 @@ public class TourGuideServiceTest {
     }
 
     @Test
+    @DisplayName("Given a user, when call updateUserPreferences method"
+            + " then preferences are updated")
+    public void givenAUser_whenUpdateUserPreferences_thenUpdatePreferences() {
+        System.out.println(
+                "\n*** Given a user, when call updateUserPreferences method "
+                        + "then preferences are updated ***");
+        // GIVEN
+        UUID userId = UUID.randomUUID();
+        User user = new User(userId, "John DOE", "01.02.03.04.05",
+                "john.doe@tourGuide.com");
+        assertThat(user.getUserPreferences().getAttractionProximity())
+                .isEqualTo(Integer.MAX_VALUE);
+        assertThat(user.getUserPreferences().getCurrency())
+                .isEqualTo(Monetary.getCurrency("USD"));
+        assertThat(user.getUserPreferences().getNumberOfAdults())
+                .isEqualTo(1);
+        assertThat(user.getUserPreferences().getNumberOfChildren())
+                .isEqualTo(0);
+        assertThat(user.getUserPreferences().getHighPricePoint())
+                .isEqualTo(Money.of(Integer.MAX_VALUE,
+                        Monetary.getCurrency("USD")));
+        assertThat(user.getUserPreferences().getLowerPricePoint())
+                .isEqualTo(Money.of(0, Monetary.getCurrency("USD")));
+        assertThat(user.getUserPreferences().getTicketQuantity())
+                .isEqualTo(1);
+        assertThat(user.getUserPreferences().getTripDuration())
+                .isEqualTo(1);
+
+        UserPreferencesDTO userPreferencesDTO = new UserPreferencesDTO();
+        userPreferencesDTO.setAttractionProximity(150);
+        userPreferencesDTO.setNumberOfAdults(2);
+        userPreferencesDTO.setHighPricePoint(650);
+        // WHEN
+        tourGuideService.updateUserPreferences(user, userPreferencesDTO);
+        // THEN
+        assertThat(user.getUserPreferences().getAttractionProximity())
+                .isEqualTo(userPreferencesDTO.getAttractionProximity());
+        assertThat(user.getUserPreferences().getNumberOfAdults())
+                .isEqualTo(userPreferencesDTO.getNumberOfAdults());
+        assertThat(user.getUserPreferences().getNumberOfChildren())
+                .isEqualTo(userPreferencesDTO.getNumberOfChildren());
+        assertThat(user.getUserPreferences().getHighPricePoint().getNumber()
+                .intValue())
+                        .isEqualTo(userPreferencesDTO.getHighPricePoint());
+        assertThat(user.getUserPreferences().getLowerPricePoint().getNumber()
+                .intValue())
+                        .isEqualTo(userPreferencesDTO.getLowerPricePoint());
+        assertThat(user.getUserPreferences().getTicketQuantity())
+                .isEqualTo(userPreferencesDTO.getTicketQuantity());
+        assertThat(user.getUserPreferences().getTripDuration())
+                .isEqualTo(userPreferencesDTO.getTripDuration());
+    }
+
+    @Test
     @DisplayName("Given a user, when call trackUser method then return his visitedLocation")
     public void givenAUser_whenTrackUser_thenReturnsHisVisitedLocation() {
         System.out.println(
                 "\n*** Given a user, when call trackUser method then return his visitedLocation ***");
-        UUID userId = UUID.randomUUID();
         // GIVEN
+        UUID userId = UUID.randomUUID();
         User user = new User(userId, "John DOE", "01.02.03.04.05",
                 "john.doe@tourGuide.com");
         visitedLocationResult = "{\"timeVisited\":\"2020-11-02T21:53:25.603+00:00\","

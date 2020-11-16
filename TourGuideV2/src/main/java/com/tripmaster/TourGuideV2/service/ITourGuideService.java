@@ -11,6 +11,7 @@ import com.tripmaster.TourGuideV2.domain.VisitedLocation;
 import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
 import com.tripmaster.TourGuideV2.dto.LocationDTO;
 import com.tripmaster.TourGuideV2.dto.ProviderDTO;
+import com.tripmaster.TourGuideV2.dto.UserPreferencesDTO;
 import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 
@@ -115,5 +116,15 @@ public interface ITourGuideService {
      * @return a List<Location>
      */
     Map<String, LocationDTO> getAllUsersLocation();
+
+    /**
+     * This method allows user to update his preferences.
+     *
+     * @param user
+     * @param userNewPreferencesDTO
+     * @return a UserPreferencesDTO
+     */
+    UserPreferencesDTO updateUserPreferences(User user,
+            UserPreferencesDTO userNewPreferencesDTO);
 
 }

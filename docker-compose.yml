@@ -8,9 +8,26 @@ services:
     networks:
       - default
 
+  rewards:
+    image: rewards
+    container_name: rewards
+    ports:
+      - "8787:8787"
+    networks:
+      - default
+
+  tripdeals:
+    image: tripdeals
+    container_name: tripdeals
+    ports:
+      - "8888:8888"
+    networks:
+      - default
+
   tourguidev2:
     depends_on:
       - gps
+      - tripdeals
     image: tourguide
     container_name: tourguide
     ports:

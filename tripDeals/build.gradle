@@ -1,3 +1,5 @@
+// TripDeals build.gradle
+
 plugins {
 	id 'org.springframework.boot' version '2.3.5.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
@@ -5,9 +7,10 @@ plugins {
 	id 'jacoco'
 	id 'checkstyle'
 }
+apply plugin: 'io.spring.dependency-management'
 
 group = 'com.tripmaster'
-version = '0.0.1-SNAPSHOT'
+version = '2.1'
 sourceCompatibility = '11'
 
 repositories {
@@ -28,31 +31,15 @@ dependencies {
 	
 }
 
-jacoco {
-    toolVersion = "0.8.4"
-}
 
-jacocoTestReport {
-    reports {
-        xml.enabled true
-        csv.enabled false
-        html.destination file("${buildDir}/jacocoHtml")
+// BOOT JAR ********************************************************************
+bootJar {
+    manifest {
+        attributes 'Start-Class': 'com.tripmaster.tripdeals.TripDealsApplication'
     }
 }
-test.finalizedBy jacocoTestReport
-check.dependsOn jacocoTestCoverageVerification
 
-jacocoTestCoverageVerification {
-  violationRules {
-    rule {
-      limit {
-        counter = 'LINE'
-        value = 'COVEREDRATIO'
-        minimum = 0.5
-      }
-    }
-  }
-}
+// TESTS ***********************************************************************
 test {
     useJUnitPlatform()
     
@@ -93,10 +80,36 @@ test {
     }
 }
 
+
+// JACOCO **********************************************************************
+jacoco {
+    toolVersion = "0.8.4"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it,
+                    exclude: ['**/libs/**']
+            )
+        }))
+    }
+}
+test.finalizedBy jacocoTestReport
+check.dependsOn jacocoTestCoverageVerification
+
+// CHECKSTYLE *************************************************
 checkstyle {
     configFile = file('build/reports/checkstyle-checker.xml');
     reportsDir = file("$project.buildDir/reports/checkstyle/")
 }
+
+checkstyleTest.enabled = false
 
 tasks.withType(Checkstyle) {
     reports {

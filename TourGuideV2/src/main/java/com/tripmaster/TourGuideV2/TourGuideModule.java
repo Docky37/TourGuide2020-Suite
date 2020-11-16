@@ -21,7 +21,7 @@ public class TourGuideModule {
      */
     @Bean
     public WebClient getWebClientTripDeals() {
-        return WebClient.create("http://localhost:8888");
+        return WebClient.create("http://tripdeals:8888");
     }
 
     /**
@@ -41,7 +41,7 @@ public class TourGuideModule {
      */
     @Bean
     public WebClient getWebClientReward() {
-        return WebClient.create("http://localhost:8787");
+        return WebClient.create("http://rewards:8787");
     }
 
 }

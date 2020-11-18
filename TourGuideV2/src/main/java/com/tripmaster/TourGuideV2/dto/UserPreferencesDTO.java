@@ -1,12 +1,7 @@
 package com.tripmaster.TourGuideV2.dto;
 
-import javax.money.CurrencyUnit;
-import javax.money.Monetary;
-
-import org.javamoney.moneta.Money;
-
 /**
- * This domain class is used to store all user's preferences.
+ * This Data Transfer Object is used to transfer user's preferences.
  *
  * @author TripMaster
  * @author Thierry Schreiner
@@ -20,19 +15,14 @@ public class UserPreferencesDTO {
     private int attractionProximity = Integer.MAX_VALUE;
 
     /**
-     * Attribute that defines US Dollar as used currency of the application.
-     */
-    private CurrencyUnit currency = Monetary.getCurrency("USD");
-
-    /**
      * The minimum price value of a TripDeal.
      */
-    private Money lowerPricePoint = Money.of(0, currency);
+    private int lowerPricePoint = 0;
 
     /**
      * The maximum price value of a TripDeal.
      */
-    private Money highPricePoint = Money.of(Integer.MAX_VALUE, currency);
+    private int highPricePoint = Integer.MAX_VALUE;
 
     /**
      * The favorite duration of trip the user is looking for.
@@ -79,29 +69,11 @@ public class UserPreferencesDTO {
     }
 
     /**
-     * Getter of currency.
-     *
-     * @return a CurrencyUnit
-     */
-    public CurrencyUnit getCurrency() {
-        return currency;
-    }
-
-    /**
-     * Setter of currency.
-     *
-     * @param pCurrency
-     */
-    public void setCurrency(final CurrencyUnit pCurrency) {
-        currency = pCurrency;
-    }
-
-    /**
      * Getter of lowerPricePoint.
      *
-     * @return a Money object
+     * @return an int
      */
-    public Money getLowerPricePoint() {
+    public int getLowerPricePoint() {
         return lowerPricePoint;
     }
 
@@ -110,16 +82,16 @@ public class UserPreferencesDTO {
      *
      * @param pLowerPricePoint
      */
-    public void setLowerPricePoint(final Money pLowerPricePoint) {
+    public void setLowerPricePoint(final int pLowerPricePoint) {
         lowerPricePoint = pLowerPricePoint;
     }
 
     /**
      * Getter of highPricePoint.
      *
-     * @return a Money object
+     * @return an int
      */
-    public Money getHighPricePoint() {
+    public int getHighPricePoint() {
         return highPricePoint;
     }
 
@@ -128,7 +100,7 @@ public class UserPreferencesDTO {
      *
      * @param pHighPricePoint
      */
-    public void setHighPricePoint(final Money pHighPricePoint) {
+    public void setHighPricePoint(final int pHighPricePoint) {
         highPricePoint = pHighPricePoint;
     }
 
@@ -202,19 +174,6 @@ public class UserPreferencesDTO {
      */
     public void setNumberOfChildren(final int pNumberOfChildren) {
         numberOfChildren = pNumberOfChildren;
-    }
-
-    /**
-     * Serialization method.
-     */
-    @Override
-    public String toString() {
-        return "UserPreferencesDTO [attractionProximity=" + attractionProximity
-                + ", currency=" + currency + ", lowerPricePoint="
-                + lowerPricePoint + ", highPricePoint=" + highPricePoint
-                + ", tripDuration=" + tripDuration + ", ticketQuantity="
-                + ticketQuantity + ", numberOfAdults=" + numberOfAdults
-                + ", numberOfChildren=" + numberOfChildren + "]";
     }
 
 }

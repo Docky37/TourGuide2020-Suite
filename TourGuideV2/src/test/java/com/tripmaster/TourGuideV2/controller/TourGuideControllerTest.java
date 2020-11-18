@@ -1,6 +1,7 @@
 package com.tripmaster.TourGuideV2.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -24,11 +25,14 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripmaster.TourGuideV2.domain.Attraction;
 import com.tripmaster.TourGuideV2.domain.Location;
 import com.tripmaster.TourGuideV2.domain.User;
@@ -38,6 +42,7 @@ import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
 import com.tripmaster.TourGuideV2.dto.LocationDTO;
 import com.tripmaster.TourGuideV2.dto.NearbyAttractionDTO;
 import com.tripmaster.TourGuideV2.dto.ProviderDTO;
+import com.tripmaster.TourGuideV2.dto.UserPreferencesDTO;
 import com.tripmaster.TourGuideV2.dto.UserRewardDTO;
 import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
@@ -77,7 +82,7 @@ public class TourGuideControllerTest {
             + "\"latitude\":48.858482,\"longitude\":2.294426,\"state\":\"France\"},"
             + "{\"attractionName\":\"Futuroscope\",\"city\":\"Chasseneuil-du-Poitou\","
             + "\"latitude\":46.669752,\"longitude\":0.368955,\"state\":\"France\"}]";
-    
+
     @BeforeEach
     public void setup() {
         mvc = MockMvcBuilders.webAppContextSetup(context).build();
@@ -108,7 +113,7 @@ public class TourGuideControllerTest {
     }
 
     @Test
-    @DisplayName("When reaquest getAllAttractions then calls service getAllAttractions method")
+    @DisplayName("When request getAllAttractions then calls service getAllAttractions method")
     public void whenRequestGetAllAttractions_thenCallsServiceGetAllAttractionMethod()
             throws Exception {
         // GIVEN
@@ -118,12 +123,14 @@ public class TourGuideControllerTest {
                 MockMvcRequestBuilders.get("/getAllAttractions"))
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.content()
+                        .contentType("application/json"))
                 .andReturn();
         result.getResponse().getContentAsString();
         // THEN
         verify(tourGuideService).getAllAttractions();
-        assertThat(result.getResponse().getContentAsString()).isEqualTo(expectedResult);
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualTo(expectedResult);
     }
 
     @Test
@@ -186,14 +193,12 @@ public class TourGuideControllerTest {
     }
 
     @Test
-    public void whenRequestAllCurrentLocations_thenCallsServiceGetAllUsersLocations()
+    @DisplayName("When request getAllCurrentLocation thenCallsServiceGetAllUsersLocation")
+    public void whenRequestAllCurrentLocation_thenCallsServiceGetAllUsersLocation()
             throws Exception {
         // GIVEN
-        UUID userId = UUID.randomUUID();
-        String userName = "John DOE";
-        User user = new User(userId, userName, "1234567890",
-                "John.Doe@mail.com");
-        tourGuideService.addUser(user);
+        given(tourGuideService.getAllUsersLocation())
+                .willReturn(new HashMap<String, LocationDTO>());
         // WHEN
         mvc.perform(MockMvcRequestBuilders
                 .get("/getAllCurrentLocations")
@@ -207,7 +212,35 @@ public class TourGuideControllerTest {
     }
 
     @Test
-    public void givenAUser_whenRequestGetTripDeals_thenCallsServiceGetTripDeals()
+    @DisplayName("Given a user, when call updateUserPreferences method"
+            + " then calls service updatesUserPreferences method")
+    public void givenAUser_whenRequestUpdatePreferences_thenUpdatePreferences()
+            throws Exception {
+        // GIVEN
+        UUID userId = UUID.randomUUID();
+        String userName = "John DOE";
+        User user = new User(userId, userName, "1234567890",
+                "John.Doe@mail.com");
+        given(tourGuideService.getUser(userName)).willReturn(user);
+        UserPreferencesDTO userNewPreferencesDTO = new UserPreferencesDTO();
+        // WHEN
+        ObjectMapper mapper = new ObjectMapper();
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+                .put("/updatePreferences?userName=" + userName)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON).characterEncoding("UTF-8")
+                .content(mapper.writeValueAsString(userNewPreferencesDTO));
+
+        mvc.perform(builder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+        // THEN
+        verify(tourGuideService).updateUserPreferences(any(User.class),
+                any(UserPreferencesDTO.class));
+    }
+
+    @Test
+    public void givenAUser_whenRequestGetTripDeals_thenCallServiceGetTripDeals()
             throws Exception {
         // GIVEN
         UUID userId = UUID.randomUUID();

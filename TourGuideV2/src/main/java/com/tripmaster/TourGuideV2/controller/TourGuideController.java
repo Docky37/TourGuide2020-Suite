@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +19,7 @@ import com.tripmaster.TourGuideV2.dto.AttractionDTO;
 import com.tripmaster.TourGuideV2.dto.AttractionsSuggestionDTO;
 import com.tripmaster.TourGuideV2.dto.LocationDTO;
 import com.tripmaster.TourGuideV2.dto.ProviderDTO;
+import com.tripmaster.TourGuideV2.dto.UserPreferencesDTO;
 import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 import com.tripmaster.TourGuideV2.service.ITourGuideService;
@@ -142,6 +145,38 @@ public class TourGuideController {
     public Map<String, LocationDTO> getAllCurrentLocations() {
         logger.info("New HTML Request on /getAllCurrentLocations");
         return tourGuideService.getAllUsersLocation();
+    }
+
+    /**
+     * HTML GET request that returns user's preferences.
+     *
+     * @param userName
+     * @return a UserPreferencesDTO
+     */
+    @GetMapping("/getUserPref")
+    public UserPreferencesDTO getUserPreferences(
+            @RequestParam final String userName) {
+        UserPreferencesDTO userPref = new UserPreferencesDTO();
+
+        return userPref;
+    }
+
+    /**
+     * HTML PUT request that allows user to modify his preferences.
+     *
+     * @param userName
+     * @param userNewPreferencesDTO
+     * @return a UserPreferencesDTO
+     */
+    @PutMapping("/updatePreferences")
+    public UserPreferencesDTO updatePreferences(
+            @RequestParam final String userName,
+            @RequestBody final UserPreferencesDTO userNewPreferencesDTO) {
+
+        UserPreferencesDTO userPreferencesDTO = tourGuideService
+                .updateUserPreferences(getUser(userName),
+                        userNewPreferencesDTO);
+        return userPreferencesDTO;
     }
 
     /**

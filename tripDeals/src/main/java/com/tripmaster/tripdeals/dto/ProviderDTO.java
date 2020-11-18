@@ -66,13 +66,4 @@ public class ProviderDTO {
         return price;
     }
 
-    /**
-     * Serialization method.
-     */
-    @Override
-    public String toString() {
-        return "ProviderDTO [tripId=" + tripId + ", name=" + name + ", price="
-                + price + "]";
-    }
-
 }

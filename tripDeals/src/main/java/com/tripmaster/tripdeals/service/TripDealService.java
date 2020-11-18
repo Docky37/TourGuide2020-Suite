@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.tripmaster.tripdeals.dto.ProviderDTO;
@@ -31,7 +32,17 @@ public class TripDealService implements ITripDealService {
     /**
      * Declaration and initialization of a TripPricer instance.
      */
-    private TripPricer tripPricer = new TripPricer();
+    @Autowired
+    private TripPricer tripPricer;
+
+    /**
+     * Class constructor.
+     *
+     * @param pTripPricer
+     */
+    public TripDealService(final TripPricer pTripPricer) {
+        tripPricer = pTripPricer;
+    }
 
     /**
      * {@inheritDoc}
@@ -51,6 +62,7 @@ public class TripDealService implements ITripDealService {
         providers.forEach(p -> {
             providerDTOList.add(new ProviderDTO(
                     p.tripId, p.name, p.price));
+            System.out.println(p.toString());
         });
         return providerDTOList;
     }

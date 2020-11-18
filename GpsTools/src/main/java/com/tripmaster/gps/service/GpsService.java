@@ -28,7 +28,8 @@ public class GpsService implements IGpsService {
     /**
      * Create an instance of GpsUtil.
      */
-    private GpsUtil gpsUtil = new GpsUtil();
+    @Autowired
+    private GpsUtil gpsUtil;
 
     /**
      * Declaration of a AttractionMapping instance that will be injected by
@@ -55,11 +56,14 @@ public class GpsService implements IGpsService {
      *
      * @param pVisitedLocationMapping
      * @param pAttractionMapping
+     * @param pGpsUtil
      */
     public GpsService(final VisitedLocationMapping pVisitedLocationMapping,
-            final AttractionMapping pAttractionMapping) {
+            final AttractionMapping pAttractionMapping,
+            final GpsUtil pGpsUtil) {
         visitedLocationMapping = pVisitedLocationMapping;
         attractionMapping = pAttractionMapping;
+        gpsUtil = pGpsUtil;
     }
 
     /**

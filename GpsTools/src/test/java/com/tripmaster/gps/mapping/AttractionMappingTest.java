@@ -30,8 +30,6 @@ public class AttractionMappingTest {
         // WHEN
         AttractionDTO mappedAttraction = attractionMapping.mapToDTO(attraction);
         // THEN
-        assertThat(mappedAttraction.getAttractionId())
-                .isNotNull();
         assertThat(mappedAttraction.getAttractionName())
                 .isEqualTo(attraction.attractionName);
         assertThat(mappedAttraction.getCity()).isEqualTo(attraction.city);

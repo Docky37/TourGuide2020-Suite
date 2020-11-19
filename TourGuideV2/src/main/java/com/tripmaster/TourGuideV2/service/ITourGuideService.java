@@ -1,5 +1,6 @@
 package com.tripmaster.TourGuideV2.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -126,5 +127,25 @@ public interface ITourGuideService {
      */
     UserPreferencesDTO updateUserPreferences(User user,
             UserPreferencesDTO userNewPreferencesDTO);
+
+    /**
+     * This method gets userPreferences from User.
+     *
+     * @param user
+     * @return a UserPreferencesDTO
+     */
+    UserPreferencesDTO getPreferences(User user);
+
+    /**
+     * This method is used to add a new VisitedLocation.
+     *
+     * @param timeVisited
+     * @param latitude
+     * @param longitude
+     * @param user
+     * @return a VisitedLocationDTO
+     */
+    VisitedLocationDTO addVisitedLocation(Date timeVisited, double latitude,
+            double longitude, User user);
 
 }

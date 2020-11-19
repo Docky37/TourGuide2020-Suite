@@ -97,8 +97,7 @@ public class TourGuideService implements ITourGuideService {
      */
     @Autowired
     public TourGuideService(final IRewardsService pRewardsService,
-            @Qualifier("getWebClientTripDeals")
-                    final WebClient pWebClientTripDeals,
+            @Qualifier("getWebClientTripDeals") final WebClient pWebClientTripDeals,
             @Qualifier("getWebClientGps") final WebClient pWebClientGps) {
         rewardsService = pRewardsService;
         webClientGps = pWebClientGps;
@@ -160,6 +159,23 @@ public class TourGuideService implements ITourGuideService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public VisitedLocationDTO trackUserLocation(final User user) {
+        final String getLocationUri = "/getUserLocation?userId="
+                + user.getUserId();
+
+        VisitedLocationDTO visitedLocationDTO = webClientGps.get()
+                .uri(getLocationUri)
+                .retrieve()
+                .bodyToMono(VisitedLocationDTO.class)
+                .block();
+
+        return visitedLocationDTO;
+    }
+
+    /**
      * This method calls the VisitedLocations getter of User class and then if
      * the list is not empty, get the latest VisitedLocation , else it calls the
      * trackUserLocation method.
@@ -196,16 +212,15 @@ public class TourGuideService implements ITourGuideService {
      * {@inheritDoc}
      */
     @Override
-    public VisitedLocationDTO trackUserLocation(final User user) {
-        final String getLocationUri = "/getUserLocation?userId=" + user.getUserId();
-
-        VisitedLocationDTO visitedLocationDTO = webClientGps.get()
-                .uri(getLocationUri)
-                .retrieve()
-                .bodyToMono(VisitedLocationDTO.class)
-                .block();
-
-        return visitedLocationDTO;
+    public VisitedLocationDTO addVisitedLocation(Date timeVisited,
+            double latitude, double longitude, User user) {
+        VisitedLocation visitedLocation = new VisitedLocation(user.getUserId(),
+                new Location(latitude, longitude), timeVisited);
+        
+        user.addToVisitedLocations(visitedLocation);
+        rewardsService.calculateRewards(user, getAllAttractions());
+         
+        return getUserLocation(user);
     }
 
     /**
@@ -242,6 +257,31 @@ public class TourGuideService implements ITourGuideService {
      * {@inheritDoc}
      */
     @Override
+    public UserPreferencesDTO getPreferences(final User user) {
+        UserPreferences userPreferences = user.getUserPreferences();
+        UserPreferencesDTO userPreferencesDTO = new UserPreferencesDTO();
+        userPreferencesDTO.setAttractionProximity(
+                userPreferences.getAttractionProximity());
+        userPreferencesDTO.setHighPricePoint(
+                userPreferences.getHighPricePoint().getNumber().intValue());
+        userPreferencesDTO.setLowerPricePoint(
+                userPreferences.getLowerPricePoint().getNumber().intValue());
+        userPreferencesDTO.setNumberOfAdults(
+                userPreferences.getNumberOfAdults());
+        userPreferencesDTO.setNumberOfChildren(
+                userPreferences.getNumberOfChildren());
+        userPreferencesDTO.setTicketQuantity(
+                userPreferences.getTicketQuantity());
+        userPreferencesDTO.setTripDuration(
+                userPreferences.getTripDuration());
+
+        return userPreferencesDTO;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public UserPreferencesDTO updateUserPreferences(final User user,
             final UserPreferencesDTO userNewPreferencesDTO) {
         UserPreferences userPreferences = user.getUserPreferences();
@@ -262,23 +302,7 @@ public class TourGuideService implements ITourGuideService {
         userPreferences.setTripDuration(
                 userNewPreferencesDTO.getTripDuration());
 
-        UserPreferencesDTO updatedPreferences = new UserPreferencesDTO();
-        updatedPreferences.setAttractionProximity(
-                userPreferences.getAttractionProximity());
-        updatedPreferences.setHighPricePoint(
-                userPreferences.getHighPricePoint().getNumber().intValue());
-        updatedPreferences.setLowerPricePoint(
-                userPreferences.getLowerPricePoint().getNumber().intValue());
-        updatedPreferences.setNumberOfAdults(
-                userPreferences.getNumberOfAdults());
-        updatedPreferences.setNumberOfChildren(
-                userPreferences.getNumberOfChildren());
-        updatedPreferences.setTicketQuantity(
-                userPreferences.getTicketQuantity());
-        updatedPreferences.setTripDuration(
-                userPreferences.getTripDuration());
-
-        return updatedPreferences;
+        return getPreferences(user);
     }
 
     /**
@@ -380,8 +404,7 @@ public class TourGuideService implements ITourGuideService {
                 user.getLastVisitedLocation().getLocation().getLatitude(),
                 user.getLastVisitedLocation().getLocation().getLongitude()));
 
-        TreeMap<String, NearbyAttractionDTO> suggestedAttractions =
-                new TreeMap<>();
+        TreeMap<String, NearbyAttractionDTO> suggestedAttractions = new TreeMap<>();
         List<Attraction> attractionsList = getNearByAttractions(
                 user.getLastVisitedLocation());
         final AtomicInteger indexHolder = new AtomicInteger(1);

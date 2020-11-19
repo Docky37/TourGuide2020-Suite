@@ -46,7 +46,7 @@ public class RewardsController {
             @RequestParam final UUID userId) {
         logger.info("HTML GET Request on localhost:8787");
         int rewardPoints = rewardsService.getRewardPoints(attractionId, userId);
-        logger.info(" {} -> User {} reward = {} points", userId, rewardPoints);
+        logger.info(" User {} reward = {} points", userId, rewardPoints);
         return rewardPoints;
     }
 

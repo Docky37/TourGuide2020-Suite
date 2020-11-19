@@ -28,6 +28,7 @@ public class ProviderDTO {
      */
     public ProviderDTO(final UUID pTripId, final String pName,
             final double pPrice) {
+        this();
         tripId = pTripId;
         name = pName;
         price = pPrice;
@@ -36,7 +37,7 @@ public class ProviderDTO {
     /**
      * No parameters protected class constructor.
      */
-    protected ProviderDTO() {
+    private ProviderDTO() {
     }
 
     /**

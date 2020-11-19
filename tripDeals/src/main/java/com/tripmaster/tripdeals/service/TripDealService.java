@@ -41,7 +41,14 @@ public class TripDealService implements ITripDealService {
      * @param pTripPricer
      */
     public TripDealService(final TripPricer pTripPricer) {
+        this();
         tripPricer = pTripPricer;
+    }
+
+    /**
+     * Private empty constructor.
+     */
+    private TripDealService() {
     }
 
     /**

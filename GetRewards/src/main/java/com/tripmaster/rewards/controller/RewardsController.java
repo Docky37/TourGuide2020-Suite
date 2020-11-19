@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tripmaster.rewards.service.RewardsService;
+import com.tripmaster.rewards.service.IRewardsService;
 
 /**
  * The controller of GetRewards application exposes one endpoint (/getReward)
@@ -31,7 +31,7 @@ public class RewardsController {
      * RewardsService declaration, for Spring injection.
      */
     @Autowired
-    private RewardsService rewardsService;
+    private IRewardsService rewardsService;
 
     /**
      * HTML GET request used to get reward points from RewardsCentral jar

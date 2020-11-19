@@ -34,7 +34,7 @@ public class RewardsService implements IRewardsService {
     /**
      * No parameter class constructor.
      */
-    public RewardsService() {
+    private RewardsService() {
     }
 
     /**
@@ -43,6 +43,7 @@ public class RewardsService implements IRewardsService {
      * @param pRewardCentral
      */
     public RewardsService(final RewardCentral pRewardCentral) {
+        this();
         this.rewardsCentral = pRewardCentral;
     }
 

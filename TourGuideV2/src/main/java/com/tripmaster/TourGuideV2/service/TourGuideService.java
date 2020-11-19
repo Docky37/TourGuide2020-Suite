@@ -197,7 +197,7 @@ public class TourGuideService implements ITourGuideService {
      */
     @Override
     public VisitedLocationDTO trackUserLocation(final User user) {
-        final String getLocationUri = "/getLocation?userId=" + user.getUserId();
+        final String getLocationUri = "/getUserLocation?userId=" + user.getUserId();
 
         VisitedLocationDTO visitedLocationDTO = webClientGps.get()
                 .uri(getLocationUri)

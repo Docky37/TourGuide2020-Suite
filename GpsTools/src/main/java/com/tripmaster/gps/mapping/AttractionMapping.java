@@ -24,7 +24,7 @@ public class AttractionMapping {
      * @return an AttractionDTO
      */
     public AttractionDTO mapToDTO(final Attraction attraction) {
-        AttractionDTO attractionDTO = new AttractionDTO(
+        AttractionDTO attractionDTO = new AttractionDTO(attraction.attractionId,
                 attraction.attractionName, attraction.city, attraction.state,
                 attraction.latitude, attraction.longitude);
         System.out.println(attractionDTO.toString());

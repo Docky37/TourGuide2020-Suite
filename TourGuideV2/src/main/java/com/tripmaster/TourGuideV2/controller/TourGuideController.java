@@ -1,13 +1,16 @@
 package com.tripmaster.TourGuideV2.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -72,6 +75,32 @@ public class TourGuideController {
                 .getUserLocation(getUser(userName));
         logger.info(visitedLocationDTO.toString() + "\n");
         return visitedLocationDTO.getLocation();
+    }
+
+    /**
+     * HTML POST request that allows us to add a new visitedLocation.
+     * Implemented for tests, to simulate incoming information of an attraction
+     * visit to generate rewards.
+     *
+     * @param timeVisited
+     * @param latitude
+     * @param longitude
+     * @param username
+     * @return a VisitedLocationDTO
+     */
+    @PostMapping("/addVisitedLocation")
+    public VisitedLocationDTO addVisitedLocation(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+                    final Date timeVisited,
+            @RequestParam final double latitude,
+            @RequestParam final double longitude,
+            @RequestParam final String userName) {
+        logger.info("New HTML Post request on /addVisitedLocation for {}",
+                userName);
+        VisitedLocationDTO visitedLocationDTO = tourGuideService
+                .addVisitedLocation(timeVisited, latitude, longitude,
+                        getUser(userName));
+        return visitedLocationDTO;
     }
 
     /**
@@ -148,7 +177,7 @@ public class TourGuideController {
     }
 
     /**
-     * HTML GET request that returns user's preferences.
+     * HTML GET request that finds user's preferences by his userName.
      *
      * @param userName
      * @return a UserPreferencesDTO
@@ -156,7 +185,8 @@ public class TourGuideController {
     @GetMapping("/getUserPref")
     public UserPreferencesDTO getUserPreferences(
             @RequestParam final String userName) {
-        UserPreferencesDTO userPref = new UserPreferencesDTO();
+        UserPreferencesDTO userPref = tourGuideService
+                .getPreferences(getUser(userName));
 
         return userPref;
     }

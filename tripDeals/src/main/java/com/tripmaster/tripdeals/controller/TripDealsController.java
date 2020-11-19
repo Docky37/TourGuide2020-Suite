@@ -50,13 +50,13 @@ public class TripDealsController {
     public List<ProviderDTO> getTripDeals(
             @RequestParam final String tripPricerApiKey,
             @RequestParam final UUID userId,
-            @RequestParam final int numberOfAdult,
+            @RequestParam final int numberOfAdults,
             @RequestParam final int numberOfChildren,
             @RequestParam final int tripDuration,
             @RequestParam final int cumulatativeRewardPoints) {
         logger.info("HTML GET Request /getTripDeals on localhost:8889");
         List<ProviderDTO> providerDTOList = tripDealService.getTripDeals(
-                tripPricerApiKey, userId, numberOfAdult, numberOfChildren,
+                tripPricerApiKey, userId, numberOfAdults, numberOfChildren,
                 tripDuration, cumulatativeRewardPoints);
         if (providerDTOList.isEmpty()) {
             logger.info("Sorry we don't find any trip deal!");

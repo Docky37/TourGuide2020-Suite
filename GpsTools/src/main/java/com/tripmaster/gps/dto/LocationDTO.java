@@ -26,14 +26,15 @@ public class LocationDTO {
      * @param pLongitude
      */
     public LocationDTO(final double pLatitude, final double pLongitude) {
+        this();
         latitude = pLatitude;
         longitude = pLongitude;
     }
 
     /**
-     * No argument and protected empty  constructor.
+     * No argument and private empty  constructor.
      */
-    protected LocationDTO() {
+    private LocationDTO() {
     }
 
     /**

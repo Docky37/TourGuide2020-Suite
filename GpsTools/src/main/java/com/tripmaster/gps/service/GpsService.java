@@ -48,7 +48,7 @@ public class GpsService implements IGpsService {
     /**
      * No argument empty constructor.
      */
-    public GpsService() {
+    private GpsService() {
     }
 
     /**
@@ -61,6 +61,7 @@ public class GpsService implements IGpsService {
     public GpsService(final VisitedLocationMapping pVisitedLocationMapping,
             final AttractionMapping pAttractionMapping,
             final GpsUtil pGpsUtil) {
+        this();
         visitedLocationMapping = pVisitedLocationMapping;
         attractionMapping = pAttractionMapping;
         gpsUtil = pGpsUtil;

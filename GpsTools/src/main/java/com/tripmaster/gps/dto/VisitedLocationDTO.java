@@ -40,15 +40,16 @@ public class VisitedLocationDTO {
      */
     public VisitedLocationDTO(final LocationDTO pLocation,
             final Date pTimeVisited, final UUID pUserId) {
+        this();
         timeVisited = (Date) pTimeVisited.clone();
         location = pLocation;
         userId = pUserId;
     }
 
     /**
-     * No argument and protected empty class constructor.
+     * No argument and private empty class constructor.
      */
-    protected VisitedLocationDTO() {
+    private VisitedLocationDTO() {
     }
 
     /**

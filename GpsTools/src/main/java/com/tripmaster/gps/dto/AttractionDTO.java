@@ -54,6 +54,7 @@ public class AttractionDTO {
     public AttractionDTO(final UUID pAttractionId, final String pAttractionName,
             final String pCity, final String pState,
             final double pLatitude, final double pLongitude) {
+        this();
         attractionId = pAttractionId;
         attractionName = pAttractionName;
         city = pCity;
@@ -63,9 +64,9 @@ public class AttractionDTO {
     }
 
     /**
-     * No argument and protected empty class constructor.
+     * No argument and private empty class constructor.
      */
-    protected AttractionDTO() {
+    private AttractionDTO() {
     }
 
     /**

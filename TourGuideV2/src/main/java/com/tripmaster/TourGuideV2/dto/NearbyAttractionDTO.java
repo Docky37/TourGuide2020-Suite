@@ -30,7 +30,7 @@ public class NearbyAttractionDTO {
     /**
      * Empty class constructor.
      */
-    protected NearbyAttractionDTO() {
+    private NearbyAttractionDTO() {
     }
 
     /**
@@ -42,6 +42,7 @@ public class NearbyAttractionDTO {
      */
     public NearbyAttractionDTO(final LocationDTO pAttractionLocation,
             final double pDistance, final int pUserReward) {
+        this();
         attractionLocation = pAttractionLocation;
         distance = pDistance;
         userReward = pUserReward;
@@ -57,15 +58,6 @@ public class NearbyAttractionDTO {
     }
 
     /**
-     * Setter of attractionLocation.
-     *
-     * @param pAttractionLocation
-     */
-    public void setAttractionLocation(final LocationDTO pAttractionLocation) {
-        this.attractionLocation = pAttractionLocation;
-    }
-
-    /**
      * Getter of distance.
      *
      * @return a double, the distance userLocation attraction.location in miles
@@ -75,30 +67,12 @@ public class NearbyAttractionDTO {
     }
 
     /**
-     * Setter of distance.
-     *
-     * @param pDistance
-     */
-    public void setDistance(final double pDistance) {
-        distance = pDistance;
-    }
-
-    /**
      * Getter of userReward.
      *
      * @return a UserReward object
      */
     public int getUserReward() {
         return userReward;
-    }
-
-    /**
-     * Setter of userReward.
-     *
-     * @param pUserReward
-     */
-    public void setUserReward(final int pUserReward) {
-        userReward = pUserReward;
     }
 
 }

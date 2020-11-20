@@ -1,4 +1,15 @@
 // TourGuideV2
+// SPOTBUGS
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.6.0"
+  }
+}
 
 plugins {
 	id 'org.springframework.boot' version '2.4.0'
@@ -6,7 +17,10 @@ plugins {
 	id 'java'
 	id 'jacoco'
 	id 'checkstyle'
+	id "com.github.spotbugs" version "4.6.0"
 }
+
+apply plugin: "com.github.spotbugs"
 apply plugin: 'io.spring.dependency-management'
 
 group = 'com.trip-master'
@@ -43,6 +57,7 @@ bootJar {
     manifest {
         attributes 'Start-Class': 'com.tripmaster.TourGuideV2.TourGuideV2Application'
     }
+    
 }
 
 // TESTS ***********************************************************************
@@ -133,5 +148,11 @@ tasks.withType(Checkstyle) {
     reports {
         xml.enabled false
         html.enabled true
+    }
+}
+spotbugsMain {
+    reports {
+        xml.enabled = false
+        html.enabled = true
     }
 }

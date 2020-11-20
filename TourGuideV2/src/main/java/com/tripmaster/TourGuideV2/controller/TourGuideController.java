@@ -218,7 +218,7 @@ public class TourGuideController {
      */
     @GetMapping("/getTripDeals")
     public List<ProviderDTO> getTripDeals(@RequestParam final String userName) {
-        logger.info("New HTML Request on /getRewards for {}", userName);
+        logger.info("New HTML Request on /getTripdeals for {}", userName);
         List<ProviderDTO> providers = tourGuideService
                 .getTripDeals(getUser(userName));
         return providers;

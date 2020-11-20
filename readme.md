@@ -35,9 +35,9 @@ Previously in TourGuide2020:
 1. This repository is divided in 4 parts; each one contains a SpringBoot v2.4.0 application built on Gradle v6.7
 2. The build.gradle file of each part allows you to export the bootJar file by running '**gradle bootJar**' command. Before to run it, check that you are in the application root directory.
 3. Exported file is located in build/libs sub-folder and, for the moment, need to be renamed (respectively as gps, rewards, tripdeals & tourguidev2). *I will do my best to change that!*
-4. At the root of each application you can find the Dockerfile that allows you to create a Docker image of the application with the Docker command  '**docker build -t imageName . **' with respectively gps, rewards, tripdeals and tourguide as imageName.
+4. At the root of each application you can find the Dockerfile that allows you to create a Docker image of the application with the Docker command  '**docker build -t imageName.**' with respectively gps, rewards, tripdeals and tourguide as imageName.
 5. When the 4 images are created, change directory to the repository root, where you can fin the docker-compose.yml file. 
-Here the command '** docker-compose up -d **' will run the 4 containers. 
+Here the command '**docker-compose up -d**' will run the 4 containers. 
 Warning: TourGuide depends on the 3 others application and is launched after them. But it is possible that TourGuide request gps before gps is ready and TourGuide can exit. Its easy to check that with Docker Desktop and easy to launch it again.
 6. You are now ready to check all my job with the Postman request collection joined in the repository root folder.
 

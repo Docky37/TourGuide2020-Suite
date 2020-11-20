@@ -65,7 +65,7 @@ public class TripDealsControllerTest {
         mvc.perform(
                 MockMvcRequestBuilders.get("/getTripDeals?userId=" + userId
                         + "&tripPricerApiKey=test-server-api-key"
-                        + "&numberOfAdult=2&numberOfChildren=0"
+                        + "&numberOfAdults=2&numberOfChildren=0"
                         + "&tripDuration=3&cumulatativeRewardPoints=5673")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -90,7 +90,7 @@ public class TripDealsControllerTest {
         mvc.perform(
                 MockMvcRequestBuilders.get("/getTripDeals?userId=" + userId
                         + "&tripPricerApiKey=test-server-api-key"
-                        + "&numberOfAdult=2&numberOfChildren=0"
+                        + "&numberOfAdults=2&numberOfChildren=0"
                         + "&tripDuration=3&cumulatativeRewardPoints=0")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())

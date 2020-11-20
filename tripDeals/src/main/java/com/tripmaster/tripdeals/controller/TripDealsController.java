@@ -40,7 +40,7 @@ public class TripDealsController {
      *
      * @param tripPricerApiKey
      * @param userId
-     * @param numberOfAdult
+     * @param numberOfAdults
      * @param numberOfChildren
      * @param tripDuration
      * @param cumulatativeRewardPoints

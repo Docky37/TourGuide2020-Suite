@@ -1,0 +1,475 @@
+{
+	"info": {
+		"_postman_id": "0b6c5e3c-20b6-49b4-aeef-2167c72d2849",
+		"name": "TourGuide 2020 Suite",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "TourGuideV2  -  Docker container 'tourguide'",
+			"item": [
+				{
+					"name": "http://localhost:8080/   -> Greetings from TourGuide!",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8080/getLocation  (by userName)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/getLocation?userName=internalUser99",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"getLocation"
+							],
+							"query": [
+								{
+									"key": "userName",
+									"value": "internalUser99"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8080/getNearbyAttractions (by userName)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/getNearbyAttractions?userName=internalUser7",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"getNearbyAttractions"
+							],
+							"query": [
+								{
+									"key": "userName",
+									"value": "internalUser7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8080/getRewards  (by userName)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/getRewards?userName=internalUser77",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"getRewards"
+							],
+							"query": [
+								{
+									"key": "userName",
+									"value": "internalUser77"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8080/getAllCurrentLocations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/getAllCurrentLocations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"getAllCurrentLocations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8080/getTripDeals (by userName)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/getTripDeals?userName=internalUser77",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"getTripDeals"
+							],
+							"query": [
+								{
+									"key": "userName",
+									"value": "internalUser77"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8080/getAllAttractions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/getAllAttractions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"getAllAttractions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8080/getUserPref (by userName)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/getUserPref?userName=internalUser77",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"getUserPref"
+							],
+							"query": [
+								{
+									"key": "userName",
+									"value": "internalUser77"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8080/updatePreferences by userName",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"attractionProximity\": 500,\r\n    \"lowerPricePoint\": 0,\r\n    \"highPricePoint\": 600,\r\n    \"tripDuration\": 15,\r\n    \"ticketQuantity\": 5,\r\n    \"numberOfAdults\": 2,\r\n    \"numberOfChildren\": 3\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/updatePreferences?userName=internalUser77",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"updatePreferences"
+							],
+							"query": [
+								{
+									"key": "userName",
+									"value": "internalUser77"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8080/addVisitedLocation (4 parameters)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/addVisitedLocation?timeVisited=2020-11-19T20:25:44.&latitude=33.817595&longitude=-117.922008&userName=internalUser77",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"addVisitedLocation"
+							],
+							"query": [
+								{
+									"key": "timeVisited",
+									"value": "2020-11-19T20:25:44."
+								},
+								{
+									"key": "latitude",
+									"value": "33.817595"
+								},
+								{
+									"key": "longitude",
+									"value": "-117.922008"
+								},
+								{
+									"key": "userName",
+									"value": "internalUser77"
+								}
+							]
+						},
+						"description": "Post request used in order to:\r\n- add a new VisitedLocation, to the given User, with the location data of an attraction.\r\nand\r\n- calculate reward for this visit."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "GpsTools  -  Docker container  'gps'",
+			"item": [
+				{
+					"name": "Request on localhost:8889/getUserLocation (gps container)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8889/getUserLocation?userId=81af8419-8e6c-4911-aadd-67277d29307f",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8889",
+							"path": [
+								"getUserLocation"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "81af8419-8e6c-4911-aadd-67277d29307f"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request on localhost:8889/getAllAttractions (gps container)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8889/getAllAttractions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8889",
+							"path": [
+								"getAllAttractions"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Application 'GpsTools' deployed in 'gps' Docker container.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "38e975e4-7060-419f-91b4-8d4aeea5c5de",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "b76894dc-d302-49e9-b1a2-8df09a5227fb",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "GetRewards - Docker container 'rewards'",
+			"item": [
+				{
+					"name": "Request on localhost:8787/getReward",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8787/getReward?attractionId=bbd72d01-0d18-4639-8f23-72485047f1ed&userId=f815142d-5f6d-4568-8ff9-d573bfe5532d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8787",
+							"path": [
+								"getReward"
+							],
+							"query": [
+								{
+									"key": "attractionId",
+									"value": "bbd72d01-0d18-4639-8f23-72485047f1ed"
+								},
+								{
+									"key": "userId",
+									"value": "f815142d-5f6d-4568-8ff9-d573bfe5532d"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Application 'GetRewards' deployed in 'rewards' Docker container.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "541ec372-0b7e-48f6-b6ba-9cfed26512c1",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "abedd203-d6c3-4fb6-8378-5c290342de69",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "TripDeals - Docker container 'tripdeals'",
+			"item": [
+				{
+					"name": "http://localhost:8888/getTripDeals (6 params)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8888/getTripDeals?tripPricerApiKey=test-server-api-key&userId=f815142d-5f6d-4568-8ff9-d573bfe5532d&numberOfAdults=2&numberOfChildren=3&tripDuration=15&cumulatativeRewardPoints=1782",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8888",
+							"path": [
+								"getTripDeals"
+							],
+							"query": [
+								{
+									"key": "tripPricerApiKey",
+									"value": "test-server-api-key"
+								},
+								{
+									"key": "userId",
+									"value": "f815142d-5f6d-4568-8ff9-d573bfe5532d"
+								},
+								{
+									"key": "numberOfAdults",
+									"value": "2"
+								},
+								{
+									"key": "numberOfChildren",
+									"value": "3"
+								},
+								{
+									"key": "tripDuration",
+									"value": "15"
+								},
+								{
+									"key": "cumulatativeRewardPoints",
+									"value": "1782"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Application 'TripDeals' deployed in 'tripdeals' Docker container.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b19af98e-3c0b-4b96-8741-88d4eff8dd1a",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "32948ba7-67ef-47ac-b1e8-66cc5f6d3331",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -85,7 +85,7 @@ public class TourGuideController {
      * @param timeVisited
      * @param latitude
      * @param longitude
-     * @param username
+     * @param userName
      * @return a VisitedLocationDTO
      */
     @PostMapping("/addVisitedLocation")

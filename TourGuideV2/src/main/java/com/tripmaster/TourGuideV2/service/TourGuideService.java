@@ -97,7 +97,8 @@ public class TourGuideService implements ITourGuideService {
      */
     @Autowired
     public TourGuideService(final IRewardsService pRewardsService,
-            @Qualifier("getWebClientTripDeals") final WebClient pWebClientTripDeals,
+            @Qualifier("getWebClientTripDeals")
+                    final WebClient pWebClientTripDeals,
             @Qualifier("getWebClientGps") final WebClient pWebClientGps) {
         rewardsService = pRewardsService;
         webClientGps = pWebClientGps;
@@ -212,14 +213,14 @@ public class TourGuideService implements ITourGuideService {
      * {@inheritDoc}
      */
     @Override
-    public VisitedLocationDTO addVisitedLocation(Date timeVisited,
-            double latitude, double longitude, User user) {
+    public VisitedLocationDTO addVisitedLocation(final Date timeVisited,
+            final double latitude, final double longitude, final User user) {
         VisitedLocation visitedLocation = new VisitedLocation(user.getUserId(),
                 new Location(latitude, longitude), timeVisited);
-        
+
         user.addToVisitedLocations(visitedLocation);
         rewardsService.calculateRewards(user, getAllAttractions());
-         
+
         return getUserLocation(user);
     }
 
@@ -404,7 +405,8 @@ public class TourGuideService implements ITourGuideService {
                 user.getLastVisitedLocation().getLocation().getLatitude(),
                 user.getLastVisitedLocation().getLocation().getLongitude()));
 
-        TreeMap<String, NearbyAttractionDTO> suggestedAttractions = new TreeMap<>();
+        TreeMap<String, NearbyAttractionDTO> suggestedAttractions =
+                new TreeMap<>();
         List<Attraction> attractionsList = getNearByAttractions(
                 user.getLastVisitedLocation());
         final AtomicInteger indexHolder = new AtomicInteger(1);

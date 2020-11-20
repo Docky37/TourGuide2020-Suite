@@ -21,8 +21,8 @@ public class TourGuideModule {
      */
     @Bean
     public WebClient getWebClientTripDeals() {
-        //return WebClient.create("http://tripdeals:8888"); // for Docker
-        return WebClient.create("http://127.0.0.1:8888"); //   run from IDE
+        return WebClient.create("http://tripdeals:8888"); // for Docker
+        //return WebClient.create("http://127.0.0.1:8888"); //   run from IDE
     }
 
     /**
@@ -32,8 +32,8 @@ public class TourGuideModule {
      */
     @Bean
     public WebClient getWebClientGps() {
-        //return WebClient.create("http://gps:8889");
-        return WebClient.create("http://127.0.0.1:8889");
+        return WebClient.create("http://gps:8889");
+        //return WebClient.create("http://127.0.0.1:8889");
     }
 
     /**
@@ -43,8 +43,8 @@ public class TourGuideModule {
      */
     @Bean
     public WebClient getWebClientReward() {
-        //return WebClient.create("http://rewards:8787");
-        return WebClient.create("http://127.0.0.1:8787");
+        return WebClient.create("http://rewards:8787");
+        //return WebClient.create("http://127.0.0.1:8787");
     }
 
 }

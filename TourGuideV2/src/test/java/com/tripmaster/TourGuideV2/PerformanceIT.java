@@ -2,7 +2,6 @@ package com.tripmaster.TourGuideV2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -23,7 +22,6 @@ import com.tripmaster.TourGuideV2.domain.Attraction;
 import com.tripmaster.TourGuideV2.domain.Location;
 import com.tripmaster.TourGuideV2.domain.User;
 import com.tripmaster.TourGuideV2.domain.VisitedLocation;
-import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 
 import com.tripmaster.TourGuideV2.helper.InternalTestHelper;
 import com.tripmaster.TourGuideV2.service.IRewardsService;

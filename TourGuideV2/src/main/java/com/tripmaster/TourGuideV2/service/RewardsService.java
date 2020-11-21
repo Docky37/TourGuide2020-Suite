@@ -1,6 +1,7 @@
 package com.tripmaster.TourGuideV2.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -185,11 +186,13 @@ public class RewardsService implements IRewardsService {
      * @return an int: the count of reward points
      */
     public int getRewardPoints(final Attraction attraction, final User user) {
-        return webClientReward.get()
+        Optional<Integer> optInt = Optional.ofNullable(webClientReward.get()
                 .uri("/getReward?attractionId=" + attraction.getAttractionId()
                         + "&userId=" + user.getUserId())
                 .retrieve()
-                .bodyToMono(Integer.class).block();
+                .bodyToMono(Integer.class).block());
+
+        return optInt.isEmpty() ? 0 : optInt.get();
     }
 
     /**

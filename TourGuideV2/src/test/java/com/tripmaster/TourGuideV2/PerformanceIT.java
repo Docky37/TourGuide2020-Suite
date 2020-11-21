@@ -75,8 +75,7 @@ public class PerformanceIT {
         TourGuideService tourGuideService = new TourGuideService(
                 rewardsService, webClientTripDeals, webClientGps);
 
-        List<User> allUsers = new ArrayList<>();
-        allUsers = tourGuideService.getAllUsers();
+        List<User> allUsers = tourGuideService.getAllUsers();
 
         ExecutorService executorService = Executors.newFixedThreadPool(100);
         CountDownLatch countDownLatch = new CountDownLatch(allUsers.size());
@@ -87,7 +86,7 @@ public class PerformanceIT {
         stopWatch.start();
 
         allUsers.forEach(u -> executorService.submit(() -> {
-            VisitedLocationDTO result = tourGuideService.trackUserLocation(u);
+            tourGuideService.trackUserLocation(u);
             countDownLatch.countDown();
             System.out.println(countDownLatch.getCount());
         }));

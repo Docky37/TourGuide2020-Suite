@@ -38,7 +38,7 @@ public class VisitedLocationDTO {
      */
     public VisitedLocationDTO(final LocationDTO pLocation,
             final Date pTimeVisited, final UUID pUserId) {
-        timeVisited = pTimeVisited;
+        timeVisited = (Date) pTimeVisited.clone();
         location = pLocation;
         userId = pUserId;
     }
@@ -64,7 +64,7 @@ public class VisitedLocationDTO {
      * @return a LocalDateTime
      */
     public Date getTimeVisited() {
-        return timeVisited;
+        return (Date) timeVisited.clone();
     }
 
     /**

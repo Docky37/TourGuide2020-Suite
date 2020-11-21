@@ -350,9 +350,7 @@ public class TourGuideService implements ITourGuideService {
             final VisitedLocation visitedLocation) {
         List<Attraction> listOfAttraction = getAllAttractions();
 
-        List<Attraction> nearbyFiveAttractions = new ArrayList<>();
-
-        nearbyFiveAttractions = listOfAttraction.stream()
+        List<Attraction> nearbyFiveAttractions = listOfAttraction.stream()
                 .sorted(Comparator.comparingDouble(a -> rewardsService
                         .getDistance(a, visitedLocation.getLocation())))
                 .limit(SIZE_OF_NEARBY_ATTRACTIONS_LIST)
@@ -506,6 +504,11 @@ public class TourGuideService implements ITourGuideService {
     private static final int THIRTY = 30;
 
     /**
+     * Constant that we reuse inside the constructor with.
+     */
+    private static final Random RANDOM = new Random();
+
+    /**
      * This method creates users for tests.
      */
     private void initializeInternalUsers() {
@@ -553,7 +556,7 @@ public class TourGuideService implements ITourGuideService {
     private double generateRandomLongitude() {
         double leftLimit = LONGITUDE_WEST_LIMIT;
         double rightLimit = LONGITUDE_EAST_LIMIT;
-        return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
+        return leftLimit + RANDOM.nextDouble() * (rightLimit - leftLimit);
     }
 
     /**
@@ -564,7 +567,7 @@ public class TourGuideService implements ITourGuideService {
     private double generateRandomLatitude() {
         double leftLimit = LATITUDE_NORTH_LIMIT;
         double rightLimit = LATITUDE_SOUTH_LIMIT;
-        return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
+        return leftLimit + RANDOM.nextDouble() * (rightLimit - leftLimit);
     }
 
     /**
@@ -574,7 +577,7 @@ public class TourGuideService implements ITourGuideService {
      */
     private Date getRandomTime() {
         LocalDateTime localDateTime = LocalDateTime.now()
-                .minusDays(new Random().nextInt(THIRTY));
+                .minusDays(RANDOM.nextInt(THIRTY));
         return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
     }
 

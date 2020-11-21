@@ -9,11 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tripmaster.TourGuideV2.domain.Attraction;
@@ -27,6 +29,8 @@ import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 import com.tripmaster.TourGuideV2.service.ITourGuideService;
 import com.tripmaster.TourGuideV2.service.TourGuideService;
+
+import io.swagger.annotations.ApiOperation;
 
 /**
  * This controller exposes five endPoints to that gives TourGuide
@@ -55,6 +59,8 @@ public class TourGuideController {
      *
      * @return a String, the welcome message
      */
+    @ApiOperation(value = "Return a welcome message.",
+            response = String.class)
     @GetMapping("/")
     public String index() {
         logger.info("New HTML Request on /");
@@ -68,6 +74,11 @@ public class TourGuideController {
      * @param userName
      * @return a String
      */
+    @ApiOperation(value = "Return the GPS location of the user who responds"
+            + " to the given userName parameter.",
+            notes = "TourGuideV2 uses a WebClient to request an endpoint of"
+                    + " GpsTools microservice that uses GpsUtil.jar.",
+            response = LocationDTO.class)
     @GetMapping("/getLocation")
     public LocationDTO getLocation(@RequestParam final String userName) {
         logger.info("New HTML Request on /getLocation for {}", userName);
@@ -88,10 +99,16 @@ public class TourGuideController {
      * @param userName
      * @return a VisitedLocationDTO
      */
+    @ApiOperation(value = "Allows you to add a new VisitedLocation for the user"
+            + " who responds to the given userName parameter.",
+            notes = "Implemented for tests, to simulate incoming information"
+                    + " of an attraction visit in order to generate a reward.",
+            response = VisitedLocationDTO.class)
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/addVisitedLocation")
     public VisitedLocationDTO addVisitedLocation(
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-                    final Date timeVisited,
+            final Date timeVisited,
             @RequestParam final double latitude,
             @RequestParam final double longitude,
             @RequestParam final String userName) {
@@ -108,6 +125,11 @@ public class TourGuideController {
      *
      * @return a List<AttractionDTO>
      */
+    @ApiOperation(value = "Return the list of all attractions",
+            notes = "The list of attractions is provided by GpsUtil.jar,"
+            + " currently it only contains 26 attractions all located"
+            + " in United States.",
+            response = AttractionDTO.class, responseContainer = "List")
     @GetMapping("/getAllAttractions")
     public List<AttractionDTO> getAllAttractions() {
         List<Attraction> attractions = tourGuideService.getAllAttractions();
@@ -124,6 +146,7 @@ public class TourGuideController {
      * HTML GET request that get the n closest tourist attractions to the user,
      * no matter how far away they are. The number n of attraction is defined by
      * the SIZE_OF_NEARBY_ATTRACTIONS_LIST constant of TourGuideService.
+     * Currently set to 5.
      *
      * @param userName
      * @return an AttractionsSuggestionDTO that contains the user location, and
@@ -138,6 +161,20 @@ public class TourGuideController {
      * @see AttractionsSuggestionDTO
      * @see NearbyAttractionDTO
      */
+    @ApiOperation(value = "Returns the 5 closest tourist attractions to the"
+            + "current user no matter how far away they are.",
+            notes = "Returns an AttractionsSuggestionDTO that contains the user"
+                    + " location, and a TreeMap with attractionName as String"
+                    + " key and a NearbyAttractionDTO as value."
+                    + " The attractionName is  prefixed by a index (1 to"
+                    + " SIZE_OF_NEARBY_ATTRACTIONS_LIST constant (set to 5)"
+                    + " in relation with the distance, in order to sort the"
+                    + " TreeMap to display suggested attractions from the"
+                    + " nearest to the farthest. The NearbyAttractionDTO"
+                    + " contains the location (latitude, longitude) of the"
+                    + " attraction, its distance from user location,"
+                    + " and the reward points for its visit.",
+            response = AttractionsSuggestionDTO.class)
     @GetMapping("/getNearbyAttractions")
     public AttractionsSuggestionDTO getNearbyAttractions(
             @RequestParam final String userName) {
@@ -156,6 +193,11 @@ public class TourGuideController {
      * @param userName
      * @return a String the serialized List of UserRewwards
      */
+    @ApiOperation(value = "Returns a list of UserRewards of the user who"
+            + " responds to the given userName parameter.",
+            notes = "TourGuideV2 uses a WebClient to request an endpoint of"
+                    + "GetRewards microservice that uses GetPricer.jar.",
+            response = UserRewardsDTO.class)
     @GetMapping("/getRewards")
     public UserRewardsDTO getRewards(@RequestParam final String userName) {
         logger.info("New HTML Request on /getRewards for {}", userName);
@@ -170,6 +212,9 @@ public class TourGuideController {
      *         {"019b04a9-067a-4c76-8817-ee75088c3822":
      *         {"longitude":-48.188821,"latitude":74.84371} ... }
      */
+    @ApiOperation(value = "Returns the list of all users' location.",
+            notes = "The location of each user corresponds to the latest"
+                    + " location stored in his location history.")
     @GetMapping("/getAllCurrentLocations")
     public Map<String, LocationDTO> getAllCurrentLocations() {
         logger.info("New HTML Request on /getAllCurrentLocations");
@@ -182,6 +227,10 @@ public class TourGuideController {
      * @param userName
      * @return a UserPreferencesDTO
      */
+    @ApiOperation(value = "Returns preferences of the users who"
+                    + " responds to the given userName parameter.",
+            notes = "",
+            response = UserPreferencesDTO.class)
     @GetMapping("/getUserPref")
     public UserPreferencesDTO getUserPreferences(
             @RequestParam final String userName) {
@@ -198,6 +247,11 @@ public class TourGuideController {
      * @param userNewPreferencesDTO
      * @return a UserPreferencesDTO
      */
+    @ApiOperation(value = "Allows us to update the preferences of the users who"
+                    + " responds to the given userName parameter.",
+            notes = "TODO: This functionality need to be updated with a limited"
+                    + " scope where user can only updates his own preferences.",
+            response = UserPreferencesDTO.class)
     @PutMapping("/updatePreferences")
     public UserPreferencesDTO updatePreferences(
             @RequestParam final String userName,
@@ -216,6 +270,14 @@ public class TourGuideController {
      * @param userName
      * @return a String
      */
+    @ApiOperation(value = "Returns a List of TripDeals suggested to the user"
+                    + " who responds to the given userName parameter.",
+            notes = "TourGuideV2 uses a WebClient to request an endpoint of"
+                    + "TripDeals microservice that uses TripPricer.jar.\n"
+                    + "Warning: It seems that TripPricer do not take in account"
+                    + " all the users' preferences.",
+            response = ProviderDTO.class, responseContainer = "List")
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/getTripDeals")
     public List<ProviderDTO> getTripDeals(@RequestParam final String userName) {
         logger.info("New HTML Request on /getTripdeals for {}", userName);

@@ -6,8 +6,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
- * This class defines 3 WebClient beans that allows TourGuide to send requests
- * to the other application of TourGuide2020-Suite.
+ * This class used in dev profile defines 3 WebClient beans that allows
+ * TourGuide to send requests to the other application of TourGuide2020-Suite.
+ * This configuration allows to makes the 4 micro-services to run and
+ * communicate in your IDE.
  *
  * @author TripMaster
  * @author Thierry Schreiner
@@ -23,7 +25,7 @@ public class TourGuideModule {
      */
     @Bean
     public WebClient getWebClientTripDeals() {
-        return WebClient.create("http://127.0.0.1:8888"); //   run from IDE
+        return WebClient.create("http://127.0.0.1:8888"); // run from IDE
     }
 
     /**

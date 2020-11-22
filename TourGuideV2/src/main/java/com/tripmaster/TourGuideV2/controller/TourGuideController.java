@@ -55,7 +55,7 @@ public class TourGuideController {
     private ITourGuideService tourGuideService;
 
     /**
-     * HTML GET request that returns a welcome message.
+     * HTTP GET request that returns a welcome message.
      *
      * @return a String, the welcome message
      */
@@ -63,12 +63,12 @@ public class TourGuideController {
             response = String.class)
     @GetMapping("/")
     public String index() {
-        logger.info("New HTML Request on /");
+        logger.info("New HTTP Request on /");
         return "Greetings from TourGuide!";
     }
 
     /**
-     * HTML GET request that returns the location of the user who responds to
+     * HTTP GET request that returns the location of the user who responds to
      * the given userName parameter.
      *
      * @param userName
@@ -81,7 +81,7 @@ public class TourGuideController {
             response = LocationDTO.class)
     @GetMapping("/getLocation")
     public LocationDTO getLocation(@RequestParam final String userName) {
-        logger.info("New HTML Request on /getLocation for {}", userName);
+        logger.info("New HTTP Request on /getLocation for {}", userName);
         VisitedLocationDTO visitedLocationDTO = tourGuideService
                 .getUserLocation(getUser(userName));
         logger.info(visitedLocationDTO.toString() + "\n");
@@ -89,7 +89,7 @@ public class TourGuideController {
     }
 
     /**
-     * HTML POST request that allows us to add a new visitedLocation.
+     * HTTP POST request that allows us to add a new visitedLocation.
      * Implemented for tests, to simulate incoming information of an attraction
      * visit to generate rewards.
      *
@@ -112,7 +112,7 @@ public class TourGuideController {
             @RequestParam final double latitude,
             @RequestParam final double longitude,
             @RequestParam final String userName) {
-        logger.info("New HTML Post request on /addVisitedLocation for {}",
+        logger.info("New HTTP Post request on /addVisitedLocation for {}",
                 userName);
         VisitedLocationDTO visitedLocationDTO = tourGuideService
                 .addVisitedLocation(timeVisited, latitude, longitude,
@@ -121,7 +121,7 @@ public class TourGuideController {
     }
 
     /**
-     * HTML GET request that return a list of all attractions.
+     * HTTP GET request that return a list of all attractions.
      *
      * @return a List<AttractionDTO>
      */
@@ -143,7 +143,7 @@ public class TourGuideController {
     }
 
     /**
-     * HTML GET request that get the n closest tourist attractions to the user,
+     * HTTP GET request that get the n closest tourist attractions to the user,
      * no matter how far away they are. The number n of attraction is defined by
      * the SIZE_OF_NEARBY_ATTRACTIONS_LIST constant of TourGuideService.
      * Currently set to 5.
@@ -178,7 +178,7 @@ public class TourGuideController {
     @GetMapping("/getNearbyAttractions")
     public AttractionsSuggestionDTO getNearbyAttractions(
             @RequestParam final String userName) {
-        logger.info("New HTML Request on /getNearbyAttractions for {}",
+        logger.info("New HTTP Request on /getNearbyAttractions for {}",
                 userName);
         AttractionsSuggestionDTO suggestion = tourGuideService
                 .getAttractionsSuggestion(getUser(userName));
@@ -187,7 +187,7 @@ public class TourGuideController {
     }
 
     /**
-     * HTML GET request that returns a List of UserRewwards of the user who
+     * HTTP GET request that returns a List of UserRewwards of the user who
      * responds to the given userName parameter.
      *
      * @param userName
@@ -200,12 +200,12 @@ public class TourGuideController {
             response = UserRewardsDTO.class)
     @GetMapping("/getRewards")
     public UserRewardsDTO getRewards(@RequestParam final String userName) {
-        logger.info("New HTML Request on /getRewards for {}", userName);
+        logger.info("New HTTP Request on /getRewards for {}", userName);
         return tourGuideService.getUserRewards(getUser(userName));
     }
 
     /**
-     * HTML GET request that returns a List of every user's most recent location
+     * HTTP GET request that returns a List of every user's most recent location
      * using user's current location stored in location history.
      *
      * @return a JSON mapping of userId to Locations similar to:
@@ -217,12 +217,12 @@ public class TourGuideController {
                     + " location stored in his location history.")
     @GetMapping("/getAllCurrentLocations")
     public Map<String, LocationDTO> getAllCurrentLocations() {
-        logger.info("New HTML Request on /getAllCurrentLocations");
+        logger.info("New HTTP Request on /getAllCurrentLocations");
         return tourGuideService.getAllUsersLocation();
     }
 
     /**
-     * HTML GET request that finds user's preferences by his userName.
+     * HTTP GET request that finds user's preferences by his userName.
      *
      * @param userName
      * @return a UserPreferencesDTO
@@ -241,7 +241,7 @@ public class TourGuideController {
     }
 
     /**
-     * HTML PUT request that allows user to modify his preferences.
+     * HTTP PUT request that allows user to modify his preferences.
      *
      * @param userName
      * @param userNewPreferencesDTO
@@ -264,7 +264,7 @@ public class TourGuideController {
     }
 
     /**
-     * HTML GET request that returns a List of TripDeals suggested to the user
+     * HTTP GET request that returns a List of TripDeals suggested to the user
      * who responds to the given userName parameter.
      *
      * @param userName
@@ -280,7 +280,7 @@ public class TourGuideController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/getTripDeals")
     public List<ProviderDTO> getTripDeals(@RequestParam final String userName) {
-        logger.info("New HTML Request on /getTripdeals for {}", userName);
+        logger.info("New HTTP Request on /getTripdeals for {}", userName);
         List<ProviderDTO> providers = tourGuideService
                 .getTripDeals(getUser(userName));
         return providers;
@@ -288,7 +288,7 @@ public class TourGuideController {
 
     /**
      * Returns the User who responds to the given userName parameter. Used by
-     * previous HTML request. This private sub method is used by previous HTML
+     * previous HTTP request. This private sub method is used by previous HTTP
      * requests.
      *
      * @param userName

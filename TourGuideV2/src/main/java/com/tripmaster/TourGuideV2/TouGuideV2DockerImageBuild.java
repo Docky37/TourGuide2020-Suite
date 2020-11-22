@@ -6,15 +6,18 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
- * This class defines 3 WebClient beans that allows TourGuide to send requests
- * to the other application of TourGuide2020-Suite.
+ * This class only used in "docker" profile defines 3 WebClient beans that
+ * allows TourGuide to send requests to the others micro-services when they are
+ * all embedded in Dockers containers in the TourGuide2020-Suite network. In
+ * this case, tourguide container communicates with gps, rewards and tripdeals
+ * containers via their hostnames (which are container names). 
  *
  * @author TripMaster
  * @author Thierry Schreiner
  */
 @Configuration
-@Profile("dev")
-public class TourGuideModule {
+@Profile("docker")
+public class TouGuideV2DockerImageBuild {
 
     /**
      * Defines the WebClient beans to deal with TripDeals API.
@@ -23,7 +26,7 @@ public class TourGuideModule {
      */
     @Bean
     public WebClient getWebClientTripDeals() {
-        return WebClient.create("http://127.0.0.1:8888"); //   run from IDE
+        return WebClient.create("http://tripdeals:8888"); // for Docker
     }
 
     /**
@@ -33,7 +36,7 @@ public class TourGuideModule {
      */
     @Bean
     public WebClient getWebClientGps() {
-        return WebClient.create("http://127.0.0.1:8889");
+        return WebClient.create("http://gps:8889");
     }
 
     /**
@@ -43,6 +46,6 @@ public class TourGuideModule {
      */
     @Bean
     public WebClient getWebClientReward() {
-        return WebClient.create("http://127.0.0.1:8787");
+        return WebClient.create("http://rewards:8787");
     }
 }

@@ -212,6 +212,31 @@ public class TourGuideControllerTest {
     }
 
     @Test
+    @DisplayName("Given a user, when call getUserPreferences method"
+            + " then calls service getPreferences method")
+    public void givenAUser_whenRequestGetPreferences_thenReturnsPreferences()
+            throws Exception {
+        // GIVEN
+        UUID userId = UUID.randomUUID();
+        String userName = "John DOE";
+        User user = new User(userId, userName, "1234567890",
+                "John.Doe@mail.com");
+        given(tourGuideService.getUser(userName)).willReturn(user);
+        UserPreferencesDTO userPreferencesDTO = new UserPreferencesDTO();
+        given(tourGuideService.getPreferences(any(User.class)))
+                .willReturn(userPreferencesDTO);
+        // WHEN
+        mvc.perform(MockMvcRequestBuilders
+                .get("/getUserPreferences?userName=" + userName)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        // THEN
+        verify(tourGuideService).getPreferences(any(User.class));
+    }
+
+    @Test
     @DisplayName("Given a user, when call updateUserPreferences method"
             + " then calls service updatesUserPreferences method")
     public void givenAUser_whenRequestUpdatePreferences_thenUpdatePreferences()
@@ -237,6 +262,38 @@ public class TourGuideControllerTest {
         // THEN
         verify(tourGuideService).updateUserPreferences(any(User.class),
                 any(UserPreferencesDTO.class));
+    }
+
+    @Test
+    @DisplayName("Given a user, when call addVisitedLocation method"
+            + " then calls service addVisitedLocation method")
+    public void givenAUser_whenAddVisitedLocation_thenVisitedLocationIsSaved()
+            throws Exception {
+        // GIVEN
+        UUID userId = UUID.randomUUID();
+        String userName = "John DOE";
+        User user = new User(userId, userName, "1234567890",
+                "John.Doe@mail.com");
+        given(tourGuideService.getUser(userName)).willReturn(user);
+        VisitedLocationDTO visitedLocationDTO = new VisitedLocationDTO(
+                new LocationDTO(45.0, 1.0), new Date(), userId);
+        // WHEN
+        ObjectMapper mapper = new ObjectMapper();
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+                .post("/addVisitedLocation?timeVisited=2020-11-19T20:25:44"
+                        + "&latitude=45.0&longitude=1.0"
+                        + "&userName=" + userName)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON).characterEncoding("UTF-8")
+                .content(mapper.writeValueAsString(visitedLocationDTO));
+
+        mvc.perform(builder)
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andDo(MockMvcResultHandlers.print());
+        // THEN
+        verify(tourGuideService).addVisitedLocation(any(Date.class),
+                any(Double.class), any(Double.class), any(User.class));
+
     }
 
     @Test

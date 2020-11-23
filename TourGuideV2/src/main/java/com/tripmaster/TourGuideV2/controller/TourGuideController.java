@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -59,8 +60,7 @@ public class TourGuideController {
      *
      * @return a String, the welcome message
      */
-    @ApiOperation(value = "Return a welcome message.",
-            response = String.class)
+    @ApiOperation(value = "Return a welcome message.", response = String.class)
     @GetMapping("/")
     public String index() {
         logger.info("New HTTP Request on /");
@@ -73,6 +73,7 @@ public class TourGuideController {
      *
      * @param userName
      * @return a String
+     * @throws Throwable
      */
     @ApiOperation(value = "Return the GPS location of the user who responds"
             + " to the given userName parameter.",
@@ -80,7 +81,8 @@ public class TourGuideController {
                     + " GpsTools microservice that uses GpsUtil.jar.",
             response = LocationDTO.class)
     @GetMapping("/getLocation")
-    public LocationDTO getLocation(@RequestParam final String userName) {
+    public LocationDTO getLocation(@RequestParam final String userName)
+            throws Throwable {
         logger.info("New HTTP Request on /getLocation for {}", userName);
         VisitedLocationDTO visitedLocationDTO = tourGuideService
                 .getUserLocation(getUser(userName));
@@ -98,12 +100,13 @@ public class TourGuideController {
      * @param longitude
      * @param userName
      * @return a VisitedLocationDTO
+     * @throws Throwable
      */
     @ApiOperation(value = "Allows you to add a new VisitedLocation for the user"
             + " who responds to the given userName parameter.",
             notes = "Implemented for tests, to simulate incoming information"
                     + " of an attraction visit in order to generate a reward.",
-            response = VisitedLocationDTO.class)
+                    response = VisitedLocationDTO.class)
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/addVisitedLocation")
     public VisitedLocationDTO addVisitedLocation(
@@ -111,7 +114,7 @@ public class TourGuideController {
             final Date timeVisited,
             @RequestParam final double latitude,
             @RequestParam final double longitude,
-            @RequestParam final String userName) {
+            @RequestParam final String userName) throws Throwable {
         logger.info("New HTTP Post request on /addVisitedLocation for {}",
                 userName);
         VisitedLocationDTO visitedLocationDTO = tourGuideService
@@ -128,8 +131,8 @@ public class TourGuideController {
     @ApiOperation(value = "Return the list of all attractions",
             notes = "The list of attractions is provided by GpsUtil.jar,"
             + " currently it only contains 26 attractions all located"
-            + " in United States.",
-            response = AttractionDTO.class, responseContainer = "List")
+            + " in United States.", response = AttractionDTO.class,
+            responseContainer = "List")
     @GetMapping("/getAllAttractions")
     public List<AttractionDTO> getAllAttractions() {
         List<Attraction> attractions = tourGuideService.getAllAttractions();
@@ -158,6 +161,7 @@ public class TourGuideController {
      *         The NearbyAttractionDTO contains the location (latitude,
      *         longitude) of the attraction, its distance from user location,
      *         and the reward points for its visit.
+     * @throws Throwable
      * @see AttractionsSuggestionDTO
      * @see NearbyAttractionDTO
      */
@@ -174,10 +178,10 @@ public class TourGuideController {
                     + " contains the location (latitude, longitude) of the"
                     + " attraction, its distance from user location,"
                     + " and the reward points for its visit.",
-            response = AttractionsSuggestionDTO.class)
+                    response = AttractionsSuggestionDTO.class)
     @GetMapping("/getNearbyAttractions")
     public AttractionsSuggestionDTO getNearbyAttractions(
-            @RequestParam final String userName) {
+            @RequestParam final String userName) throws Throwable {
         logger.info("New HTTP Request on /getNearbyAttractions for {}",
                 userName);
         AttractionsSuggestionDTO suggestion = tourGuideService
@@ -192,6 +196,7 @@ public class TourGuideController {
      *
      * @param userName
      * @return a String the serialized List of UserRewwards
+     * @throws Throwable
      */
     @ApiOperation(value = "Returns a list of UserRewards of the user who"
             + " responds to the given userName parameter.",
@@ -199,7 +204,8 @@ public class TourGuideController {
                     + "GetRewards microservice that uses GetPricer.jar.",
             response = UserRewardsDTO.class)
     @GetMapping("/getRewards")
-    public UserRewardsDTO getRewards(@RequestParam final String userName) {
+    public UserRewardsDTO getRewards(@RequestParam final String userName)
+            throws Throwable {
         logger.info("New HTTP Request on /getRewards for {}", userName);
         return tourGuideService.getUserRewards(getUser(userName));
     }
@@ -214,7 +220,7 @@ public class TourGuideController {
      */
     @ApiOperation(value = "Returns the list of all users' location.",
             notes = "The location of each user corresponds to the latest"
-                    + " location stored in his location history.")
+            + " location stored in his location history.")
     @GetMapping("/getAllCurrentLocations")
     public Map<String, LocationDTO> getAllCurrentLocations() {
         logger.info("New HTTP Request on /getAllCurrentLocations");
@@ -226,14 +232,14 @@ public class TourGuideController {
      *
      * @param userName
      * @return a UserPreferencesDTO
+     * @throws Throwable
      */
     @ApiOperation(value = "Returns preferences of the users who"
-                    + " responds to the given userName parameter.",
-            notes = "",
+            + " responds to the given userName parameter.", notes = "",
             response = UserPreferencesDTO.class)
-    @GetMapping("/getUserPref")
+    @GetMapping("/getUserPreferences")
     public UserPreferencesDTO getUserPreferences(
-            @RequestParam final String userName) {
+            @RequestParam final String userName) throws Throwable {
         UserPreferencesDTO userPref = tourGuideService
                 .getPreferences(getUser(userName));
 
@@ -246,16 +252,18 @@ public class TourGuideController {
      * @param userName
      * @param userNewPreferencesDTO
      * @return a UserPreferencesDTO
+     * @throws Throwable
      */
     @ApiOperation(value = "Allows us to update the preferences of the users who"
-                    + " responds to the given userName parameter.",
+            + " responds to the given userName parameter.",
             notes = "TODO: This functionality need to be updated with a limited"
                     + " scope where user can only updates his own preferences.",
             response = UserPreferencesDTO.class)
     @PutMapping("/updatePreferences")
     public UserPreferencesDTO updatePreferences(
             @RequestParam final String userName,
-            @RequestBody final UserPreferencesDTO userNewPreferencesDTO) {
+            @RequestBody final UserPreferencesDTO userNewPreferencesDTO)
+            throws Throwable {
 
         UserPreferencesDTO userPreferencesDTO = tourGuideService
                 .updateUserPreferences(getUser(userName),
@@ -269,9 +277,10 @@ public class TourGuideController {
      *
      * @param userName
      * @return a String
+     * @throws Throwable
      */
     @ApiOperation(value = "Returns a List of TripDeals suggested to the user"
-                    + " who responds to the given userName parameter.",
+            + " who responds to the given userName parameter.",
             notes = "TourGuideV2 uses a WebClient to request an endpoint of"
                     + "TripDeals microservice that uses TripPricer.jar.\n"
                     + "Warning: It seems that TripPricer do not take in account"
@@ -279,7 +288,8 @@ public class TourGuideController {
             response = ProviderDTO.class, responseContainer = "List")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/getTripDeals")
-    public List<ProviderDTO> getTripDeals(@RequestParam final String userName) {
+    public List<ProviderDTO> getTripDeals(@RequestParam final String userName)
+            throws Throwable {
         logger.info("New HTTP Request on /getTripdeals for {}", userName);
         List<ProviderDTO> providers = tourGuideService
                 .getTripDeals(getUser(userName));
@@ -293,9 +303,23 @@ public class TourGuideController {
      *
      * @param userName
      * @return a User
+     * @throws UserNotFoundException
      */
-    private User getUser(final String userName) {
-        return tourGuideService.getUser(userName);
+    private User getUser(final String userName) throws UserNotFoundException {
+        User user = tourGuideService.getUser(userName);
+        if (user != null) {
+            return user;
+        } else {
+            throw new UserNotFoundException();
+        }
+
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    private void addressFireStationNotFoundHandler(
+            final UserNotFoundException e) {
+        logger.info("END of Request with Status 404 NOT FOUND");
     }
 
 }

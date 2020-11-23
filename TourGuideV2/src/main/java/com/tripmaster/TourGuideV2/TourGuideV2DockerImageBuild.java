@@ -10,14 +10,14 @@ import org.springframework.web.reactive.function.client.WebClient;
  * allows TourGuide to send requests to the others micro-services when they are
  * all embedded in Dockers containers in the TourGuide2020-Suite network. In
  * this case, tourguide container communicates with gps, rewards and tripdeals
- * containers via their hostnames (which are container names). 
+ * containers via their hostnames (which are container names).
  *
  * @author TripMaster
  * @author Thierry Schreiner
  */
 @Configuration
 @Profile("docker")
-public class TouGuideV2DockerImageBuild {
+public class TourGuideV2DockerImageBuild {
 
     /**
      * Defines the WebClient beans to deal with TripDeals API.

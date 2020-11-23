@@ -3,7 +3,7 @@
 ## Overview:
 TourGuide is a Spring Boot application of TripMaster's applications. It allows users to discover attractions near of their location and provides them discounts on hotel stays and reductions on ticket prices for shows.
 
-Following its success, in 2020 TourGuide is faltering and suffers of poor performances, so TripMaster Group manager decided to develop a this new version that will be deployed soon.
+Following its success, in 2020 TourGuide is faltering and suffers of poor performances, so TripMaster Group manager decided to develop this new version that will be deployed soon.
 
 
 ## Technical
@@ -51,12 +51,13 @@ Here the command '**docker-compose up -d**' will run the 4 containers.
 Warning: TourGuide depends on the 3 others application and is launched after them. But it is possible that TourGuide request gps before gps is ready and TourGuide can exit. Its easy to check that with Docker Desktop and easy to launch it again.
 6. You are now ready to check all my job with the Postman request collection joined in the repository root folder.
 
-
 ## DOCUMENTATION
 
 A Swagger (v3.0) documentation is available at http://localhost:8080/swagger-ui/index.html#/
 The Swagger UI allows you to tests end-points directly from the documentation. 
 
+If you wanna test this endpoint, I think it will be helpfull for you to know the userName of all the 100 users created for test, isn't it ?
+Don't worry, easy to remember that the first one is 'internalUser0' and the latest one 'internalUser99'!
 
 Hope you enjoy it. Thanks.
    

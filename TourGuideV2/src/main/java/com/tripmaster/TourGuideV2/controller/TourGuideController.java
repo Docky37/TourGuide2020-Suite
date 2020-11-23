@@ -78,7 +78,12 @@ public class TourGuideController {
     @ApiOperation(value = "Return the GPS location of the user who responds"
             + " to the given userName parameter.",
             notes = "TourGuideV2 uses a WebClient to request an endpoint of"
-                    + " GpsTools microservice that uses GpsUtil.jar.",
+                    + " GpsTools microservice that uses GpsUtil.jar.\n"
+                    + "If you wanna test this endpoint, I think it will be"
+                    + " helpfull for you to know the userName of all the 100"
+                    + " users created for test, isn't it ?\n"
+                    + "Don't worry, easy to remember that the first one is"
+                    + " 'internalUser0' and the latest one 'internalUser99'!",
             response = LocationDTO.class)
     @GetMapping("/getLocation")
     public LocationDTO getLocation(@RequestParam final String userName)
@@ -103,10 +108,15 @@ public class TourGuideController {
      * @throws Throwable
      */
     @ApiOperation(value = "Allows you to add a new VisitedLocation for the user"
-            + " who responds to the given userName parameter.",
+            + " who responds to the given userName parameter.\n",
             notes = "Implemented for tests, to simulate incoming information"
-                    + " of an attraction visit in order to generate a reward.",
-                    response = VisitedLocationDTO.class)
+                    + " of an attraction visit in order to generate a reward."
+                    + "If you wanna test this endpoint, I think it will be"
+                    + " helpfull for you to know the userName of all the 100"
+                    + " users created for test, isn't it ?\n"
+                    + "Don't worry, easy to remember that the first one is"
+                    + " 'internalUser0' and the latest one 'internalUser99'!",
+            response = VisitedLocationDTO.class)
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/addVisitedLocation")
     public VisitedLocationDTO addVisitedLocation(
@@ -177,7 +187,12 @@ public class TourGuideController {
                     + " nearest to the farthest. The NearbyAttractionDTO"
                     + " contains the location (latitude, longitude) of the"
                     + " attraction, its distance from user location,"
-                    + " and the reward points for its visit.",
+                    + " and the reward points for its visit.\n"
+                    + "If you wanna test this endpoint, I think it will be"
+                    + " helpfull for you to know the userName of all the 100"
+                    + " users created for test, isn't it ?\n"
+                    + "Don't worry, easy to remember that the first one is"
+                    + " 'internalUser0' and the latest one 'internalUser99'!",
                     response = AttractionsSuggestionDTO.class)
     @GetMapping("/getNearbyAttractions")
     public AttractionsSuggestionDTO getNearbyAttractions(
@@ -201,7 +216,12 @@ public class TourGuideController {
     @ApiOperation(value = "Returns a list of UserRewards of the user who"
             + " responds to the given userName parameter.",
             notes = "TourGuideV2 uses a WebClient to request an endpoint of"
-                    + "GetRewards microservice that uses GetPricer.jar.",
+                    + "GetRewards microservice that uses GetPricer.jar.\n"
+                    + "If you wanna test this endpoint, I think it will be"
+                    + " helpfull for you to know the userName of all the 100"
+                    + " users created for test, isn't it ?\n"
+                    + "Don't worry, easy to remember that the first one is"
+                    + " 'internalUser0' and the latest one 'internalUser99'!",
             response = UserRewardsDTO.class)
     @GetMapping("/getRewards")
     public UserRewardsDTO getRewards(@RequestParam final String userName)
@@ -235,7 +255,12 @@ public class TourGuideController {
      * @throws Throwable
      */
     @ApiOperation(value = "Returns preferences of the users who"
-            + " responds to the given userName parameter.", notes = "",
+            + " responds to the given userName parameter.",
+            notes = "If you wanna test this endpoint, I think it will be"
+                    + " helpfull for you to know the userName of all the 100"
+                    + " users created for test, isn't it ?\n"
+                    + "Don't worry, easy to remember that the first one is"
+                    + " 'internalUser0' and the latest one 'internalUser99'!",
             response = UserPreferencesDTO.class)
     @GetMapping("/getUserPreferences")
     public UserPreferencesDTO getUserPreferences(
@@ -257,7 +282,12 @@ public class TourGuideController {
     @ApiOperation(value = "Allows us to update the preferences of the users who"
             + " responds to the given userName parameter.",
             notes = "TODO: This functionality need to be updated with a limited"
-                    + " scope where user can only updates his own preferences.",
+                    + " scope where user can only updates his own preferences."
+                    + "\nIf you wanna test this endpoint, I think it will be"
+                    + " helpfull for you to know the userName of all the 100"
+                    + " users created for test, isn't it ?\n"
+                    + "Don't worry, easy to remember that the first one is"
+                    + " 'internalUser0' and the latest one 'internalUser99'!",
             response = UserPreferencesDTO.class)
     @PutMapping("/updatePreferences")
     public UserPreferencesDTO updatePreferences(
@@ -284,7 +314,12 @@ public class TourGuideController {
             notes = "TourGuideV2 uses a WebClient to request an endpoint of"
                     + "TripDeals microservice that uses TripPricer.jar.\n"
                     + "Warning: It seems that TripPricer do not take in account"
-                    + " all the users' preferences.",
+                    + " all the users' preferences.\n"
+                    + "If you wanna test this endpoint, I think it will be"
+                    + " helpfull for you to know the userName of all the 100"
+                    + " users created for test, isn't it ?\n"
+                    + "Don't worry, easy to remember that the first one is"
+                    + " 'internalUser0' and the latest one 'internalUser99'!",
             response = ProviderDTO.class, responseContainer = "List")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/getTripDeals")

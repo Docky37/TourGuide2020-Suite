@@ -117,7 +117,7 @@ check.dependsOn jacocoTestCoverageVerification
 
 // CHECKSTYLE *************************************************
 checkstyle {
-    configFile = file('build/reports/checkstyle-checker.xml');
+    configFile = file('config/checkstyle-checker.xml');
     reportsDir = file("$project.buildDir/reports/checkstyle/")
 }
 

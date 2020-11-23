@@ -166,19 +166,19 @@
 					"response": []
 				},
 				{
-					"name": "http://localhost:8080/getUserPref (by userName)",
+					"name": "http://localhost:8080/getUserPreferences (by userName)",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/getUserPref?userName=internalUser77",
+							"raw": "http://localhost:8080/getUserPreferences?userName=internalUser77",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
-								"getUserPref"
+								"getUserPreferences"
 							],
 							"query": [
 								{
@@ -230,7 +230,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/addVisitedLocation?timeVisited=2020-11-19T20:25:44.&latitude=33.817595&longitude=-117.922008&userName=internalUser77",
+							"raw": "http://localhost:8080/addVisitedLocation?timeVisited=2020-11-19T20:25:44&latitude=33.817595&longitude=-117.922008&userName=internalUser77",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -242,7 +242,7 @@
 							"query": [
 								{
 									"key": "timeVisited",
-									"value": "2020-11-19T20:25:44."
+									"value": "2020-11-19T20:25:44"
 								},
 								{
 									"key": "latitude",

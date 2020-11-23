@@ -1,7 +1,7 @@
 version: '3'
 services:
   gps:
-    image: gps
+    image: docky37/tourguide2020:gps_v2.1
     container_name: gps
     ports:
       - "8889:8889"
@@ -9,7 +9,7 @@ services:
       - default
 
   rewards:
-    image: rewards
+    image: docky37/tourguide2020:rewards_v2.1
     container_name: rewards
     ports:
       - "8787:8787"
@@ -17,7 +17,7 @@ services:
       - default
 
   tripdeals:
-    image: tripdeals
+    image: docky37/tourguide2020:tripdeals_v2.1
     container_name: tripdeals
     ports:
       - "8888:8888"
@@ -28,9 +28,11 @@ services:
     depends_on:
       - gps
       - tripdeals
-    image: tourguide
+    image: docky37/tourguide2020:tourguide_v2.1
     container_name: tourguide
     ports:
       - "8080:8080"
     networks:
       - default
+
+    

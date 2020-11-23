@@ -1,11 +1,23 @@
 // GpsTools project
 
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.6.0"
+  }
+}
+
 plugins {
 	id 'org.springframework.boot' version '2.4.0'
 	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
 	id 'java'
     id 'jacoco'
     id 'checkstyle'
+    id "com.github.spotbugs" version "4.6.0"
 }
 apply plugin: 'io.spring.dependency-management'
 
@@ -125,5 +137,24 @@ tasks.withType(Checkstyle) {
     reports {
         xml.enabled false
         html.enabled true
+    }
+}
+    
+tasks.withType(Checkstyle) {
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+
+// SPOTBUGS****************************************************
+spotbugs {
+    spotbugsTest.enabled = false
+}
+
+spotbugsMain {
+    reports {
+        xml.enabled = false
+        html.enabled = true
     }
 }

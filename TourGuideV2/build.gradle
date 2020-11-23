@@ -147,17 +147,23 @@ checkstyle {
 
 checkstyleTest.enabled = false
 
-
-// SPOTBUGS****************************************************
 tasks.withType(Checkstyle) {
     reports {
         xml.enabled false
         html.enabled true
     }
 }
+
+// SPOTBUGS****************************************************
 spotbugsMain {
     reports {
         xml.enabled = false
         html.enabled = true
+    }
+}
+spotbugsTest {
+    reports {
+        xml.enabled = false
+        html.enabled = false
     }
 }

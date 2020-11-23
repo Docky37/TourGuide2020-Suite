@@ -25,7 +25,7 @@ TourGuide2020 is now a suite of 4 SpringBoot micro-services:
 
 ## Content
 
-The current v2.1 release (23 Nov. 2020) add UserNotFoundException, some tests and implements SpotBugs reports.
+The current v2.1.1 release (23 Nov. 2020) add UserNotFoundException, some tests and implements SpotBugs reports.
 
 Previously in TourGuide2020:  
 

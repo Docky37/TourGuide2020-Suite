@@ -172,7 +172,7 @@ public class TourGuideService implements ITourGuideService {
                 .retrieve()
                 .bodyToMono(VisitedLocationDTO.class)
                 .block();
-
+        saveNewVisitedLocation(user, visitedLocationDTO);
         return visitedLocationDTO;
     }
 
@@ -198,15 +198,25 @@ public class TourGuideService implements ITourGuideService {
 
         } else {
             visitedLocationDTO = trackUserLocation(user);
-            visitedLocation = new VisitedLocation(
-                    new Location(visitedLocationDTO.getLocation().getLatitude(),
-                            visitedLocationDTO.getLocation().getLongitude()),
-                    visitedLocationDTO.getTimeVisited());
-            user.addToVisitedLocations(visitedLocation);
             rewardsService.calculateRewards(user, getAllAttractions());
         }
 
         return visitedLocationDTO;
+    }
+
+    /**
+     * Private method use to map the new VisitedLocationDTO to VisitedLocation
+     * and add it to user.visitedLocations.
+     *
+     * @param user
+     * @param visitedLocationDTO
+     */
+    private void saveNewVisitedLocation(final User user,
+            final VisitedLocationDTO visitedLocationDTO) {
+        user.addToVisitedLocations(new VisitedLocation(
+                new Location(visitedLocationDTO.getLocation().getLatitude(),
+                        visitedLocationDTO.getLocation().getLongitude()),
+                visitedLocationDTO.getTimeVisited()));
     }
 
     /**

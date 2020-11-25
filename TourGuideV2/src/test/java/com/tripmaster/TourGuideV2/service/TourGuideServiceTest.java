@@ -289,6 +289,21 @@ public class TourGuideServiceTest {
                                 MediaType.APPLICATION_JSON_VALUE)
                         .setBody(visitedLocationResult));
 
+        jsonResult = "[";
+        attractions.forEach(
+                a -> jsonResult = jsonResult.concat(a.toString() + ","));
+        jsonResult = jsonResult.substring(0,
+                jsonResult.length() - 1);
+        jsonResult = jsonResult.concat("]");
+        System.out.println(jsonResult);
+
+        mockWebServerGps.enqueue(
+                new MockResponse()
+                        .setResponseCode(200)
+                        .setHeader(HttpHeaders.CONTENT_TYPE,
+                                MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(jsonResult));
+
         tourGuideService.addUser(user);
         // WHEN
         VisitedLocationDTO visitedLocationDTO = tourGuideService

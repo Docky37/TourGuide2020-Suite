@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -98,7 +99,7 @@ public class TourGuideService implements ITourGuideService {
     @Autowired
     public TourGuideService(final IRewardsService pRewardsService,
             @Qualifier("getWebClientTripDeals")
-                    final WebClient pWebClientTripDeals,
+    final WebClient pWebClientTripDeals,
             @Qualifier("getWebClientGps") final WebClient pWebClientGps) {
         rewardsService = pRewardsService;
         webClientGps = pWebClientGps;
@@ -167,13 +168,34 @@ public class TourGuideService implements ITourGuideService {
         final String getLocationUri = "/getUserLocation?userId="
                 + user.getUserId();
 
-        VisitedLocationDTO visitedLocationDTO = webClientGps.get()
-                .uri(getLocationUri)
-                .retrieve()
-                .bodyToMono(VisitedLocationDTO.class)
-                .block();
+        Optional<VisitedLocationDTO> optVisitedLocationDTO = Optional
+                .ofNullable(webClientGps.get()
+                        .uri(getLocationUri)
+                        .retrieve()
+                        .bodyToMono(VisitedLocationDTO.class)
+                        .block());
 
+        VisitedLocationDTO visitedLocationDTO = optVisitedLocationDTO
+                .orElseThrow();
+        saveNewVisitedLocation(user, visitedLocationDTO);
         return visitedLocationDTO;
+    }
+
+    /**
+     * Private method use to map the new VisitedLocationDTO to VisitedLocation
+     * and add it to user.visitedLocations.
+     *
+     * @param user
+     * @param visitedLocationDTO
+     */
+    private void saveNewVisitedLocation(final User user,
+            final VisitedLocationDTO visitedLocationDTO) {
+        user.addToVisitedLocations(new VisitedLocation(
+                new Location(visitedLocationDTO.getLocation().getLatitude(),
+                        visitedLocationDTO.getLocation().getLongitude()),
+                visitedLocationDTO.getTimeVisited()));
+        rewardsService.calculateRewards(user, getAllAttractions());
+
     }
 
     /**
@@ -198,12 +220,6 @@ public class TourGuideService implements ITourGuideService {
 
         } else {
             visitedLocationDTO = trackUserLocation(user);
-            visitedLocation = new VisitedLocation(
-                    new Location(visitedLocationDTO.getLocation().getLatitude(),
-                            visitedLocationDTO.getLocation().getLongitude()),
-                    visitedLocationDTO.getTimeVisited());
-            user.addToVisitedLocations(visitedLocation);
-            rewardsService.calculateRewards(user, getAllAttractions());
         }
 
         return visitedLocationDTO;
@@ -403,8 +419,8 @@ public class TourGuideService implements ITourGuideService {
                 user.getLastVisitedLocation().getLocation().getLatitude(),
                 user.getLastVisitedLocation().getLocation().getLongitude()));
 
-        TreeMap<String, NearbyAttractionDTO> suggestedAttractions =
-                new TreeMap<>();
+        TreeMap<String, NearbyAttractionDTO>
+        suggestedAttractions = new TreeMap<>();
         List<Attraction> attractionsList = getNearByAttractions(
                 user.getLastVisitedLocation());
         final AtomicInteger indexHolder = new AtomicInteger(1);

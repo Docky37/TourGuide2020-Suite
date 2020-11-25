@@ -20,12 +20,13 @@ import com.tripmaster.TourGuideV2.service.ITourGuideService;
  * @author Thierry Schreiner
  */
 
-public class Tracker  {
+public class Tracker extends Thread {
 
     /**
      * Create a SLF4J/LOG4J LOGGER instance.
      */
     private Logger logger = LoggerFactory.getLogger(Tracker.class);
+
     /**
      * Defines the interval in minutes between two calls for users tracking.
      */
@@ -36,6 +37,12 @@ public class Tracker  {
      * Create an instance of a Fixed thread ExecutorService.
      */
     private final ExecutorService executorService = Executors
+            .newFixedThreadPool(1);
+
+    /**
+     * Create an instance of a Fixed thread ExecutorService.
+     */
+    private final ExecutorService executorService2 = Executors
             .newFixedThreadPool(100);
 
     /**
@@ -49,13 +56,18 @@ public class Tracker  {
     private boolean isTrackerStopped = false;
 
     /**
+     * Used to store the duration spent to get all users current location.
+     */
+    private long latestUserTrackingDuration = 0;
+
+    /**
      * Class constructor.
      *
      * @param pTourGuideService
      */
     public Tracker(final ITourGuideService pTourGuideService) {
         this.tourGuideService = pTourGuideService;
-        trackUsers();
+        executorService.submit(this);
     }
 
     /**
@@ -63,14 +75,14 @@ public class Tracker  {
      */
     public void stopTracking() {
         isTrackerStopped = true;
-        executorService.shutdownNow();
+        executorService2.shutdownNow();
     }
 
     /**
      * Overridden Run super method.
      */
-    //@Override
-    public void trackUsers() {
+    @Override
+    public void run() {
         StopWatch stopWatch = new StopWatch();
         while (true) {
             if (Thread.currentThread().isInterrupted() || isTrackerStopped) {
@@ -83,7 +95,7 @@ public class Tracker  {
             logger.info("Begin Tracker. Tracking " + users.size() + " users.");
             stopWatch.start();
 
-            users.forEach(u -> executorService.submit(() -> {
+            users.forEach(u -> executorService2.submit(() -> {
                 tourGuideService.trackUserLocation(u);
                 countDownLatch.countDown();
                 System.out.println(countDownLatch.getCount());
@@ -96,6 +108,7 @@ public class Tracker  {
             }
 
             stopWatch.stop();
+            setLatestUserTrackingDuration(stopWatch.getTime());
             logger.info("Tracker Time Elapsed: "
                     + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime())
                     + " seconds.");
@@ -109,4 +122,24 @@ public class Tracker  {
         }
 
     }
+
+    /**
+     * Getter of the latestUserTrackingDuration.
+     *
+     * @return a long a duration in seconds
+     */
+    public long getLatestUserTrackingDuration() {
+        return latestUserTrackingDuration;
+    }
+
+    /**
+     * Getter of the latestUserTrackingDuration.
+     *
+     * @param pScoreLatestUserTrack
+     */
+    public void setLatestUserTrackingDuration(
+            final long pScoreLatestUserTrack) {
+        latestUserTrackingDuration = pScoreLatestUserTrack;
+    }
+
 }

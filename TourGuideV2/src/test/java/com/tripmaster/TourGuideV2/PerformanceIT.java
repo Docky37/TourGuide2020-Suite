@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -68,37 +67,35 @@ public class PerformanceIT {
     public void highVolumeTrackLocation() throws InterruptedException {
 
         // Users should be incremented up to 100,000, and test finishes within
-        // 15 minutes
-        InternalTestHelper.setInternalUserNumber(1000);
+        // 5 minutes
+        InternalTestHelper.setInternalUserNumber(10000);
         TourGuideService tourGuideService = new TourGuideService(
                 rewardsService, webClientTripDeals, webClientGps);
 
         List<User> allUsers = tourGuideService.getAllUsers();
+        int usersCount = allUsers.size();
+        Date referenceDate = new Date();
 
-        ExecutorService executorService = Executors.newFixedThreadPool(100);
-        CountDownLatch countDownLatch = new CountDownLatch(allUsers.size());
+        while (tourGuideService.getTracker().getLatestUserTrackingDuration() == 0) {
+            TimeUnit.SECONDS.sleep(5);
+        }
+        long score = TimeUnit.MILLISECONDS
+                .toSeconds(tourGuideService.getTracker()
+                        .getLatestUserTrackingDuration());
+        System.out.println("\n###############################################################################################################################\n");
         System.out.println(
-                "countDownLatch.getCount() = " + countDownLatch.getCount());
+                "      GIVEN a number of " + usersCount
+                        + " users, WHEN I run highVolumeTrackLocation,"
+                        + " THEN the test is completed in " + score
+                        + " secondes.");
+        System.out.println("\n###############################################################################################################################\n");
 
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+        assertThat(TimeUnit.MINUTES.toSeconds(5) >= score).isTrue();
 
-        allUsers.forEach(u -> executorService.submit(() -> {
-            tourGuideService.trackUserLocation(u);
-            countDownLatch.countDown();
-            System.out.println(countDownLatch.getCount());
-        }));
-
-        countDownLatch.await();
-        executorService.shutdown();
-        stopWatch.stop();
-        tourGuideService.getTracker().stopTracking();
-
-        System.out.println("highVolumeTrackLocation: Time Elapsed: "
-                + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime())
-                + " seconds.");
-        assertThat(TimeUnit.MINUTES.toSeconds(15) >= TimeUnit.MILLISECONDS
-                .toSeconds(stopWatch.getTime())).isTrue();
+        allUsers.forEach(u -> {
+            assertThat(u.getLastVisitedLocation().getTimeVisited())
+                    .isAfterOrEqualTo(referenceDate);
+        });
     }
 
     @Test
@@ -106,7 +103,7 @@ public class PerformanceIT {
 
         // Users should be incremented up to 100,000, and test finishes within
         // 20 minutes
-        InternalTestHelper.setInternalUserNumber(1000);
+        InternalTestHelper.setInternalUserNumber(10000);
         TourGuideService tourGuideService = new TourGuideService(
                 rewardsService, webClientTripDeals, webClientGps);
         tourGuideService.getTracker().stopTracking();

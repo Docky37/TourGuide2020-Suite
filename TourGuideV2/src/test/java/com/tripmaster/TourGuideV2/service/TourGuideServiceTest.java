@@ -74,6 +74,16 @@ public class TourGuideServiceTest {
                 "Paris", "France", 48.853208d, 2.348640d));
         attractions.add(new Attraction(UUID.randomUUID(), "Musée Automobile",
                 "Vernon", "France", 46.441387, 0.475771));
+        attractions.add(new Attraction(UUID.randomUUID(), "Clos Lucé",
+                "Amboise", "France", 47.410445, 0.991830));
+        attractions.add(
+                new Attraction(UUID.randomUUID(), "Eglise Saint-Jean-Baptiste",
+                        "Saint-Jean-de-Luz", "France", 43.386897, -1.661847));
+        attractions.add(new Attraction(UUID.randomUUID(), "La Rhune",
+                "Ascain", "France", 43.309685, -1.635410));
+        attractions.add(new Attraction(UUID.randomUUID(), "Grand place",
+                "Arras", "France",
+                50.292564, 2.781040));
     }
 
     @BeforeAll
@@ -289,21 +299,6 @@ public class TourGuideServiceTest {
                                 MediaType.APPLICATION_JSON_VALUE)
                         .setBody(visitedLocationResult));
 
-        jsonResult = "[";
-        attractions.forEach(
-                a -> jsonResult = jsonResult.concat(a.toString() + ","));
-        jsonResult = jsonResult.substring(0,
-                jsonResult.length() - 1);
-        jsonResult = jsonResult.concat("]");
-        System.out.println(jsonResult);
-
-        mockWebServerGps.enqueue(
-                new MockResponse()
-                        .setResponseCode(200)
-                        .setHeader(HttpHeaders.CONTENT_TYPE,
-                                MediaType.APPLICATION_JSON_VALUE)
-                        .setBody(jsonResult));
-
         tourGuideService.addUser(user);
         // WHEN
         VisitedLocationDTO visitedLocationDTO = tourGuideService
@@ -318,32 +313,6 @@ public class TourGuideServiceTest {
         System.out.println(
                 "\n***  ***");
         // GIVEN
-        attractions.add(new Attraction(UUID.randomUUID(), "Clos Lucé",
-                "Amboise", "France", 47.410445, 0.991830));
-        attractions.add(
-                new Attraction(UUID.randomUUID(), "Eglise Saint-Jean-Baptiste",
-                        "Saint-Jean-de-Luz", "France", 43.386897, -1.661847));
-        attractions.add(new Attraction(UUID.randomUUID(), "La Rhune",
-                "Ascain", "France", 43.309685, -1.635410));
-        attractions.add(new Attraction(UUID.randomUUID(), "Grand place",
-                "Arras", "France",
-                50.292564, 2.781040));
-
-        jsonResult = "[";
-        attractions.forEach(
-                a -> jsonResult = jsonResult.concat(a.toString() + ","));
-        jsonResult = jsonResult.substring(0,
-                jsonResult.length() - 1);
-        jsonResult = jsonResult.concat("]");
-        System.out.println(jsonResult);
-
-        mockWebServerGps.enqueue(
-                new MockResponse()
-                        .setResponseCode(200)
-                        .setHeader(HttpHeaders.CONTENT_TYPE,
-                                MediaType.APPLICATION_JSON_VALUE)
-                        .setBody(jsonResult));
-
         UUID userId = UUID.randomUUID();
         User user = new User(userId, "John DOE", "01.02.03.04.05",
                 "john.doe@tourGuide.com");
@@ -514,21 +483,6 @@ public class TourGuideServiceTest {
                                 MediaType.APPLICATION_JSON_VALUE)
                         .setBody(visitedLocationResult));
 
-        jsonResult = "[";
-        attractions.forEach(
-                a -> jsonResult = jsonResult.concat(a.toString() + ","));
-        jsonResult = jsonResult.substring(0,
-                jsonResult.length() - 1);
-        jsonResult = jsonResult.concat("]");
-        System.out.println(jsonResult);
-
-        mockWebServerGps.enqueue(
-                new MockResponse()
-                        .setResponseCode(200)
-                        .setHeader(HttpHeaders.CONTENT_TYPE,
-                                MediaType.APPLICATION_JSON_VALUE)
-                        .setBody(jsonResult));
-
         // WHEN
         VisitedLocationDTO visitedLocationDTO = tourGuideService
                 .getUserLocation(user);
@@ -539,8 +493,6 @@ public class TourGuideServiceTest {
                 user.getLastVisitedLocation().getLocation().getLongitude());
         assertThat(visitedLocationDTO.getTimeVisited()).isEqualTo(
                 user.getLastVisitedLocation().getTimeVisited());
-        verify(rewardsService).calculateRewards(any(User.class),
-                Mockito.<Attraction>anyList());
     }
 
     @Test

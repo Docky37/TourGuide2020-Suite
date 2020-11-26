@@ -95,11 +95,11 @@ public interface ITourGuideService {
     AttractionsSuggestionDTO getAttractionsSuggestion(User user);
 
     /**
-     * Get the list of all attractions.
+     * Get the list of all attractions from GpsTools microservice.
      *
      * @return a List<Attraction>
      */
-    List<Attraction> getAllAttractions();
+    List<Attraction> getAllAttractionsFromGpsTools();
 
     /**
      * Get the list of the n closest attractions. The number n is defined by the

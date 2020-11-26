@@ -117,7 +117,7 @@ public class TourGuideControllerTest {
     public void whenRequestGetAllAttractions_thenCallsServiceGetAllAttractionMethod()
             throws Exception {
         // GIVEN
-        given(tourGuideService.getAllAttractions()).willReturn(attractions);
+        given(tourGuideService.getAllAttractionsFromGpsTools()).willReturn(attractions);
         // WHEN
         MvcResult result = mvc.perform(
                 MockMvcRequestBuilders.get("/getAllAttractions"))
@@ -128,7 +128,7 @@ public class TourGuideControllerTest {
                 .andReturn();
         result.getResponse().getContentAsString();
         // THEN
-        verify(tourGuideService).getAllAttractions();
+        verify(tourGuideService).getAllAttractionsFromGpsTools();
         assertThat(result.getResponse().getContentAsString())
                 .isEqualTo(expectedResult);
     }

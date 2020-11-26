@@ -89,6 +89,13 @@ public class TourGuideService implements ITourGuideService {
     private boolean testMode = true;
 
     /**
+     * Create a locale list of attractions to avoid many calls on GpsUtil
+     * because this list has a low update frequency. This list is created
+     * when service is launched and need a daily update.
+     */
+    private List<Attraction> attractions;
+
+    /**
      * This class constructor allows Spring to inject 3 beans, RewardsService
      * and 2 WebClient beans discriminated against by the @Qualifier annotation.
      *
@@ -98,8 +105,7 @@ public class TourGuideService implements ITourGuideService {
      */
     @Autowired
     public TourGuideService(final IRewardsService pRewardsService,
-            @Qualifier("getWebClientTripDeals")
-    final WebClient pWebClientTripDeals,
+            @Qualifier("getWebClientTripDeals") final WebClient pWebClientTripDeals,
             @Qualifier("getWebClientGps") final WebClient pWebClientGps) {
         rewardsService = pRewardsService;
         webClientGps = pWebClientGps;
@@ -194,7 +200,7 @@ public class TourGuideService implements ITourGuideService {
                 new Location(visitedLocationDTO.getLocation().getLatitude(),
                         visitedLocationDTO.getLocation().getLongitude()),
                 visitedLocationDTO.getTimeVisited()));
-        rewardsService.calculateRewards(user, getAllAttractions());
+        rewardsService.calculateRewards(user, getAttractions());
 
     }
 
@@ -235,7 +241,7 @@ public class TourGuideService implements ITourGuideService {
                 new Location(latitude, longitude), timeVisited);
 
         user.addToVisitedLocations(visitedLocation);
-        rewardsService.calculateRewards(user, getAllAttractions());
+        rewardsService.calculateRewards(user, getAttractions());
 
         return getUserLocation(user);
     }
@@ -364,7 +370,7 @@ public class TourGuideService implements ITourGuideService {
     @Override
     public List<Attraction> getNearByAttractions(
             final VisitedLocation visitedLocation) {
-        List<Attraction> listOfAttraction = getAllAttractions();
+        List<Attraction> listOfAttraction = getAttractions();
 
         List<Attraction> nearbyFiveAttractions = listOfAttraction.stream()
                 .sorted(Comparator.comparingDouble(a -> rewardsService
@@ -380,7 +386,7 @@ public class TourGuideService implements ITourGuideService {
     /**
      * {@inheritDoc}
      */
-    public List<Attraction> getAllAttractions() {
+    public List<Attraction> getAllAttractionsFromGpsTools() {
         final String attractionUri = "/getAllAttractions";
 
         Flux<Attraction> attractionsFlux = webClientGps.get()
@@ -390,7 +396,7 @@ public class TourGuideService implements ITourGuideService {
 
         List<Attraction> listOfAttraction = attractionsFlux.collectList()
                 .block();
-
+        setAttractions(listOfAttraction);
         return listOfAttraction;
     }
 
@@ -419,8 +425,7 @@ public class TourGuideService implements ITourGuideService {
                 user.getLastVisitedLocation().getLocation().getLatitude(),
                 user.getLastVisitedLocation().getLocation().getLongitude()));
 
-        TreeMap<String, NearbyAttractionDTO>
-        suggestedAttractions = new TreeMap<>();
+        TreeMap<String, NearbyAttractionDTO> suggestedAttractions = new TreeMap<>();
         List<Attraction> attractionsList = getNearByAttractions(
                 user.getLastVisitedLocation());
         final AtomicInteger indexHolder = new AtomicInteger(1);
@@ -528,7 +533,7 @@ public class TourGuideService implements ITourGuideService {
      * This method creates users for tests.
      */
     private void initializeInternalUsers() {
-        List<Attraction> attractions = getAllAttractions();
+        List<Attraction> attractions = getAllAttractionsFromGpsTools();
         IntStream.range(0, InternalTestHelper.getInternalUserNumber())
                 .forEach(i -> {
                     String userName = "internalUser" + i;
@@ -606,4 +611,24 @@ public class TourGuideService implements ITourGuideService {
         return tracker;
     }
 
+    /**
+     * Getter of attractions, that is a class variable create to avoid many
+     * calls to GpsUtil.
+     *
+     * @return a List<Attraction>
+     */
+    public List<Attraction> getAttractions() {
+        return attractions;
+    }
+
+    /**
+     * Setter of attractions.
+     *
+     * @param pAttractions
+     */
+    public void setAttractions(List<Attraction> pAttractions) {
+        attractions = pAttractions;
+    }
+
+    
 }

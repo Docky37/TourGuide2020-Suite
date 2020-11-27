@@ -1,7 +1,6 @@
 package com.tripmaster.TourGuideV2.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -12,6 +11,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.money.Monetary;
 
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -301,8 +301,16 @@ public class TourGuideServiceTest {
 
         tourGuideService.addUser(user);
         // WHEN
-        VisitedLocationDTO visitedLocationDTO = tourGuideService
-                .trackUserLocation(user);
+        VisitedLocationDTO visitedLocationDTO = null;
+        @SuppressWarnings("unchecked")
+        CompletableFuture<VisitedLocationDTO> result = (CompletableFuture<VisitedLocationDTO>) tourGuideService.trackUserLocation(user);
+        try {
+            visitedLocationDTO = result.get();
+        } catch (InterruptedException | ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         // THEN
         assertThat(visitedLocationDTO.getUserId()).isEqualTo(user.getUserId());
     }

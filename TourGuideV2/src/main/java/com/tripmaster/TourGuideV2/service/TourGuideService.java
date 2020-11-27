@@ -12,6 +12,10 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -89,11 +93,13 @@ public class TourGuideService implements ITourGuideService {
     private boolean testMode = true;
 
     /**
-     * Create a locale list of attractions to avoid many calls on GpsUtil
-     * because this list has a low update frequency. This list is created
-     * when service is launched and need a daily update.
+     * Create a class list of attractions to avoid many calls on GpsUtil because
+     * this list has a low update frequency. This list is created when service
+     * is launched and need a daily update.
      */
     private List<Attraction> attractions;
+
+    private Executor executorService = Executors.newFixedThreadPool(1000);
 
     /**
      * This class constructor allows Spring to inject 3 beans, RewardsService
@@ -170,21 +176,22 @@ public class TourGuideService implements ITourGuideService {
      * {@inheritDoc}
      */
     @Override
-    public VisitedLocationDTO trackUserLocation(final User user) {
-        final String getLocationUri = "/getUserLocation?userId="
-                + user.getUserId();
+    public CompletableFuture<VisitedLocationDTO> trackUserLocation(final User user) {
+        return CompletableFuture.supplyAsync(() -> {
+            final String getLocationUri = "/getUserLocation?userId="
+                    + user.getUserId();
+            Optional<VisitedLocationDTO> optVisitedLocationDTO = Optional
+                    .ofNullable(webClientGps.get()
+                            .uri(getLocationUri)
+                            .retrieve()
+                            .bodyToMono(VisitedLocationDTO.class)
+                            .block());
 
-        Optional<VisitedLocationDTO> optVisitedLocationDTO = Optional
-                .ofNullable(webClientGps.get()
-                        .uri(getLocationUri)
-                        .retrieve()
-                        .bodyToMono(VisitedLocationDTO.class)
-                        .block());
-
-        VisitedLocationDTO visitedLocationDTO = optVisitedLocationDTO
-                .orElseThrow();
-        saveNewVisitedLocation(user, visitedLocationDTO);
-        return visitedLocationDTO;
+            VisitedLocationDTO visitedLocationDTO = optVisitedLocationDTO
+                    .orElseThrow();
+            saveNewVisitedLocation(user, visitedLocationDTO);
+            return visitedLocationDTO;
+        }, executorService );
     }
 
     /**
@@ -215,7 +222,7 @@ public class TourGuideService implements ITourGuideService {
     @Override
     public VisitedLocationDTO getUserLocation(final User user) {
         VisitedLocation visitedLocation;
-        VisitedLocationDTO visitedLocationDTO;
+        VisitedLocationDTO visitedLocationDTO = null;
         if (user.getVisitedLocations().size() > 0) {
             visitedLocation = user.getLastVisitedLocation();
             visitedLocationDTO = new VisitedLocationDTO(
@@ -225,7 +232,13 @@ public class TourGuideService implements ITourGuideService {
                     visitedLocation.getUserId());
 
         } else {
-            visitedLocationDTO = trackUserLocation(user);
+            CompletableFuture<VisitedLocationDTO> result = trackUserLocation(user);
+            try {
+                visitedLocationDTO = result.get();
+            } catch (InterruptedException | ExecutionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
 
         return visitedLocationDTO;
@@ -630,5 +643,4 @@ public class TourGuideService implements ITourGuideService {
         attractions = pAttractions;
     }
 
-    
 }

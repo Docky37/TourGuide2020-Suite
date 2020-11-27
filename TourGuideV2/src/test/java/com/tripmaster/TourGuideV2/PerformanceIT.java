@@ -2,6 +2,8 @@ package com.tripmaster.TourGuideV2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -22,7 +24,7 @@ import com.tripmaster.TourGuideV2.domain.Attraction;
 import com.tripmaster.TourGuideV2.domain.Location;
 import com.tripmaster.TourGuideV2.domain.User;
 import com.tripmaster.TourGuideV2.domain.VisitedLocation;
-
+import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 import com.tripmaster.TourGuideV2.helper.InternalTestHelper;
 import com.tripmaster.TourGuideV2.service.IRewardsService;
 import com.tripmaster.TourGuideV2.service.RewardsService;
@@ -41,6 +43,7 @@ public class PerformanceIT {
 
     int totalRewards = 0;
 
+    int count = 0;
     /*
      * A note on performance improvements:
      * 
@@ -69,28 +72,38 @@ public class PerformanceIT {
 
         // Users should be incremented up to 100,000, and test finishes within
         // 15 minutes
-        InternalTestHelper.setInternalUserNumber(1000);
+        InternalTestHelper.setInternalUserNumber(100);
         TourGuideService tourGuideService = new TourGuideService(
                 rewardsService, webClientTripDeals, webClientGps);
+        tourGuideService.getTracker().stopTracking();
 
         List<User> allUsers = tourGuideService.getAllUsers();
-
-        ExecutorService executorService = Executors.newFixedThreadPool(100);
-        CountDownLatch countDownLatch = new CountDownLatch(allUsers.size());
-        System.out.println(
-                "countDownLatch.getCount() = " + countDownLatch.getCount());
-
+        allUsers.forEach(u-> u.clearVisitedLocations());
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
         allUsers.forEach(u -> executorService.submit(() -> {
-            tourGuideService.trackUserLocation(u);
-            countDownLatch.countDown();
-            System.out.println(countDownLatch.getCount());
+            CompletableFuture<?> result = tourGuideService.trackUserLocation(u);
+            assertThat(result).isNotNull()
+                    .isInstanceOf(CompletableFuture.class);
+            try {
+                assertThat(result.get()).isInstanceOf(VisitedLocationDTO.class);
+                System.out.println(
+                        u.getUserName() + " " + result.get().toString());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
         }));
 
-        countDownLatch.await();
-        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+        }
         stopWatch.stop();
         tourGuideService.getTracker().stopTracking();
 
@@ -99,6 +112,11 @@ public class PerformanceIT {
                 + " seconds.");
         assertThat(TimeUnit.MINUTES.toSeconds(15) >= TimeUnit.MILLISECONDS
                 .toSeconds(stopWatch.getTime())).isTrue();
+        allUsers.forEach(u -> {
+            assertThat(u.getVisitedLocations().size()).isEqualTo(1);
+        });
+        System.out.println("final count -> " + count);
+
     }
 
     @Test
@@ -113,7 +131,8 @@ public class PerformanceIT {
         ExecutorService executorService = Executors.newFixedThreadPool(1000);
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        List<Attraction> attractions = tourGuideService.getAllAttractions();
+        List<Attraction> attractions = tourGuideService
+                .getAllAttractionsFromGpsTools();
         Attraction attraction = attractions.get(0);
         List<User> allUsers = tourGuideService.getAllUsers();
         allUsers.forEach(u -> u.addToVisitedLocations(
@@ -132,7 +151,6 @@ public class PerformanceIT {
                 System.out.println(
                         u.getUserName() + " " + result.get().toString());
             } catch (InterruptedException | ExecutionException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             ;
@@ -159,6 +177,7 @@ public class PerformanceIT {
         System.out.println(allUsers.size());
         allUsers.forEach(u -> totalRewards += u.getUserRewards().size());
         System.out.println(totalRewards);
+
     }
 
 }

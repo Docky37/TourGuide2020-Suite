@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import javax.money.Monetary;
 
@@ -301,18 +299,11 @@ public class TourGuideServiceTest {
 
         tourGuideService.addUser(user);
         // WHEN
-        VisitedLocationDTO visitedLocationDTO = null;
-        @SuppressWarnings("unchecked")
-        CompletableFuture<VisitedLocationDTO> result = (CompletableFuture<VisitedLocationDTO>) tourGuideService.trackUserLocation(user);
-        try {
-            visitedLocationDTO = result.get();
-        } catch (InterruptedException | ExecutionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        VisitedLocationDTO result = tourGuideService.trackUserLocation(user)
+                .block();
 
         // THEN
-        assertThat(visitedLocationDTO.getUserId()).isEqualTo(user.getUserId());
+        assertThat(result.getUserId()).isEqualTo(user.getUserId());
     }
 
     @Test

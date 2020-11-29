@@ -2,12 +2,9 @@ package com.tripmaster.TourGuideV2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,7 +21,6 @@ import com.tripmaster.TourGuideV2.domain.Attraction;
 import com.tripmaster.TourGuideV2.domain.Location;
 import com.tripmaster.TourGuideV2.domain.User;
 import com.tripmaster.TourGuideV2.domain.VisitedLocation;
-import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
 import com.tripmaster.TourGuideV2.helper.InternalTestHelper;
 import com.tripmaster.TourGuideV2.service.IRewardsService;
 import com.tripmaster.TourGuideV2.service.RewardsService;
@@ -66,56 +62,45 @@ public class PerformanceIT {
      * assertTrue(TimeUnit.MINUTES.toSeconds(20) >=
      * TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
      */
+        int resultsCount = 0;
 
     @Test
     public void highVolumeTrackLocation() throws InterruptedException {
 
         // Users should be incremented up to 100,000, and test finishes within
         // 15 minutes
-        InternalTestHelper.setInternalUserNumber(100);
+        InternalTestHelper.setInternalUserNumber(100000);
         TourGuideService tourGuideService = new TourGuideService(
                 rewardsService, webClientTripDeals, webClientGps);
         tourGuideService.getTracker().stopTracking();
 
         List<User> allUsers = tourGuideService.getAllUsers();
         allUsers.forEach(u-> u.clearVisitedLocations());
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        allUsers.forEach(u -> executorService.submit(() -> {
-            CompletableFuture<?> result = tourGuideService.trackUserLocation(u);
-            assertThat(result).isNotNull()
-                    .isInstanceOf(CompletableFuture.class);
-            try {
-                assertThat(result.get()).isInstanceOf(VisitedLocationDTO.class);
-                System.out.println(
-                        u.getUserName() + " " + result.get().toString());
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        }));
-
-        try {
-            if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
-                executorService.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
+        allUsers.forEach(u ->  {
+            tourGuideService.trackUserLocation(u)
+                    .subscribe(visitedLocation -> {
+                        resultsCount++;
+                    });
+        });
+        while(resultsCount < allUsers.size()) {
+            System.out.println(resultsCount);
+            Thread.sleep(5000L);
         }
+
         stopWatch.stop();
         tourGuideService.getTracker().stopTracking();
 
-        System.out.println("highVolumeTrackLocation: Time Elapsed: "
+        System.out.println("\n  *** highVolumeTrackLocation: Time Elapsed: "
                 + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime())
-                + " seconds.");
+                + " seconds.\n");
         assertThat(TimeUnit.MINUTES.toSeconds(15) >= TimeUnit.MILLISECONDS
                 .toSeconds(stopWatch.getTime())).isTrue();
         allUsers.forEach(u -> {
             assertThat(u.getVisitedLocations().size()).isEqualTo(1);
         });
-        System.out.println("final count -> " + count);
 
     }
 

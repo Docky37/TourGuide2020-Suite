@@ -145,7 +145,8 @@ public class TourGuideController {
             responseContainer = "List")
     @GetMapping("/getAllAttractions")
     public List<AttractionDTO> getAllAttractions() {
-        List<Attraction> attractions = tourGuideService.getAllAttractionsFromGpsTools();
+        List<Attraction> attractions = tourGuideService
+                .getAllAttractionsFromGpsTools();
         List<AttractionDTO> attractionsDTO = new ArrayList<>();
         attractions.forEach(a -> {
             attractionsDTO.add(new AttractionDTO(a.getAttractionName(),

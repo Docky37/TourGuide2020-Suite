@@ -3,7 +3,6 @@ package com.tripmaster.TourGuideV2.service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Service;
 
@@ -16,6 +15,8 @@ import com.tripmaster.TourGuideV2.dto.ProviderDTO;
 import com.tripmaster.TourGuideV2.dto.UserPreferencesDTO;
 import com.tripmaster.TourGuideV2.dto.UserRewardsDTO;
 import com.tripmaster.TourGuideV2.dto.VisitedLocationDTO;
+
+import reactor.core.publisher.Mono;
 
 @Service
 public interface ITourGuideService {
@@ -79,9 +80,9 @@ public interface ITourGuideService {
      * Reward for the given user.
      *
      * @param user
-     * @return a VisitedLocationDTO
+     * @return a Mono<VisitedLocationDTO>
      */
-    CompletableFuture<?> trackUserLocation(User user);
+    Mono<VisitedLocationDTO> trackUserLocation(User user);
 
     /**
      * This method build the requested Data Transfer Object from the list of the

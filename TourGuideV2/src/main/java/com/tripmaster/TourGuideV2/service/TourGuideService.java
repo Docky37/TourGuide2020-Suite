@@ -1,5 +1,6 @@
 package com.tripmaster.TourGuideV2.service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -8,14 +9,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -47,6 +43,8 @@ import com.tripmaster.TourGuideV2.helper.InternalTestHelper;
 import com.tripmaster.TourGuideV2.tracker.Tracker;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 /**
  * This service layer class is used dealing with external GpsUtil.jar and
@@ -58,6 +56,16 @@ import reactor.core.publisher.Flux;
 @Service
 public class TourGuideService implements ITourGuideService {
 
+    /**
+     * Number of retry of WebClient requests that get no answer.
+     */
+    private static final int RETRY_PARAM_NUMBER_OF_ITERATION = 10;
+
+    /**
+     * Delay before a new retry of WebClient requests without answer.
+     */
+    private static final Duration RETRY_PARAM_DELAY_BEFORE_RETRY = Duration
+            .ofSeconds(30);
     /**
      * Create a SLF4J/LOG4J LOGGER instance.
      */
@@ -99,11 +107,9 @@ public class TourGuideService implements ITourGuideService {
      */
     private List<Attraction> attractions;
 
-    private Executor executorService = Executors.newFixedThreadPool(1000);
-
     /**
      * This class constructor allows Spring to inject 3 beans, RewardsService
-     * and 2 WebClient beans discriminated against by the @Qualifier annotation.
+     * and 2 WebClient beans discriminated against by the Qualifier annotation.
      *
      * @param pRewardsService
      * @param pWebClientTripDeals
@@ -111,7 +117,8 @@ public class TourGuideService implements ITourGuideService {
      */
     @Autowired
     public TourGuideService(final IRewardsService pRewardsService,
-            @Qualifier("getWebClientTripDeals") final WebClient pWebClientTripDeals,
+            @Qualifier("getWebClientTripDeals")
+                    final WebClient pWebClientTripDeals,
             @Qualifier("getWebClientGps") final WebClient pWebClientGps) {
         rewardsService = pRewardsService;
         webClientGps = pWebClientGps;
@@ -176,22 +183,34 @@ public class TourGuideService implements ITourGuideService {
      * {@inheritDoc}
      */
     @Override
-    public CompletableFuture<VisitedLocationDTO> trackUserLocation(final User user) {
-        return CompletableFuture.supplyAsync(() -> {
-            final String getLocationUri = "/getUserLocation?userId="
-                    + user.getUserId();
-            Optional<VisitedLocationDTO> optVisitedLocationDTO = Optional
-                    .ofNullable(webClientGps.get()
-                            .uri(getLocationUri)
-                            .retrieve()
-                            .bodyToMono(VisitedLocationDTO.class)
-                            .block());
+    public Mono<VisitedLocationDTO> trackUserLocation(final User user) {
+        final String getLocationUri = "/getUserLocation?userId="
+                + user.getUserId();
 
-            VisitedLocationDTO visitedLocationDTO = optVisitedLocationDTO
-                    .orElseThrow();
-            saveNewVisitedLocation(user, visitedLocationDTO);
-            return visitedLocationDTO;
-        }, executorService );
+        return webClientGps.get()
+                .uri(getLocationUri)
+                .retrieve()
+                .bodyToMono(VisitedLocationDTO.class)
+                .map(visitedLocationDTO -> {
+                    saveNewVisitedLocation(user, visitedLocationDTO);
+                    return visitedLocationDTO;
+                })
+                .retryWhen(manageRetry());
+    }
+
+    /**
+     * Private method that defines the strategy to decide when to retry (number
+     * of iterations and delay).
+     *
+     * @return a Retry - the strategy to decide when to retry
+     */
+    private Retry manageRetry() {
+        return Retry
+                .backoff(RETRY_PARAM_NUMBER_OF_ITERATION,
+                        RETRY_PARAM_DELAY_BEFORE_RETRY)
+                .doBeforeRetry(objectRetryContext -> logger.info(
+                        "\nError occured, retrying {} ---------------------\n",
+                        objectRetryContext.totalRetries()));
     }
 
     /**
@@ -232,13 +251,7 @@ public class TourGuideService implements ITourGuideService {
                     visitedLocation.getUserId());
 
         } else {
-            CompletableFuture<VisitedLocationDTO> result = trackUserLocation(user);
-            try {
-                visitedLocationDTO = result.get();
-            } catch (InterruptedException | ExecutionException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            visitedLocationDTO = trackUserLocation(user).block();
         }
 
         return visitedLocationDTO;
@@ -438,7 +451,8 @@ public class TourGuideService implements ITourGuideService {
                 user.getLastVisitedLocation().getLocation().getLatitude(),
                 user.getLastVisitedLocation().getLocation().getLongitude()));
 
-        TreeMap<String, NearbyAttractionDTO> suggestedAttractions = new TreeMap<>();
+        TreeMap<String, NearbyAttractionDTO> suggestedAttractions =
+                new TreeMap<>();
         List<Attraction> attractionsList = getNearByAttractions(
                 user.getLastVisitedLocation());
         final AtomicInteger indexHolder = new AtomicInteger(1);
@@ -546,7 +560,7 @@ public class TourGuideService implements ITourGuideService {
      * This method creates users for tests.
      */
     private void initializeInternalUsers() {
-        List<Attraction> attractions = getAllAttractionsFromGpsTools();
+        List<Attraction> attractionList = getAllAttractionsFromGpsTools();
         IntStream.range(0, InternalTestHelper.getInternalUserNumber())
                 .forEach(i -> {
                     String userName = "internalUser" + i;
@@ -554,7 +568,7 @@ public class TourGuideService implements ITourGuideService {
                     String email = userName + "@tourGuide.com";
                     User user = new User(UUID.randomUUID(), userName, phone,
                             email);
-                    generateUserLocationHistory(user, attractions);
+                    generateUserLocationHistory(user, attractionList);
                     logger.debug("user = " + user.toString());
                     internalUserMap.put(userName, user);
                 });
@@ -567,10 +581,10 @@ public class TourGuideService implements ITourGuideService {
      * calling 3 sub method to generate randomized latitude, longitude and time.
      *
      * @param user
-     * @param attractions
+     * @param pAttractions
      */
     private void generateUserLocationHistory(final User user,
-            final List<Attraction> attractions) {
+            final List<Attraction> pAttractions) {
         IntStream.range(0, NUMBER_OF_USER_VISITED_LOCATIONS_TO_CREATE)
                 .forEach(i -> {
                     user.addToVisitedLocations(
@@ -639,7 +653,7 @@ public class TourGuideService implements ITourGuideService {
      *
      * @param pAttractions
      */
-    public void setAttractions(List<Attraction> pAttractions) {
+    public void setAttractions(final List<Attraction> pAttractions) {
         attractions = pAttractions;
     }
 

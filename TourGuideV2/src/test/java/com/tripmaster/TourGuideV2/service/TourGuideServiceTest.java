@@ -44,6 +44,7 @@ import com.tripmaster.TourGuideV2.service.TourGuideService;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import reactor.core.publisher.Mono;
 
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -333,23 +334,13 @@ public class TourGuideServiceTest {
         System.out.println(attractions.toString());
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     @DisplayName("Given a user when Get Suggestions thenReturnSuggestions")
     public void givenAUser_whenGetSuggestions_thenReturnSuggestions() {
         System.out.println(
                 "\n*** Given a user when Get Suggestions thenReturnSuggestions ***");
         // GIVEN
-        attractions.add(new Attraction(UUID.randomUUID(), "Clos Lucé",
-                "Amboise", "France", 47.410445, 0.991830));
-        attractions.add(
-                new Attraction(UUID.randomUUID(), "Eglise Saint-Jean-Baptiste",
-                        "Saint-Jean-de-Luz", "France", 43.386897, -1.661847));
-        attractions.add(new Attraction(UUID.randomUUID(), "La Rhune",
-                "Ascain", "France", 43.309685, -1.635410));
-        attractions.add(new Attraction(UUID.randomUUID(), "Grand place",
-                "Arras", "France",
-                50.292564, 2.781040));
-
         jsonResult = "[";
         attractions.forEach(
                 a -> jsonResult = jsonResult.concat(a.toString() + ","));
@@ -369,7 +360,15 @@ public class TourGuideServiceTest {
         User user = new User(userId, "John DOE", "01.02.03.04.05",
                 "john.doe@tourGuide.com");
         user.addToVisitedLocations(new VisitedLocation(user.getUserId(),
-                new Location(45d, 1d), new Date()));
+                new Location(48.841419, 2.320694), new Date()));
+        given(rewardsService.getDistance(any(Attraction.class),
+                any(Location.class))).willReturn(2.6, 282.0, 2.5, 301.0, 188.0,
+                        680.0, 685.0, 164.0, 2.5, 2.6, 164.0, 188.0, 282.0);
+        given(rewardsService.getRewardPoints(any(VisitedLocation.class),
+                any(Attraction.class), any(User.class))).willReturn(
+                        Mono.just(123),
+                        Mono.just(456), Mono.just(777), Mono.just(231),
+                        Mono.just(765));
 
         // WHEN
         AttractionsSuggestionDTO suggestion = tourGuideService
@@ -481,7 +480,6 @@ public class TourGuideServiceTest {
                         .setHeader(HttpHeaders.CONTENT_TYPE,
                                 MediaType.APPLICATION_JSON_VALUE)
                         .setBody(visitedLocationResult));
-
         // WHEN
         VisitedLocationDTO visitedLocationDTO = tourGuideService
                 .getUserLocation(user);
@@ -503,8 +501,9 @@ public class TourGuideServiceTest {
         User user = new User(UUID.randomUUID(), "John DOE", "01.02.03.04.05",
                 "john.doe@tourGuide.com");
 
-        given(rewardsService.getRewardPoints(any(Attraction.class),
-                any(User.class))).willReturn(77);
+        given(rewardsService.getRewardPoints(any(VisitedLocation.class),
+                any(Attraction.class),
+                any(User.class))).willReturn(Mono.just(77));
 
         user.addUserReward(new UserReward(new VisitedLocation(user.getUserId(),
                 new Location(attractions.get(0).getLatitude(),

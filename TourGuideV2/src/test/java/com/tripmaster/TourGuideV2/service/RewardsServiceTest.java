@@ -8,8 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -86,7 +86,7 @@ public class RewardsServiceTest {
 
     @Test // Here we test the calculateRewards and getRewardPoints methods
     @DisplayName("Given a nearby attraction when calculateRewards then 1 reward created")
-    public void given1VisitedLocationAnd2NearbyAttractions_whenCalculateRewards_thenUserRewardsListSizeIsEqualTo2()
+    public void givenAVisitedLocationAndANearbyAttractions_whenCalculateRewards_thenUserRewardsListSizeIsEqualTo1()
             throws InterruptedException, ExecutionException {
         System.out.println(
                 "\n\n *** Given a nearby attraction when calculateRewards"
@@ -107,12 +107,9 @@ public class RewardsServiceTest {
                                 MediaType.APPLICATION_JSON_VALUE)
                         .setBody("77"));
 
-
         // WHEN
-        CompletableFuture<?> result = rewardsService.calculateRewards(user,
-                attractions);
-        assertThat(result).isNotNull().isInstanceOf(CompletableFuture.class);
-        assertThat(result.get()).isInstanceOf(User.class);
+        rewardsService.calculateRewards(user, attractions);
+        TimeUnit.SECONDS.sleep(1);
         List<UserReward> userRewards = user.getUserRewards();
         System.out.println(userRewards.size());
         // THEN
@@ -165,7 +162,8 @@ public class RewardsServiceTest {
         assertThat(distance).isEqualTo(422);
     }
 
-    @Test // Here we test both calculate rewards and private nearAttraction method
+    @Test // Here we test both calculate rewards and private nearAttraction
+          // method
     @DisplayName("Given MaxValue for ProximityBuffer, whenGetAttractions then return all Attractions")
     public void givenAMaxIntProximityBuffer_whenCalculateRewards_thenReturnAllAttractions()
             throws InterruptedException, ExecutionException {
@@ -173,8 +171,8 @@ public class RewardsServiceTest {
                 "\n\n *** Given MaxValue for ProximityBuffer, whenGetAttractions then return all Attractions ***");
         // GIVEN
         rewardsService.setProximityBuffer(Integer.MAX_VALUE);
-        User user = new User(UUID.randomUUID(), "jon", "000",
-                "jon@tourGuide.com");
+        User user = new User(UUID.randomUUID(), "john", "000",
+                "john@tourGuide.com");
         user.addToVisitedLocations(
                 new VisitedLocation(user.getUserId(), new Location(
                         attractions.get(0).getLatitude(),
@@ -190,11 +188,13 @@ public class RewardsServiceTest {
         });
 
         // WHEN
-        CompletableFuture<?> result = rewardsService.calculateRewards(user,
-                attractions);
-        assertThat(result).isNotNull().isInstanceOf(CompletableFuture.class);
-        assertThat(result.get()).isInstanceOf(User.class);
+        rewardsService.calculateRewards(user, attractions);
         List<UserReward> userRewards = user.getUserRewards();
+        while(userRewards.size() < attractions.size()) {
+            TimeUnit.MILLISECONDS.sleep(200);
+            userRewards = user.getUserRewards();
+        }
+        
         // THEN
         System.out.println(userRewards.size());
         assertThat(userRewards.size()).isEqualTo(attractions.size());

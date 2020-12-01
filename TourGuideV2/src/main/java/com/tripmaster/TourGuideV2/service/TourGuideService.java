@@ -118,7 +118,7 @@ public class TourGuideService implements ITourGuideService {
     @Autowired
     public TourGuideService(final IRewardsService pRewardsService,
             @Qualifier("getWebClientTripDeals")
-                    final WebClient pWebClientTripDeals,
+    final WebClient pWebClientTripDeals,
             @Qualifier("getWebClientGps") final WebClient pWebClientGps) {
         rewardsService = pRewardsService;
         webClientGps = pWebClientGps;
@@ -470,7 +470,9 @@ public class TourGuideService implements ITourGuideService {
                                     rewardsService.getDistance(a,
                                             user.getLastVisitedLocation()
                                                     .getLocation()),
-                                    rewardsService.getRewardPoints(a, user)));
+                                    rewardsService.getRewardPoints(
+                                            user.getLastVisitedLocation(), a,
+                                            user).block()));
                 });
 
         suggestion.setSuggestedAttractions(suggestedAttractions);
@@ -530,21 +532,21 @@ public class TourGuideService implements ITourGuideService {
     private static final int NUMBER_OF_USER_VISITED_LOCATIONS_TO_CREATE = 3;
 
     /**
-     * Define the north limit of user's locations area (USA for Tests).
+     * Define the north limit of user's locations area.
      */
-    private static final double LATITUDE_NORTH_LIMIT = 42;
+    private static final double LATITUDE_NORTH_LIMIT = 85.05112878;
     /**
-     * Define the south limit of user's locations area (USA for Tests).
+     * Define the south limit of user's locations area.
      */
-    private static final double LATITUDE_SOUTH_LIMIT = 25;
+    private static final double LATITUDE_SOUTH_LIMIT = -85.05112878;
     /**
-     * Define the west limit of user's locations area (USA for Tests).
+     * Define the west limit of user's locations area.
      */
-    private static final double LONGITUDE_WEST_LIMIT = -125;
+    private static final double LONGITUDE_WEST_LIMIT = -180;
     /**
-     * Define the east limit of user's locations area (USA for Tests).
+     * Define the east limit of user's locations area.
      */
-    private static final double LONGITUDE_EAST_LIMIT = -66;
+    private static final double LONGITUDE_EAST_LIMIT = 180;
 
     /**
      * Number 30 used in time randomization.
@@ -569,7 +571,7 @@ public class TourGuideService implements ITourGuideService {
                     User user = new User(UUID.randomUUID(), userName, phone,
                             email);
                     generateUserLocationHistory(user, attractionList);
-                    logger.debug("user = " + user.toString());
+                    //logger.debug("user = " + user.toString());
                     internalUserMap.put(userName, user);
                 });
         logger.debug("Created " + InternalTestHelper.getInternalUserNumber()

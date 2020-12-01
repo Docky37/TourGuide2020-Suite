@@ -180,6 +180,13 @@ public class User {
     }
 
     /**
+     * Only used for performance to clean User for performance test.
+     */
+    public void clearRewards() {
+        userRewards.clear();
+    }
+
+    /**
      * Getter of the userRewards List.
      *
      * @return a List<UserReward>

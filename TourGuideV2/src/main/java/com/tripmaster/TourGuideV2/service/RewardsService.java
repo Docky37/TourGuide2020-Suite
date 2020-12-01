@@ -1,10 +1,7 @@
 package com.tripmaster.TourGuideV2.service;
 
+import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +16,9 @@ import com.tripmaster.TourGuideV2.domain.User;
 import com.tripmaster.TourGuideV2.domain.UserReward;
 import com.tripmaster.TourGuideV2.domain.VisitedLocation;
 
+import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
+
 /**
  * This service layer class is used to deal with the external RewardCentral.jar
  * library to manage user rewards.
@@ -32,6 +32,17 @@ public class RewardsService implements IRewardsService {
      * Create a SLF4J/LOG4J LOGGER instance.
      */
     private Logger logger = LoggerFactory.getLogger(RewardsService.class);
+
+    /**
+     * Number of retry of WebClient requests that get no answer.
+     */
+    private static final int RETRY_PARAM_NUMBER_OF_ITERATION = 20;
+
+    /**
+     * Delay before a new retry of WebClient requests without answer.
+     */
+    private static final Duration RETRY_PARAM_DELAY_BEFORE_RETRY = Duration
+            .ofSeconds(30);
 
     /**
      * Number 60 use in distance calculation.
@@ -114,31 +125,62 @@ public class RewardsService implements IRewardsService {
     }
 
     /**
-     * Asynchronous method use to calculate user rewards.
-     *
-     * @param user
-     * @return a CompletableFuture<?>
+     * {@inheritDoc}
      */
     @Override
-    public CompletableFuture<?> calculateRewards(final User user,
+    public void calculateRewards(final User user,
             final List<Attraction> attractions) {
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        return CompletableFuture.supplyAsync(() -> {
-            user.getVisitedLocations().forEach(vl -> {
-                attractions.stream()
-                        .filter(a -> nearAttraction(vl, a))
-                        .forEach(a -> {
-                            if (user.getUserRewards().stream().noneMatch(
-                                    r -> r.getAttraction().getAttractionName()
-                                            .equals(a.getAttractionName()))) {
-                                user.addUserReward(new UserReward(vl, a,
-                                        getRewardPoints(a, user)));
-                            }
-                        });
-            });
-            return user;
-        }, executorService);
+        user.getVisitedLocations().forEach(vl -> {
+            attractions.stream()
+                    .filter(a -> nearAttraction(vl, a))
+                    .forEach(a -> {
+                        if (user.getUserRewards().stream().noneMatch(
+                                r -> r.getAttraction().getAttractionName()
+                                        .equals(a.getAttractionName()))) {
+                            getRewardPoints(vl, a, user)
+                                    .subscribe();
+                        }
+                    });
+        });
+    };
 
+    /**
+     * This method builds and sends an HTTP request on localhost:8787/getReward
+     * in order to get the attraction reward points for the given user.
+     *
+     * @param vl
+     * @param attraction
+     * @param user
+     * @return an Mono<Integer>: the count of reward points
+     */
+    public Mono<Integer> getRewardPoints(final VisitedLocation vl,
+            final Attraction attraction,
+            final User user) {
+        return webClientReward.get()
+                .uri("/getReward?attractionId=" + attraction.getAttractionId()
+                        + "&userId=" + user.getUserId())
+                .retrieve()
+                .bodyToMono(Integer.class)
+                .map(reward -> {
+                    user.addUserReward(new UserReward(vl, attraction, reward));
+                    return reward;
+                })
+                .retryWhen(manageRetry());
+    }
+
+    /**
+     * Private method that defines the strategy to decide when to retry (number
+     * of iterations and delay).
+     *
+     * @return a Retry - the strategy to decide when to retry
+     */
+    private Retry manageRetry() {
+        return Retry
+                .backoff(RETRY_PARAM_NUMBER_OF_ITERATION,
+                        RETRY_PARAM_DELAY_BEFORE_RETRY)
+                .doBeforeRetry(objectRetryContext -> logger.info(
+                        "\nError occured, retrying {} ---------------------\n",
+                        objectRetryContext.totalRetries()));
     }
 
     /**
@@ -170,29 +212,11 @@ public class RewardsService implements IRewardsService {
      */
     private boolean nearAttraction(final VisitedLocation visitedLocation,
             final Attraction attraction) {
-        logger.debug("nearAttraction - distance = "
-                + getDistance(attraction, visitedLocation.getLocation()));
+        // logger.debug("nearAttraction - distance = "
+        // + getDistance(attraction, visitedLocation.getLocation()));
 
         return !(getDistance(attraction,
                 visitedLocation.getLocation()) > proximityBuffer);
-    }
-
-    /**
-     * This method builds and sends an HTTP request on localhost:8787/getReward
-     * in order to get the attraction reward points for the given user.
-     *
-     * @param attraction
-     * @param user
-     * @return an int: the count of reward points
-     */
-    public int getRewardPoints(final Attraction attraction, final User user) {
-        Optional<Integer> optInt = Optional.ofNullable(webClientReward.get()
-                .uri("/getReward?attractionId=" + attraction.getAttractionId()
-                        + "&userId=" + user.getUserId())
-                .retrieve()
-                .bodyToMono(Integer.class).block());
-
-        return optInt.isEmpty() ? 0 : optInt.get();
     }
 
     /**

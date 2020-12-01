@@ -1,11 +1,13 @@
 package com.tripmaster.TourGuideV2.service;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import com.tripmaster.TourGuideV2.domain.Attraction;
 import com.tripmaster.TourGuideV2.domain.Location;
 import com.tripmaster.TourGuideV2.domain.User;
+import com.tripmaster.TourGuideV2.domain.VisitedLocation;
+
+import reactor.core.publisher.Mono;
 
 public interface IRewardsService {
 
@@ -26,10 +28,8 @@ public interface IRewardsService {
      *
      * @param user
      * @param attractions
-     * @return a CompletableFuture<?>
      */
-    CompletableFuture<?> calculateRewards(User user,
-            List<Attraction> attractions);
+    void calculateRewards(User user, List<Attraction> attractions);
 
     /**
      * This method checks if the distance between location and attraction and
@@ -64,10 +64,12 @@ public interface IRewardsService {
     /**
      * Get the reward points the user has wan for a visited attraction.
      *
+     * @param visitedLocation
      * @param attraction
      * @param user
-     * @return an int
+     * @return a Mono<Integer>
      */
-    int getRewardPoints(Attraction attraction, User user);
+    Mono<Integer> getRewardPoints(VisitedLocation visitedLocation,
+            Attraction attraction, User user);
 
 }

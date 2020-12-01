@@ -1,4 +1,4 @@
-# TourGuide2020 Suite - v2.1 release (23/11/2020)
+# TourGuide2020 Suite - v2.1.2 release (01/12/2020)
 
 ## Overview:
 TourGuide is a Spring Boot application of TripMaster's applications. It allows users to discover attractions near of their location and provides them discounts on hotel stays and reductions on ticket prices for shows.
@@ -25,7 +25,7 @@ TourGuide2020 is now a suite of 4 SpringBoot micro-services:
 
 ## Content
 
-The current v2.1.1 release (23 Nov. 2020) add UserNotFoundException, some tests and implements SpotBugs reports.
+The current v2.1.2 release (01/12/2020) optimizes tracking and getRewards to boost performance with a non-blocking implementation of WebClient (Spring WebFlux - Reactive programming)
 
 Previously in TourGuide2020:  
 
@@ -35,6 +35,8 @@ Previously in TourGuide2020:
 
 - The v2.0.2.beta_release (20 Nov. 2020) finalizes functionalities, tests, code style and now runs in 4 Docker's containers.
 
+- The v2.1.1 release (23 Nov. 2020) add UserNotFoundException, some tests and implements SpotBugs reports.
+
 ## Quick way to run with Docker
 The folder 'QuickWayToRunInDocker' contains a docker-compose.yml file that downloads the TourGuide2020-Suite images on my Docker Hub repository and runs the application.
 Change directory to 'QuickWayToRunInDocker' and use the command line '**docker-compose up -d**'.
@@ -42,7 +44,7 @@ Change directory to 'QuickWayToRunInDocker' and use the command line '**docker-c
 ## Other way
 Important: Now 2 profiles are available. The 'dev' profile is used to run applications into your IDE, the 'docker' profile is required to build the Docker image of TourGuideV2. Profile can be set in application.propertis file.
  
-1. This repository is divided in 4 parts; each one contains a SpringBoot v2.4.0 application built on Gradle v6.7
+1. This repository is divided in 4 parts; each one contains a SpringBoot v2.4.0 application built on Gradle v6.7.1
 2. The build.gradle file of each part allows you to export the bootJar file by running '**gradle bootJar**' command. Before to run it, check that you are in the application root directory.
 3. Exported file is located in build/libs sub-folder and, for the moment, need to be renamed (respectively as gps, rewards, tripdeals & tourguidev2). *I will do my best to change that!*
 4. At the root of each application you can find the Dockerfile that allows you to create a Docker image of the application with the Docker command  '**docker build -t imageName.**' with respectively gps, rewards, tripdeals and tourguide as imageName.

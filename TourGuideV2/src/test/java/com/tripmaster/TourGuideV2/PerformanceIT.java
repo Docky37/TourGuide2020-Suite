@@ -4,10 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.StopWatch;
@@ -37,9 +33,9 @@ public class PerformanceIT {
 
     WebClient webClientGps = WebClient.create("http://localhost:8889");;
 
-    int totalRewards = 0;
+    int visitedLocationsCount = 0;
+    int rewardsCount = 0;
 
-    int count = 0;
     /*
      * A note on performance improvements:
      * 
@@ -62,7 +58,6 @@ public class PerformanceIT {
      * assertTrue(TimeUnit.MINUTES.toSeconds(20) >=
      * TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
      */
-        int resultsCount = 0;
 
     @Test
     public void highVolumeTrackLocation() throws InterruptedException {
@@ -72,26 +67,35 @@ public class PerformanceIT {
         InternalTestHelper.setInternalUserNumber(100000);
         TourGuideService tourGuideService = new TourGuideService(
                 rewardsService, webClientTripDeals, webClientGps);
-        tourGuideService.getTracker().stopTracking();
 
+        tourGuideService.getTracker().stopTracking();
         List<User> allUsers = tourGuideService.getAllUsers();
-        allUsers.forEach(u-> u.clearVisitedLocations());
+        allUsers.forEach(u -> u.clearVisitedLocations());
+
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        allUsers.forEach(u ->  {
-            tourGuideService.trackUserLocation(u)
-                    .subscribe(visitedLocation -> {
-                        resultsCount++;
-                    });
+        allUsers.forEach(u -> {
+            tourGuideService.trackUserLocation(u).subscribe();
         });
-        while(resultsCount < allUsers.size()) {
-            System.out.println(resultsCount);
-            Thread.sleep(5000L);
+
+        while (visitedLocationsCount < allUsers.size()) {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            visitedLocationsCount = 0;
+            allUsers.forEach(u -> {
+                if (u.getVisitedLocations().size() > 0) {
+                    visitedLocationsCount++;
+                };
+            });
         }
+        System.out.println(visitedLocationsCount
+                + " visitedLocations... Ok now each user is localized!");
 
         stopWatch.stop();
-        tourGuideService.getTracker().stopTracking();
 
         System.out.println("\n  *** highVolumeTrackLocation: Time Elapsed: "
                 + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime())
@@ -106,63 +110,62 @@ public class PerformanceIT {
 
     @Test
     public void highVolumeGetRewards() {
-
         // Users should be incremented up to 100,000, and test finishes within
         // 20 minutes
-        InternalTestHelper.setInternalUserNumber(1000);
+        InternalTestHelper.setInternalUserNumber(100000);
         TourGuideService tourGuideService = new TourGuideService(
                 rewardsService, webClientTripDeals, webClientGps);
+
         tourGuideService.getTracker().stopTracking();
-        ExecutorService executorService = Executors.newFixedThreadPool(1000);
+        List<User> allUsers = tourGuideService.getAllUsers();
+        allUsers.forEach(u -> {
+            u.clearVisitedLocations();
+            u.clearRewards();
+        });
+
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
+
         List<Attraction> attractions = tourGuideService
                 .getAllAttractionsFromGpsTools();
         Attraction attraction = attractions.get(0);
-        List<User> allUsers = tourGuideService.getAllUsers();
+
         allUsers.forEach(u -> u.addToVisitedLocations(
                 new VisitedLocation(u.getUserId(),
                         new Location(attraction.getLatitude(),
                                 attraction.getLongitude()),
                         new Date())));
 
-        allUsers.forEach(u -> executorService.submit(() -> {
-            CompletableFuture<?> result = rewardsService.calculateRewards(u,
-                    attractions);
-            assertThat(result).isNotNull()
-                    .isInstanceOf(CompletableFuture.class);
+        allUsers.forEach(u -> {
+            rewardsService.calculateRewards(u, attractions);
+        });
+
+        while (rewardsCount < allUsers.size()) {
             try {
-                assertThat(result.get()).isInstanceOf(User.class);
-                System.out.println(
-                        u.getUserName() + " " + result.get().toString());
-            } catch (InterruptedException | ExecutionException e) {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            ;
-        }));
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(19, TimeUnit.MINUTES)) {
-                executorService.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
+            rewardsCount = 0;
+            allUsers.forEach(u -> {
+                if (u.getUserRewards().size() > 0) {
+                    rewardsCount++;
+                };
+            });
         }
+        System.out.println(rewardsCount
+                + " rewards... Ok now each user has got his reward!");
+
         for (User user : allUsers) {
             assertThat(user.getUserRewards().size() > 0).isTrue();
         }
-        executorService.shutdown();
         stopWatch.stop();
 
-        System.out.println("highVolumeGetRewards: Time Elapsed: "
+        System.out.println("highVolumeGetRewards - Time Elapsed: "
                 + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime())
-                + " seconds.");
+                + " seconds for " + allUsers.size());
         assertThat(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS
                 .toSeconds(stopWatch.getTime())).isTrue();
-        System.out.println(allUsers.size());
-        allUsers.forEach(u -> totalRewards += u.getUserRewards().size());
-        System.out.println(totalRewards);
-
     }
 
 }
